@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Criar Cápsula do Tempo</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root { --natal-red: #c41e3a; --natal-green: #165b33; --natal-gold: #ffd700; --midnight: #0a0e14; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(180deg, #0a0e14 0%, #1a2e1a 50%, #2a1a1a 100%); min-height: 100vh; color: white; overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Pacifico', cursive; }
+
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .snowflake { position: absolute; top: -20px; color: rgba(255,255,255,0.8); animation: snowfall linear infinite; }
+        @keyframes snowfall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(360deg); } }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+        .tela { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.5s ease; }
+        .tela.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* TELA BOAS VINDAS */
+        .tela-boas { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+        .icone-presente { font-size: 5rem; animation: bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .titulo-evento { font-size: 2.2rem; color: var(--natal-gold); margin: 24px 0 12px; text-shadow: 0 0 30px rgba(255,215,0,0.5); }
+        .subtitulo { color: rgba(255,255,255,0.8); margin-bottom: 8px; }
+        .data-abertura { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 12px 24px; border-radius: 12px; margin: 20px 0 40px; font-weight: 600; }
+        .btn-iniciar { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; }
+        .btn-iniciar:hover { transform: translateY(-3px) scale(1.02); }
+
+        /* TELA CADASTRO */
+        .tela-cadastro { padding: 20px 0; }
+        .header-tela { text-align: center; margin-bottom: 32px; }
+        .header-tela h2 { font-size: 1.8rem; color: var(--natal-gold); }
+        .header-tela p { color: rgba(255,255,255,0.7); margin-top: 8px; }
+        .passo { font-size: 0.85rem; color: var(--natal-gold); margin-bottom: 8px; }
+
+        .foto-section { text-align: center; margin-bottom: 32px; }
+        .foto-container { width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 16px; position: relative; cursor: pointer; overflow: hidden; border: 4px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.05); transition: all 0.3s; }
+        .foto-container:hover { border-color: var(--natal-gold); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+        .foto-container.has-photo { border-color: var(--natal-gold); }
+        .foto-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--natal-gold); }
+        .foto-placeholder span { font-size: 3rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .foto-placeholder p { font-size: 0.8rem; margin-top: 8px; }
+        .foto-preview { width: 100%; height: 100%; object-fit: cover; }
+        .foto-input { display: none; }
+        .foto-label { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255,255,255,0.9); }
+        .form-group input { width: 100%; padding: 16px 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .form-group input:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
+        .form-group input::placeholder { color: rgba(255,255,255,0.4); }
+
+        .btn-continuar { width: 100%; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 20px; transition: all 0.3s; }
+        .btn-continuar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.4); }
+        .btn-continuar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* TELA DESEJOS */
+        .tela-desejos { padding: 20px 0; }
+        .desejos-contador { text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255,215,0,0.1); border-radius: 12px; color: var(--natal-gold); font-weight: 600; }
+
+        .categoria { margin-bottom: 24px; }
+        .categoria-titulo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 1.1rem; color: var(--natal-gold); font-weight: 600; }
+        .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag { padding: 10px 18px; border-radius: 20px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
+        .tag:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.1); }
+        .tag.selected { background: rgba(255,215,0,0.2); border-color: var(--natal-gold); color: var(--natal-gold); font-weight: 600; transform: scale(1.05); }
+
+        /* TELA MENSAGEM */
+        .tela-mensagem { padding: 20px 0; }
+        .desejos-selecionados { background: rgba(255,215,0,0.1); border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+        .desejos-selecionados h4 { color: var(--natal-gold); margin-bottom: 12px; font-size: 0.9rem; }
+        .mini-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .mini-tag { background: var(--natal-gold); color: var(--midnight); padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+
+        .textarea-group { margin-bottom: 20px; }
+        .textarea-group label { display: block; margin-bottom: 10px; font-weight: 500; }
+        .textarea-group textarea { width: 100%; height: 200px; padding: 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; resize: none; transition: all 0.3s; }
+        .textarea-group textarea:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
+        .textarea-group textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .char-counter { text-align: right; font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 8px; }
+        .char-counter.warning { color: var(--natal-gold); }
+        .char-counter.limit { color: var(--natal-red); }
+
+        .btn-lacrar { width: 100%; background: linear-gradient(135deg, var(--natal-red), #a01830); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(196,30,58,0.4); transition: all 0.3s; }
+        .btn-lacrar:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(196,30,58,0.5); }
+        .btn-lacrar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* TELA SUCESSO */
+        .tela-sucesso { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+        .sucesso-foto { width: 140px; height: 140px; border-radius: 50%; overflow: hidden; margin: 0 auto 24px; border: 4px solid var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); animation: successPop 0.6s ease-out; }
+        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .sucesso-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .sucesso-foto-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4rem; }
+        .sucesso-titulo { font-size: 2rem; color: var(--natal-gold); margin-bottom: 12px; }
+        .sucesso-msg { color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6; }
+        .sucesso-data { background: rgba(255,215,0,0.15); padding: 16px 24px; border-radius: 16px; margin-bottom: 24px; }
+        .sucesso-data .label { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .sucesso-data .value { font-size: 1.3rem; font-weight: 700; color: var(--natal-gold); margin-top: 4px; }
+        .sucesso-data .dias { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+        .link-box { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; width: 100%; }
+        .link-box label { font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px; }
+        .link-box input { width: 100%; background: transparent; border: none; color: var(--natal-gold); font-family: monospace; font-size: 0.85rem; text-align: center; }
+
+        .sucesso-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .btn-sucesso { padding: 14px 24px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; border: none; }
+        .btn-copiar { background: var(--natal-gold); color: var(--midnight); }
+        .btn-compartilhar { background: var(--natal-green); color: white; }
+        .btn-ver { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; }
+
+        /* LOADING */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+        .loading-capsula { width: 120px; height: 150px; position: relative; animation: shake 0.5s ease-in-out infinite; }
+        @keyframes shake { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        .capsula-corpo { position: absolute; width: 100%; height: 100%; background: linear-gradient(180deg, #ffd700 0%, #b8860b 50%, #8b6914 100%); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; box-shadow: 0 0 60px rgba(255,215,0,0.5); }
+        .loading-texto { margin-top: 30px; font-size: 1.2rem; color: var(--natal-gold); animation: pulse 1s infinite; }
+
+        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+        .confete { position: absolute; animation: confeteFall 3s ease-out forwards; }
+        @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 2000; opacity: 0; transition: all 0.4s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--natal-red); }
+
+        .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+        .erro-icon { font-size: 5rem; margin-bottom: 24px; }
+        .erro-titulo { font-size: 1.8rem; color: var(--natal-red); margin-bottom: 12px; }
+        .erro-msg { color: rgba(255,255,255,0.7); }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="confetes" id="confetes"></div>
+
+    <div class="container">
+        <!-- TELA BOAS VINDAS -->
+        <div class="tela tela-boas active" id="telaBoas">
+            <div class="icone-presente">🎁</div>
+            <h1 class="titulo-evento" id="nomeEvento">Carregando...</h1>
+            <p class="subtitulo">Crie sua cápsula do tempo!</p>
+            <div class="data-abertura">📅 Abre em: <strong id="dataEvento">--/--/----</strong></div>
+            <button class="btn-iniciar" onclick="irParaCadastro()">🎁 CRIAR MINHA CÁPSULA</button>
+        </div>
+
+        <!-- TELA CADASTRO -->
+        <div class="tela tela-cadastro" id="telaCadastro">
+            <div class="header-tela">
+                <p class="passo">Passo 1 de 3</p>
+                <h2>📸 Sua Identificação</h2>
+                <p>Tire uma foto e preencha seu nome</p>
+            </div>
+
+            <div class="foto-section">
+                <div class="foto-container" id="fotoContainer" onclick="document.getElementById('fotoInput').click()">
+                    <div class="foto-placeholder" id="fotoPlaceholder">
+                        <span>📷</span>
+                        <p>Toque para foto</p>
+                    </div>
+                    <img class="foto-preview" id="fotoPreview" style="display:none">
+                </div>
+                <input type="file" class="foto-input" id="fotoInput" accept="image/*" capture="user" onchange="processarFoto(event)">
+                <p class="foto-label">Esta foto será seu avatar na cerimônia!</p>
+            </div>
+
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" placeholder="Seu primeiro nome" maxlength="30">
+            </div>
+
+            <div class="form-group">
+                <label for="sobrenome">Sobrenome</label>
+                <input type="text" id="sobrenome" placeholder="Seu sobrenome" maxlength="30">
+            </div>
+
+            <button class="btn-continuar" onclick="irParaDesejos()">Continuar →</button>
+        </div>
+
+        <!-- TELA DESEJOS -->
+        <div class="tela tela-desejos" id="telaDesejos">
+            <div class="header-tela">
+                <p class="passo">Passo 2 de 3</p>
+                <h2>✨ Seus Desejos</h2>
+                <p>Selecione o que deseja para o próximo ano</p>
+            </div>
+
+            <div class="desejos-contador">Selecionados: <span id="contadorDesejos">0</span> / 10</div>
+
+            <div class="categoria">
+                <div class="categoria-titulo">❤️ Vida Pessoal</div>
+                <div class="tags-grid">
+                    <button class="tag" onclick="toggleTag(this)">Saúde</button>
+                    <button class="tag" onclick="toggleTag(this)">Família</button>
+                    <button class="tag" onclick="toggleTag(this)">Romance</button>
+                    <button class="tag" onclick="toggleTag(this)">Amizades</button>
+                    <button class="tag" onclick="toggleTag(this)">Paz</button>
+                    <button class="tag" onclick="toggleTag(this)">Felicidade</button>
+                </div>
+            </div>
+
+            <div class="categoria">
+                <div class="categoria-titulo">🎯 Conquistas</div>
+                <div class="tags-grid">
+                    <button class="tag" onclick="toggleTag(this)">Viagens</button>
+                    <button class="tag" onclick="toggleTag(this)">Carreira</button>
+                    <button class="tag" onclick="toggleTag(this)">Estudos</button>
+                    <button class="tag" onclick="toggleTag(this)">Promoção</button>
+                    <button class="tag" onclick="toggleTag(this)">Negócio</button>
+                    <button class="tag" onclick="toggleTag(this)">Casa própria</button>
+                </div>
+            </div>
+
+            <div class="categoria">
+                <div class="categoria-titulo">💰 Financeiro</div>
+                <div class="tags-grid">
+                    <button class="tag" onclick="toggleTag(this)">Economizar</button>
+                    <button class="tag" onclick="toggleTag(this)">Investir</button>
+                    <button class="tag" onclick="toggleTag(this)">Quitar dívidas</button>
+                    <button class="tag" onclick="toggleTag(this)">Carro</button>
+                    <button class="tag" onclick="toggleTag(this)">Renda extra</button>
+                </div>
+            </div>
+
+            <div class="categoria">
+                <div class="categoria-titulo">🌈 Bem-estar</div>
+                <div class="tags-grid">
+                    <button class="tag" onclick="toggleTag(this)">Exercícios</button>
+                    <button class="tag" onclick="toggleTag(this)">Meditação</button>
+                    <button class="tag" onclick="toggleTag(this)">Terapia</button>
+                    <button class="tag" onclick="toggleTag(this)">Hobby novo</button>
+                    <button class="tag" onclick="toggleTag(this)">Menos stress</button>
+                    <button class="tag" onclick="toggleTag(this)">Ler mais</button>
+                    <button class="tag" onclick="toggleTag(this)">Dormir melhor</button>
+                </div>
+            </div>
+
+            <button class="btn-continuar" onclick="irParaMensagem()">Continuar →</button>
+        </div>
+
+        <!-- TELA MENSAGEM -->
+        <div class="tela tela-mensagem" id="telaMensagem">
+            <div class="header-tela">
+                <p class="passo">Passo 3 de 3</p>
+                <h2>💌 Sua Mensagem</h2>
+                <p>Escreva para o seu eu do futuro</p>
+            </div>
+
+            <div class="desejos-selecionados">
+                <h4>🎯 Seus desejos selecionados:</h4>
+                <div class="mini-tags" id="miniTags"></div>
+            </div>
+
+            <div class="textarea-group">
+                <label>Mensagem para você do futuro:</label>
+                <textarea id="mensagem" placeholder="Querido eu do futuro...
+
+O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial para si mesmo..." maxlength="3000" oninput="atualizarContador()"></textarea>
+                <div class="char-counter" id="charCounter">0 / 3000</div>
+            </div>
+
+            <button class="btn-lacrar" id="btnLacrar" onclick="lacrarCapsula()">🔒 LACRAR MINHA CÁPSULA</button>
+        </div>
+
+        <!-- TELA SUCESSO -->
+        <div class="tela tela-sucesso" id="telaSucesso">
+            <div class="sucesso-foto" id="sucessoFoto">
+                <div class="sucesso-foto-placeholder">👤</div>
+            </div>
+            <h2 class="sucesso-titulo">🎉 Cápsula Lacrada!</h2>
+            <p class="sucesso-msg" id="sucessoMsg">Sua mensagem está segura até a data de abertura.</p>
+            
+            <div class="sucesso-data">
+                <div class="label">📅 Data de abertura:</div>
+                <div class="value" id="sucessoData">--/--/----</div>
+                <div class="dias" id="sucessoDias">-- dias restantes</div>
+            </div>
+
+            <div class="link-box">
+                <label>🔗 Seu link único (guarde bem!):</label>
+                <input type="text" id="linkCapsula" readonly>
+            </div>
+
+            <div class="sucesso-actions">
+                <button class="btn-sucesso btn-copiar" onclick="copiarLink()">📋 Copiar Link</button>
+                <button class="btn-sucesso btn-compartilhar" onclick="compartilhar()">📤 Compartilhar</button>
+                <button class="btn-sucesso btn-ver" onclick="verCapsula()">👁️ Ver Cápsula</button>
+            </div>
+        </div>
+
+        <!-- TELA ERRO -->
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 class="erro-titulo">Evento não encontrado</h2>
+            <p class="erro-msg">Verifique se o link está correto ou peça um novo ao organizador.</p>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loading-capsula"><div class="capsula-corpo"></div></div>
+        <p class="loading-texto">Lacrando sua cápsula...</p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        let eventoId = null, eventoData = null, fotoBase64 = null, desejosSelecionados = [], capsulaId = null;
+
+        const mostrarToast = (m, t='success') => { const toast = document.getElementById('toast'); toast.textContent = m; toast.className = 'toast show' + (t==='error'?' error':''); setTimeout(() => toast.className = 'toast', 3000); };
+        const formatarData = d => new Date(d).toLocaleDateString('pt-BR');
+        const gerarID = p => `${p}_${Date.now()}_${Math.random().toString(36).substr(2,9)}`;
+
+        function criarParticulas() {
+            const c = document.getElementById('particles');
+            ['❄','❅','❆','✧'].forEach(f => { for(let i=0;i<5;i++) { const el = document.createElement('div'); el.className = 'snowflake'; el.textContent = f; el.style.cssText = `left:${Math.random()*100}vw;animation-duration:${8+Math.random()*5}s;animation-delay:${Math.random()*10}s;font-size:${0.5+Math.random()*0.8}rem`; c.appendChild(el); } });
+            for(let i=0;i<30;i++) { const s = document.createElement('div'); s.className = 'star'; s.style.cssText = `left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${1+Math.random()*2}px;height:${s.style.width};animation-duration:${2+Math.random()*3}s`; c.appendChild(s); }
+        }
+
+        function criarConfetes() {
+            const c = document.getElementById('confetes'); c.innerHTML = '';
+            const cores = ['#c41e3a','#165b33','#ffd700','#fff','#ff6b6b','#4ecdc4'];
+            for(let i=0;i<100;i++) { const cf = document.createElement('div'); cf.className = 'confete'; cf.style.cssText = `left:${Math.random()*100}vw;background:${cores[Math.floor(Math.random()*cores.length)]};animation-delay:${Math.random()*2}s;width:${5+Math.random()*10}px;height:${cf.style.width};border-radius:${Math.random()>0.5?'50%':'0'}`; c.appendChild(cf); }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            criarParticulas();
+            const params = new URLSearchParams(window.location.search);
+            eventoId = params.get('evento');
+            if (!eventoId) { mostrarTela('telaErro'); return; }
+
+            try {
+                const snap = await database.ref(`eventos/${eventoId}`).once('value');
+                eventoData = snap.val();
+                if (!eventoData || eventoData.arquivado) { mostrarTela('telaErro'); return; }
+                document.getElementById('nomeEvento').textContent = eventoData.nome;
+                document.getElementById('dataEvento').textContent = formatarData(eventoData.dataAbertura);
+                mostrarTela('telaBoas');
+            } catch { mostrarTela('telaErro'); }
+        });
+
+        function mostrarTela(id) { document.querySelectorAll('.tela').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+        function irParaCadastro() { mostrarTela('telaCadastro'); }
+
+        function processarFoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const max = 800;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > max) { h *= max/w; w = max; } }
+                    else { if (h > max) { w *= max/h; h = max; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    document.getElementById('fotoPreview').src = fotoBase64;
+                    document.getElementById('fotoPreview').style.display = 'block';
+                    document.getElementById('fotoPlaceholder').style.display = 'none';
+                    document.getElementById('fotoContainer').classList.add('has-photo');
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function irParaDesejos() {
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            if (!nome || !sobrenome) { mostrarToast('Preencha nome e sobrenome', 'error'); return; }
+            mostrarTela('telaDesejos');
+        }
+
+        function toggleTag(el) {
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                desejosSelecionados = desejosSelecionados.filter(d => d !== el.textContent);
+            } else {
+                if (desejosSelecionados.length >= 10) { mostrarToast('Máximo 10 desejos!', 'error'); return; }
+                el.classList.add('selected');
+                desejosSelecionados.push(el.textContent);
+            }
+            document.getElementById('contadorDesejos').textContent = desejosSelecionados.length;
+        }
+
+        function irParaMensagem() {
+            if (desejosSelecionados.length === 0) { mostrarToast('Selecione pelo menos 1 desejo', 'error'); return; }
+            document.getElementById('miniTags').innerHTML = desejosSelecionados.map(d => `<span class="mini-tag">${d}</span>`).join('');
+            mostrarTela('telaMensagem');
+        }
+
+        function atualizarContador() {
+            const len = document.getElementById('mensagem').value.length;
+            const counter = document.getElementById('charCounter');
+            counter.textContent = `${len} / 3000`;
+            counter.className = 'char-counter' + (len > 2700 ? ' warning' : '') + (len >= 3000 ? ' limit' : '');
+        }
+
+        async function lacrarCapsula() {
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            const mensagem = document.getElementById('mensagem').value.trim();
+
+            if (!mensagem) { mostrarToast('Escreva uma mensagem', 'error'); return; }
+
+            const btn = document.getElementById('btnLacrar');
+            btn.disabled = true;
+            document.getElementById('loading').classList.add('active');
+
+            try {
+                capsulaId = gerarID('cap');
+                let fotoUrl = null;
+
+                if (fotoBase64) {
+                    const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
+                    const response = await fetch(fotoBase64);
+                    const blob = await response.blob();
+                    await fotoRef.put(blob);
+                    fotoUrl = await fotoRef.getDownloadURL();
+                }
+
+                await database.ref(`capsulas/${capsulaId}`).set({
+                    eventoId,
+                    nome,
+                    sobrenome,
+                    foto: fotoUrl,
+                    desejos: desejosSelecionados,
+                    mensagemPessoal: mensagem,
+                    dataCriacao: new Date().toISOString(),
+                    dataAbertura: eventoData.dataAbertura,
+                    liberada: false,
+                    aberta: false
+                });
+
+                document.getElementById('loading').classList.remove('active');
+                mostrarSucesso(fotoUrl, nome, sobrenome);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading').classList.remove('active');
+                mostrarToast('Erro ao salvar. Tente novamente.', 'error');
+                btn.disabled = false;
+            }
+        }
+
+        function mostrarSucesso(fotoUrl, nome, sobrenome) {
+            const sucessoFoto = document.getElementById('sucessoFoto');
+            if (fotoUrl) {
+                sucessoFoto.innerHTML = `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover">`;
+            }
+
+            document.getElementById('sucessoMsg').textContent = `${nome}, sua cápsula está segura até a cerimônia de abertura!`;
+            document.getElementById('sucessoData').textContent = formatarData(eventoData.dataAbertura);
+            
+            const dias = Math.ceil((new Date(eventoData.dataAbertura) - new Date()) / (1000*60*60*24));
+            document.getElementById('sucessoDias').textContent = `${dias} dias restantes`;
+
+            const base = window.location.origin + window.location.pathname.replace('jogador.html','');
+            const link = `${base}capsula.html?id=${capsulaId}`;
+            document.getElementById('linkCapsula').value = link;
+
+            mostrarTela('telaSucesso');
+            criarConfetes();
+        }
+
+        async function copiarLink() {
+            const link = document.getElementById('linkCapsula').value;
+            try {
+                await navigator.clipboard.writeText(link);
+                mostrarToast('✓ Link copiado!');
+            } catch {
+                const i = document.createElement('input'); i.value = link;
+                document.body.appendChild(i); i.select(); document.execCommand('copy');
+                document.body.removeChild(i);
+                mostrarToast('✓ Link copiado!');
+            }
+        }
+
+        function compartilhar() {
+            const link = document.getElementById('linkCapsula').value;
+            if (navigator.share) {
+                navigator.share({ title: '🎁 Minha Cápsula do Tempo', text: 'Criei uma cápsula do tempo! Veja quando abrir:', url: link });
+            } else {
+                copiarLink();
+            }
+        }
+
+        function verCapsula() {
+            window.location.href = document.getElementById('linkCapsula').value;
+        }
+    </script>
+</body>
+</html>

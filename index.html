@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Cápsula do Tempo - Painel do Guardião</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        :root { --natal-red: #c41e3a; --natal-green: #165b33; --natal-gold: #ffd700; --midnight: #0a0e14; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(180deg, #0a0e14 0%, #1a2e1a 50%, #2a1a1a 100%); min-height: 100vh; color: white; overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Pacifico', cursive; }
+
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .snowflake { position: absolute; top: -20px; color: rgba(255,255,255,0.8); animation: snowfall linear infinite; }
+        @keyframes snowfall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(360deg); } }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        header { position: sticky; top: 0; background: rgba(10,14,20,0.95); backdrop-filter: blur(20px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 2px solid rgba(255,215,0,0.3); }
+        .logo { display: flex; align-items: center; gap: 16px; }
+        .logo h1 { font-size: 1.8rem; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-sub { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+        .btn-header { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
+        .btn-header:hover { background: rgba(255,255,255,0.2); }
+
+        .tabs { display: flex; justify-content: center; gap: 8px; padding: 20px; background: rgba(0,0,0,0.3); position: relative; z-index: 1; }
+        .tab-btn { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 8px; }
+        .tab-btn.active { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border-color: var(--natal-gold); }
+        .tab-badge { background: var(--natal-red); color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; }
+        .tab-btn.active .tab-badge { background: var(--midnight); color: var(--natal-gold); }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px 40px; position: relative; z-index: 1; }
+        .tab-panel { display: none; animation: fadeIn 0.4s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-criar { background: rgba(255,255,255,0.05); border-radius: 24px; padding: 32px; margin-bottom: 32px; border: 1px solid rgba(255,215,0,0.2); }
+        .section-title { font-size: 1.6rem; margin-bottom: 24px; color: var(--natal-gold); display: flex; align-items: center; gap: 12px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: end; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+        .form-group input { padding: 14px 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-family: 'Poppins', sans-serif; }
+        .form-group input:focus { outline: none; border-color: var(--natal-gold); }
+        .btn-primary { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 14px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 4px 15px rgba(255,215,0,0.3); transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,215,0,0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .eventos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 24px; }
+        .evento-card { background: rgba(255,255,255,0.08); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.4s; }
+        .evento-card:hover { transform: translateY(-5px); border-color: var(--natal-gold); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .evento-card.arquivado { opacity: 0.6; }
+        .evento-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .evento-nome { font-size: 1.4rem; color: var(--natal-gold); }
+        .evento-status { padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .status-ativo { background: rgba(22,91,51,0.3); color: #4ade80; }
+        .status-arquivado { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
+        .qr-container { background: white; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 16px; cursor: pointer; transition: transform 0.3s; }
+        .qr-container:hover { transform: scale(1.05); }
+        .evento-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+        .stat-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--natal-gold); }
+        .stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+        .link-container { display: flex; gap: 8px; margin: 12px 0; }
+        .link-input { flex: 1; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; font-size: 0.8rem; font-family: monospace; }
+        .btn-sm { padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .btn-copy { background: var(--natal-green); color: white; }
+        .btn-copy:hover { background: #0f4025; }
+        .evento-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        .btn-action { flex: 1; min-width: 100px; padding: 10px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.3s; }
+        .btn-fechar { background: rgba(196,30,58,0.2); border: 2px solid var(--natal-red); color: var(--natal-red); }
+        .btn-fechar:hover { background: var(--natal-red); color: white; }
+        .btn-cerimonia { background: rgba(255,215,0,0.2); border: 2px solid var(--natal-gold); color: var(--natal-gold); }
+        .btn-cerimonia:hover { background: var(--natal-gold); color: var(--midnight); }
+        .btn-lista { background: rgba(22,91,51,0.2); border: 2px solid var(--natal-green); color: #4ade80; }
+        .btn-lista:hover { background: var(--natal-green); color: white; }
+
+        .participantes-live { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-top: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .participantes-title { font-size: 1rem; color: var(--natal-gold); margin-bottom: 16px; }
+        .participantes-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .participante-mini { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 20px; animation: slideIn 0.5s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .participante-foto { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 2px solid var(--natal-gold); }
+        .participante-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .participante-nome { font-size: 0.85rem; }
+
+        /* NOTIFICAÇÃO NOVA CÁPSULA */
+        .notif-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s; }
+        .notif-overlay.active { opacity: 1; visibility: visible; }
+        .notif-foto { width: 200px; height: 200px; border-radius: 50%; overflow: hidden; border: 6px solid var(--natal-gold); margin-bottom: 24px; animation: notifZoom 0.8s ease-out; box-shadow: 0 0 100px rgba(255,215,0,0.6); }
+        @keyframes notifZoom { 0% { transform: scale(0) rotate(-180deg); } 50% { transform: scale(1.2) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+        .notif-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .notif-nome { font-family: 'Pacifico', cursive; font-size: 3rem; color: var(--natal-gold); margin-bottom: 12px; text-shadow: 0 0 40px rgba(255,215,0,0.8); animation: notifSlide 0.6s ease-out 0.3s both; }
+        @keyframes notifSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .notif-msg { font-size: 1.5rem; color: white; animation: notifSlide 0.6s ease-out 0.5s both; }
+        .notif-desejos { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 24px; max-width: 600px; animation: notifSlide 0.6s ease-out 0.7s both; }
+        .notif-desejo { background: rgba(255,215,0,0.2); color: var(--natal-gold); padding: 10px 20px; border-radius: 20px; font-size: 1.1rem; }
+
+        /* CERIMÔNIA FECHAMENTO */
+        .cerimonia-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #1a1a2e, #0a0e14); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s; overflow: hidden; }
+        .cerimonia-overlay.active { opacity: 1; visibility: visible; }
+        .cerimonia-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 10; }
+        .cerimonia-titulo { font-family: 'Pacifico', cursive; font-size: 3rem; color: var(--natal-gold); margin-bottom: 40px; text-shadow: 0 0 50px rgba(255,215,0,0.5); animation: glow 2s ease-in-out infinite; z-index: 5; }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 50px rgba(255,215,0,0.5); } 50% { text-shadow: 0 0 100px rgba(255,215,0,0.8); } }
+        .avatares-circulo { position: relative; width: 500px; height: 500px; }
+        .avatar-circulo { position: absolute; width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid var(--natal-gold); box-shadow: 0 0 30px rgba(255,215,0,0.4); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.1); } }
+        .avatar-circulo img { width: 100%; height: 100%; object-fit: cover; }
+        .nuvem-palavras { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+        .palavra-nuvem { position: absolute; font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--natal-gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); animation: palavraFloat 4s ease-in-out infinite; }
+        @keyframes palavraFloat { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-15px); opacity: 1; } }
+        .cerimonia-contador { margin-top: 40px; text-align: center; z-index: 5; }
+        .contador-valor { font-family: 'Orbitron', sans-serif; font-size: 5rem; font-weight: 900; color: var(--natal-gold); }
+        .contador-label { color: rgba(255,255,255,0.7); }
+
+        /* CERIMÔNIA ABERTURA - ESTILO MARIO PARTY */
+        .abertura-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #1a1a2e, #0a0e14); z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.5s; overflow: hidden; }
+        .abertura-overlay.active { opacity: 1; visibility: visible; }
+        .abertura-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .abertura-titulo { font-family: 'Pacifico', cursive; font-size: 4rem; color: var(--natal-gold); text-shadow: 0 0 60px rgba(255,215,0,0.8); animation: titlePop 1s ease-out; z-index: 10; }
+        @keyframes titlePop { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .avatares-voando { position: absolute; width: 100%; height: 100%; }
+        .avatar-voador { position: absolute; width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid var(--natal-gold); box-shadow: 0 0 50px rgba(255,215,0,0.5); }
+        .avatar-voador img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-voador.anim1 { animation: voar1 8s ease-in-out infinite; }
+        .avatar-voador.anim2 { animation: voar2 9s ease-in-out infinite; }
+        .avatar-voador.anim3 { animation: voar3 7s ease-in-out infinite; }
+        .avatar-voador.anim4 { animation: voar4 10s ease-in-out infinite; }
+        @keyframes voar1 { 0%,100%{transform:translate(0,0) rotate(0) scale(1)} 25%{transform:translate(100px,-80px) rotate(15deg) scale(1.2)} 50%{transform:translate(50px,60px) rotate(-10deg) scale(0.9)} 75%{transform:translate(-80px,-40px) rotate(5deg) scale(1.1)} }
+        @keyframes voar2 { 0%,100%{transform:translate(0,0) rotate(0) scale(1)} 25%{transform:translate(-120px,60px) rotate(-20deg) scale(1.15)} 50%{transform:translate(80px,-50px) rotate(10deg) scale(0.95)} 75%{transform:translate(-40px,80px) rotate(-5deg) scale(1.05)} }
+        @keyframes voar3 { 0%,100%{transform:translate(0,0) rotate(0) scale(1)} 25%{transform:translate(60px,100px) rotate(10deg) scale(1.1)} 50%{transform:translate(-100px,-30px) rotate(-15deg) scale(0.85)} 75%{transform:translate(90px,-70px) rotate(8deg) scale(1.2)} }
+        @keyframes voar4 { 0%,100%{transform:translate(0,0) rotate(0) scale(1)} 25%{transform:translate(-80px,-90px) rotate(-12deg) scale(1.05)} 50%{transform:translate(120px,40px) rotate(18deg) scale(0.9)} 75%{transform:translate(-60px,60px) rotate(-8deg) scale(1.15)} }
+        .palavras-voando { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .palavra-voando { position: absolute; font-family: 'Poppins', sans-serif; font-weight: 800; color: rgba(255,215,0,0.7); animation: palavraVoar 12s linear infinite; text-shadow: 0 0 30px rgba(255,215,0,0.5); }
+        @keyframes palavraVoar { 0%{transform:translateY(100vh) rotate(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(-100vh) rotate(360deg);opacity:0} }
+        .stats-finais { background: rgba(0,0,0,0.6); padding: 40px 60px; border-radius: 24px; margin-top: 40px; text-align: center; z-index: 10; animation: statsUp 1s ease-out 0.5s both; backdrop-filter: blur(10px); }
+        @keyframes statsUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .stats-finais h3 { color: rgba(255,255,255,0.7); margin-bottom: 24px; font-family: 'Pacifico', cursive; }
+        .stats-grid { display: flex; gap: 50px; justify-content: center; }
+        .stat-final-valor { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--natal-gold); }
+        .stat-final-label { color: rgba(255,255,255,0.6); }
+
+        /* TAB CERIMÔNIA */
+        .cerimonia-header { text-align: center; margin-bottom: 40px; }
+        .cerimonia-title { font-size: 3rem; color: var(--natal-gold); text-shadow: 0 0 30px rgba(255,215,0,0.5); }
+        .cerimonia-stats { display: flex; justify-content: center; gap: 40px; margin: 30px 0; flex-wrap: wrap; }
+        .cerimonia-stat-value { font-size: 3rem; font-weight: 700; color: var(--natal-gold); font-family: 'Orbitron', sans-serif; }
+        .cerimonia-stat-label { color: rgba(255,255,255,0.6); }
+        .avatares-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+        .avatar-card { width: 180px; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; border: 2px solid rgba(255,255,255,0.1); transition: all 0.4s; }
+        .avatar-card.aguardando { filter: grayscale(0.3); }
+        .avatar-card.liberada { border-color: var(--natal-gold); animation: cardPulse 2s infinite; }
+        @keyframes cardPulse { 0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); } 50% { box-shadow: 0 0 50px rgba(255,215,0,0.6); } }
+        .avatar-card.aberta { border-color: var(--natal-green); background: rgba(22,91,51,0.2); }
+        .avatar-foto { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 12px; overflow: hidden; border: 3px solid rgba(255,255,255,0.3); }
+        .avatar-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+        .avatar-nome { font-weight: 600; margin-bottom: 4px; }
+        .avatar-status { font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; display: inline-block; margin-bottom: 8px; }
+        .avatar-status.aguardando { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+        .avatar-status.liberada { background: rgba(255,215,0,0.2); color: var(--natal-gold); }
+        .avatar-status.aberta { background: rgba(22,91,51,0.3); color: #4ade80; }
+        .avatar-desejos { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 8px 0; }
+        .avatar-desejo-tag { background: rgba(255,215,0,0.15); color: var(--natal-gold); font-size: 0.65rem; padding: 2px 6px; border-radius: 8px; }
+        .avatar-btn { margin-top: 10px; padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; width: 100%; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .avatar-btn.liberar { background: var(--natal-gold); color: var(--midnight); }
+        .avatar-btn.ver { background: var(--natal-green); color: white; }
+
+        /* MODAIS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: linear-gradient(180deg, #1a2e1a, #0f1922); border-radius: 24px; padding: 32px; max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto; border: 1px solid rgba(255,215,0,0.3); transform: scale(0.9); transition: all 0.3s; }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .modal-title { font-size: 1.5rem; color: var(--natal-gold); }
+        .btn-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+        .btn-close:hover { background: var(--natal-red); }
+        .lista-participantes { display: flex; flex-direction: column; gap: 12px; }
+        .lista-item { display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .lista-item-foto { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 2px solid var(--natal-gold); flex-shrink: 0; }
+        .lista-item-foto img { width: 100%; height: 100%; object-fit: cover; }
+        .lista-item-info { flex: 1; }
+        .lista-item-nome { font-weight: 600; }
+        .lista-item-status { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .busca-input { width: 100%; padding: 14px 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; font-family: 'Poppins', sans-serif; margin-bottom: 20px; }
+        .busca-input:focus { outline: none; border-color: var(--natal-gold); }
+        .senha-modal .modal { max-width: 400px; text-align: center; }
+        .senha-input { width: 100%; padding: 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.1); color: white; text-align: center; font-size: 1.2rem; font-family: 'Poppins', sans-serif; margin: 20px 0; }
+        .senha-input:focus { outline: none; border-color: var(--natal-gold); }
+        .qr-modal .modal { max-width: 420px; text-align: center; }
+        .qr-ampliado { background: white; padding: 20px; border-radius: 16px; display: inline-block; margin: 20px 0; }
+
+        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3000; }
+        .confete { position: absolute; animation: confeteFall 3s ease-out forwards; }
+        @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
+
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 16px 28px; border-radius: 12px; font-weight: 500; z-index: 4000; opacity: 0; transition: all 0.4s; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--natal-red); }
+
+        .empty-state { text-align: center; padding: 60px; background: rgba(255,255,255,0.03); border-radius: 24px; border: 2px dashed rgba(255,255,255,0.2); }
+        .empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.5; }
+        .empty-text { color: rgba(255,255,255,0.6); }
+        .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 40px; color: rgba(255,255,255,0.6); }
+        .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--natal-gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1024px) { .container { padding: 20px; } .form-grid { grid-template-columns: 1fr; } .eventos-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { header { padding: 12px 16px; flex-direction: column; gap: 12px; } .logo h1 { font-size: 1.4rem; } .tabs { flex-wrap: wrap; } .cerimonia-title { font-size: 2rem; } .avatar-card { width: 140px; } .avatares-circulo { width: 300px; height: 300px; } .cerimonia-titulo, .abertura-titulo { font-size: 2rem; } .stats-grid { flex-direction: column; gap: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="confetes" id="confetes"></div>
+
+    <!-- NOTIFICAÇÃO -->
+    <div class="notif-overlay" id="notifOverlay">
+        <div class="notif-foto" id="notifFoto"><img src="" alt=""></div>
+        <h2 class="notif-nome" id="notifNome">Nome</h2>
+        <p class="notif-msg" id="notifMsg">✨ Lacrou sua cápsula! ✨</p>
+        <div class="notif-desejos" id="notifDesejos"></div>
+    </div>
+
+    <!-- CERIMÔNIA FECHAMENTO -->
+    <div class="cerimonia-overlay" id="cerimoniaFechamento">
+        <button class="cerimonia-close" onclick="fecharCerimoniaFechamento()">&times;</button>
+        <h1 class="cerimonia-titulo" id="fechamentoTitulo">🔒 Lacrando Cápsulas...</h1>
+        <div class="avatares-circulo" id="avataresFechamento"></div>
+        <div class="nuvem-palavras" id="nuvemFechamento"></div>
+        <div class="cerimonia-contador">
+            <div class="contador-valor" id="contadorFechamento">0</div>
+            <div class="contador-label">cápsulas lacradas</div>
+        </div>
+    </div>
+
+    <!-- CERIMÔNIA ABERTURA -->
+    <div class="abertura-overlay" id="cerimoniaAbertura">
+        <button class="cerimonia-close" onclick="fecharCerimoniaAbertura()">&times;</button>
+        <div class="abertura-container">
+            <div class="avatares-voando" id="avataresVoando"></div>
+            <div class="palavras-voando" id="palavrasVoando"></div>
+            <h1 class="abertura-titulo">🎉 Hora de Abrir!</h1>
+            <div class="stats-finais">
+                <h3>✨ Resumo do Evento ✨</h3>
+                <div class="stats-grid">
+                    <div><div class="stat-final-valor" id="statCapsulas">0</div><div class="stat-final-label">Cápsulas</div></div>
+                    <div><div class="stat-final-valor" id="statDesejos">0</div><div class="stat-final-label">Desejos</div></div>
+                    <div><div class="stat-final-valor" id="statChars">0</div><div class="stat-final-label">Caracteres</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <span style="font-size:1.6rem">🎄</span>
+            <div><h1>Cápsula do Tempo</h1><p class="logo-sub">Painel do Guardião</p></div>
+            <span style="font-size:1.6rem">🎊</span>
+        </div>
+        <button class="btn-header" onclick="abrirBusca()">🔍 Recuperar Link</button>
+    </header>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="eventos" onclick="trocarTab('eventos')">📦 Eventos</button>
+        <button class="tab-btn" data-tab="cerimonia" onclick="trocarTab('cerimonia')">🎉 Cerimônia <span class="tab-badge" id="badgeCaps">0</span></button>
+    </div>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <div class="tab-panel active" id="panelEventos">
+            <section class="section-criar">
+                <h2 class="section-title">➕ Criar Novo Evento</h2>
+                <form class="form-grid" onsubmit="criarEvento(event)">
+                    <div class="form-group"><label>Nome do Evento</label><input type="text" id="nomeEvento" placeholder='ex: "Natal 2024"' required></div>
+                    <div class="form-group"><label>Data de Abertura</label><input type="date" id="dataAbertura" required></div>
+                    <button type="submit" class="btn-primary" id="btnCriar">🎁 CRIAR</button>
+                </form>
+            </section>
+            <div id="eventosContainer"><div class="loading"><div class="spinner"></div><span>Carregando...</span></div></div>
+        </div>
+        <div class="tab-panel" id="panelCerimonia">
+            <div id="cerimoniaContainer"><div class="empty-state"><div class="empty-icon">🎭</div><p class="empty-text">Selecione um evento para gerenciar</p></div></div>
+        </div>
+    </div>
+
+    <!-- MODAIS -->
+    <div class="modal-overlay" id="modalBusca">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">🔍 Recuperar Link</h3><button class="btn-close" onclick="fecharModal('modalBusca')">&times;</button></div>
+            <input type="text" class="busca-input" id="buscaInput" placeholder="Digite nome ou sobrenome..." oninput="buscarCapsulas()">
+            <div class="lista-participantes" id="buscaResultados"><p style="text-align:center;color:rgba(255,255,255,0.5)">Digite para buscar</p></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalLista">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">📋 Participantes</h3><button class="btn-close" onclick="fecharModal('modalLista')">&times;</button></div>
+            <div class="lista-participantes" id="listaParticipantes"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay qr-modal" id="modalQR">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title" id="qrTitulo">QR Code</h3><button class="btn-close" onclick="fecharModal('modalQR')">&times;</button></div>
+            <div class="qr-ampliado" id="qrAmpliado"></div>
+            <p style="color:rgba(255,255,255,0.6)">📱 Escaneie para participar</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay senha-modal" id="modalSenha">
+        <div class="modal">
+            <div class="modal-header"><h3 class="modal-title">🔐 Senha do Guardião</h3><button class="btn-close" onclick="fecharModal('modalSenha')">&times;</button></div>
+            <p style="color:rgba(255,255,255,0.7)">Digite a senha para liberar:</p>
+            <input type="password" class="senha-input" id="senhaInput" placeholder="••••••••" onkeypress="if(event.key==='Enter')verificarSenha()">
+            <button class="btn-primary" onclick="verificarSenha()" style="width:100%">🔓 LIBERAR</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const SENHA = 'otacilia';
+        let eventosData = {}, capsulasData = {}, capsulasAnteriores = {}, eventoCerimoniaId = null, capsulaLiberar = null;
+
+        const gerarID = p => `${p}_${Date.now()}_${Math.random().toString(36).substr(2,9)}`;
+        const formatarData = d => new Date(d).toLocaleDateString('pt-BR');
+        const mostrarToast = (m, t='success') => { const toast = document.getElementById('toast'); toast.textContent = m; toast.className = 'toast show' + (t==='error'?' error':''); setTimeout(() => toast.className = 'toast', 3000); };
+        const copiarLink = async link => { try { await navigator.clipboard.writeText(link); mostrarToast('✓ Copiado!'); } catch { const i = document.createElement('input'); i.value = link; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); mostrarToast('✓ Copiado!'); } };
+
+        function criarParticulas() {
+            const c = document.getElementById('particles');
+            ['❄','❅','❆','✧'].forEach((f,_) => { for(let i=0;i<8;i++) { const el = document.createElement('div'); el.className = 'snowflake'; el.textContent = f; el.style.cssText = `left:${Math.random()*100}vw;animation-duration:${8+Math.random()*5}s;animation-delay:${Math.random()*10}s;font-size:${0.5+Math.random()*0.8}rem`; c.appendChild(el); } });
+            for(let i=0;i<50;i++) { const s = document.createElement('div'); s.className = 'star'; s.style.cssText = `left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${1+Math.random()*3}px;height:${s.style.width};animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*5}s`; c.appendChild(s); }
+        }
+
+        function criarConfetes() {
+            const c = document.getElementById('confetes'); c.innerHTML = '';
+            const cores = ['#c41e3a','#165b33','#ffd700','#fff','#ff6b6b','#4ecdc4','#ff69b4'];
+            for(let i=0;i<150;i++) { const cf = document.createElement('div'); cf.className = 'confete'; cf.style.cssText = `left:${Math.random()*100}vw;background:${cores[Math.floor(Math.random()*cores.length)]};animation-delay:${Math.random()*2}s;width:${5+Math.random()*10}px;height:${cf.style.width};border-radius:${Math.random()>0.5?'50%':'0'}`; c.appendChild(cf); }
+        }
+
+        const trocarTab = tab => { document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab)); document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id===`panel${tab.charAt(0).toUpperCase()+tab.slice(1)}`)); };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            criarParticulas();
+            const d = new Date(); d.setFullYear(d.getFullYear()+1);
+            document.getElementById('dataAbertura').value = d.toISOString().split('T')[0];
+            database.ref('eventos').on('value', snap => { eventosData = snap.val() || {}; renderEventos(); });
+            database.ref('capsulas').on('value', snap => {
+                const novas = snap.val() || {};
+                Object.entries(novas).forEach(([id, cap]) => {
+                    if (!capsulasAnteriores[id] && cap.nome) mostrarNotif(cap, 'lacrou');
+                    else if (capsulasAnteriores[id] && !capsulasAnteriores[id].aberta && cap.aberta) mostrarNotif(cap, 'abriu');
+                });
+                capsulasAnteriores = JSON.parse(JSON.stringify(novas));
+                capsulasData = novas;
+                document.getElementById('badgeCaps').textContent = Object.keys(capsulasData).length;
+                renderEventos();
+                if (eventoCerimoniaId) renderCerimonia(eventoCerimoniaId);
+            });
+        });
+
+        function mostrarNotif(cap, tipo) {
+            const o = document.getElementById('notifOverlay');
+            document.getElementById('notifFoto').innerHTML = cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:4rem">👤</div>';
+            document.getElementById('notifNome').textContent = `${cap.nome} ${cap.sobrenome}`;
+            document.getElementById('notifMsg').textContent = tipo === 'lacrou' ? '✨ Lacrou sua cápsula! ✨' : '✨ Abriu sua cápsula! ✨';
+            const desejos = document.getElementById('notifDesejos'); desejos.innerHTML = '';
+            (cap.desejos||[]).forEach(d => { const t = document.createElement('span'); t.className = 'notif-desejo'; t.textContent = d; desejos.appendChild(t); });
+            o.classList.add('active'); criarConfetes();
+            setTimeout(() => o.classList.remove('active'), 6000);
+        }
+
+        function renderEventos() {
+            const c = document.getElementById('eventosContainer');
+            const arr = Object.entries(eventosData).sort((a,b) => new Date(b[1].dataCriacao) - new Date(a[1].dataCriacao));
+            if (!arr.length) { c.innerHTML = '<div class="empty-state"><div class="empty-icon">🎁</div><p class="empty-text">Nenhum evento criado ainda</p></div>'; return; }
+            c.innerHTML = '<div class="eventos-grid" id="eventosGrid"></div>';
+            arr.forEach(([id, ev]) => document.getElementById('eventosGrid').appendChild(criarCard(id, ev)));
+        }
+
+        function criarCard(id, evento) {
+            const card = document.createElement('div');
+            card.className = `evento-card ${evento.arquivado?'arquivado':''}`;
+            const base = window.location.origin + window.location.pathname.replace('index.html','');
+            const link = `${base}jogador.html?evento=${id}`;
+            const caps = Object.values(capsulasData).filter(c => c.eventoId === id);
+            const total = caps.length, abertas = caps.filter(c => c.aberta).length, liberadas = caps.filter(c => c.liberada).length;
+
+            card.innerHTML = `
+                <div class="evento-header"><h3 class="evento-nome">${evento.nome}</h3><span class="evento-status ${evento.arquivado?'status-arquivado':'status-ativo'}">${evento.arquivado?'📁 Arquivado':'✅ Ativo'}</span></div>
+                ${!evento.arquivado?`<div class="qr-container" onclick="ampliarQR('${id}','${evento.nome}')"><div id="qr-${id}"></div></div>`:''}
+                <div class="evento-stats"><div class="stat-item"><div class="stat-value">${total}</div><div class="stat-label">Cápsulas</div></div><div class="stat-item"><div class="stat-value">${liberadas}</div><div class="stat-label">Liberadas</div></div><div class="stat-item"><div class="stat-value">${abertas}</div><div class="stat-label">Abertas</div></div></div>
+                <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-bottom:12px">📅 Abre: <strong style="color:var(--natal-gold)">${formatarData(evento.dataAbertura)}</strong></div>
+                ${!evento.arquivado?`<div class="link-container"><input type="text" class="link-input" value="${link}" readonly><button class="btn-sm btn-copy" onclick="copiarLink('${link}')">📋</button></div>`:''}
+                ${total?`<div class="participantes-live"><h4 class="participantes-title">👥 Participantes (${total})</h4><div class="participantes-grid" id="part-${id}"></div></div>`:''}
+                <div class="evento-actions">
+                    ${!evento.arquivado?`<button class="btn-action btn-lista" onclick="verLista('${id}')">📋</button><button class="btn-action btn-cerimonia" onclick="gerenciar('${id}')">🎉 Gerenciar</button><button class="btn-action btn-fechar" onclick="fecharEvento('${id}')">🔒 Lacrar</button>`:`<button class="btn-action btn-cerimonia" onclick="iniciarAbertura('${id}')">🎊 Abrir!</button>`}
+                </div>`;
+
+            if (!evento.arquivado) setTimeout(() => { const qr = document.getElementById(`qr-${id}`); if(qr&&!qr.hasChildNodes()) new QRCode(qr, {text:link,width:140,height:140,colorDark:"#165b33",correctLevel:QRCode.CorrectLevel.H}); }, 100);
+            setTimeout(() => { const pg = document.getElementById(`part-${id}`); if(pg) pg.innerHTML = caps.slice(0,8).map(c => `<div class="participante-mini"><div class="participante-foto">${c.foto?`<img src="${c.foto}">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:1rem">👤</div>'}</div><span class="participante-nome">${c.nome}</span></div>`).join('') + (caps.length>8?`<span style="color:rgba(255,255,255,0.5);padding:8px">+${caps.length-8}</span>`:''); }, 150);
+            return card;
+        }
+
+        async function criarEvento(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnCriar'), nome = document.getElementById('nomeEvento').value.trim(), data = document.getElementById('dataAbertura').value;
+            if (!nome||!data) return mostrarToast('Preencha tudo', 'error');
+            btn.disabled = true; btn.textContent = '⏳';
+            try {
+                await database.ref(`eventos/${gerarID('evt')}`).set({nome, dataCriacao: new Date().toISOString(), dataAbertura: new Date(data+'T12:00:00').toISOString(), arquivado: false});
+                mostrarToast('🎉 Evento criado!');
+                document.getElementById('nomeEvento').value = '';
+            } catch { mostrarToast('Erro', 'error'); }
+            btn.disabled = false; btn.textContent = '🎁 CRIAR';
+        }
+
+        async function fecharEvento(eventoId) {
+            const caps = Object.entries(capsulasData).filter(([,c]) => c.eventoId === eventoId);
+            if (!caps.length) return mostrarToast('Nenhuma cápsula para lacrar', 'error');
+            if (!confirm(`Lacrar ${caps.length} cápsulas? Isso iniciará a cerimônia de fechamento!`)) return;
+
+            const o = document.getElementById('cerimoniaFechamento'), av = document.getElementById('avataresFechamento'), nv = document.getElementById('nuvemFechamento'), ct = document.getElementById('contadorFechamento');
+            av.innerHTML = ''; nv.innerHTML = '';
+            
+            caps.forEach(([,cap], i) => {
+                const angle = (i/caps.length)*2*Math.PI - Math.PI/2, r = 180;
+                const el = document.createElement('div'); el.className = 'avatar-circulo';
+                el.style.cssText = `left:${250+r*Math.cos(angle)-40}px;top:${250+r*Math.sin(angle)-40}px;animation-delay:${i*0.2}s`;
+                el.innerHTML = cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2rem">👤</div>';
+                av.appendChild(el);
+            });
+
+            const desejos = caps.flatMap(([,c]) => c.desejos||[]), contagem = {};
+            desejos.forEach(d => contagem[d] = (contagem[d]||0)+1);
+            Object.entries(contagem).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([d,c], i) => {
+                const p = document.createElement('div'); p.className = 'palavra-nuvem'; p.textContent = d;
+                p.style.cssText = `font-size:${1+c*0.3}rem;left:${15+Math.random()*70}%;top:${15+Math.random()*70}%;animation-delay:${i*0.4}s`;
+                nv.appendChild(p);
+            });
+
+            o.classList.add('active'); criarConfetes();
+            let count = 0;
+            const interval = setInterval(() => { ct.textContent = ++count; if(count>=caps.length) clearInterval(interval); }, 150);
+            setTimeout(async () => { await database.ref(`eventos/${eventoId}/arquivado`).set(true); mostrarToast('✅ Evento lacrado!'); }, caps.length*150+2000);
+        }
+
+        const fecharCerimoniaFechamento = () => document.getElementById('cerimoniaFechamento').classList.remove('active');
+
+        function iniciarAbertura(eventoId) {
+            const caps = Object.entries(capsulasData).filter(([,c]) => c.eventoId === eventoId).map(([id,c]) => ({id,...c}));
+            if (!caps.length) return;
+
+            const o = document.getElementById('cerimoniaAbertura'), av = document.getElementById('avataresVoando'), pv = document.getElementById('palavrasVoando');
+            av.innerHTML = ''; pv.innerHTML = '';
+
+            const anims = ['anim1','anim2','anim3','anim4'];
+            caps.forEach((cap, i) => {
+                const el = document.createElement('div'); 
+                el.className = `avatar-voador ${anims[i%4]}`;
+                el.style.cssText = `left:${5+Math.random()*75}%;top:${5+Math.random()*75}%;animation-delay:${i*0.3}s`;
+                el.innerHTML = cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:3rem">👤</div>';
+                av.appendChild(el);
+            });
+
+            const desejos = caps.flatMap(c => c.desejos||[]), contagem = {};
+            desejos.forEach(d => contagem[d] = (contagem[d]||0)+1);
+            Object.entries(contagem).sort((a,b)=>b[1]-a[1]).slice(0,15).forEach(([d,c], i) => {
+                const p = document.createElement('div'); p.className = 'palavra-voando'; p.textContent = d;
+                p.style.cssText = `font-size:${1.5+c*0.4}rem;left:${5+Math.random()*90}%;animation-delay:${i*1.2}s`;
+                pv.appendChild(p);
+            });
+
+            document.getElementById('statCapsulas').textContent = caps.length;
+            document.getElementById('statDesejos').textContent = desejos.length;
+            document.getElementById('statChars').textContent = caps.reduce((s,c) => s+(c.mensagemPessoal?.length||0), 0).toLocaleString();
+
+            o.classList.add('active'); criarConfetes();
+            setTimeout(() => { gerenciar(eventoId); }, 20000);
+        }
+
+        const fecharCerimoniaAbertura = () => document.getElementById('cerimoniaAbertura').classList.remove('active');
+
+        function gerenciar(eventoId) {
+            document.getElementById('cerimoniaAbertura').classList.remove('active');
+            eventoCerimoniaId = eventoId; trocarTab('cerimonia'); renderCerimonia(eventoId);
+        }
+
+        function renderCerimonia(eventoId) {
+            const c = document.getElementById('cerimoniaContainer'), ev = eventosData[eventoId];
+            if (!ev) { c.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p class="empty-text">Evento não encontrado</p></div>'; return; }
+            const caps = Object.entries(capsulasData).filter(([,cp]) => cp.eventoId === eventoId).map(([id,cp]) => ({id,...cp}));
+            const total = caps.length, liberadas = caps.filter(cp => cp.liberada).length, abertas = caps.filter(cp => cp.aberta).length;
+
+            c.innerHTML = `
+                <div class="cerimonia-header"><h1 class="cerimonia-title">🎉 ${ev.nome}</h1></div>
+                <div class="cerimonia-stats"><div><div class="cerimonia-stat-value">${total}</div><div class="cerimonia-stat-label">Total</div></div><div><div class="cerimonia-stat-value">${liberadas}</div><div class="cerimonia-stat-label">Liberadas</div></div><div><div class="cerimonia-stat-value">${abertas}</div><div class="cerimonia-stat-label">Abertas</div></div></div>
+                <div style="text-align:center;margin-bottom:20px"><button class="btn-primary" onclick="liberarTodas('${eventoId}')" style="margin-right:10px">🔓 Liberar Todas</button>${ev.arquivado?`<button class="btn-primary" onclick="iniciarAbertura('${eventoId}')" style="background:var(--natal-red)">🎊 Animação</button>`:''}</div>
+                <div class="avatares-grid" id="avataresGrid"></div>`;
+
+            const grid = document.getElementById('avataresGrid');
+            if (!caps.length) { grid.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;width:100%">Nenhuma cápsula ainda</p>'; return; }
+
+            caps.forEach(cap => {
+                const status = cap.aberta ? 'aberta' : (cap.liberada ? 'liberada' : 'aguardando');
+                const label = cap.aberta ? '✅ Aberta' : (cap.liberada ? '🔓 Liberada' : '🔒 Aguardando');
+                const card = document.createElement('div'); card.className = `avatar-card ${status}`;
+                card.innerHTML = `
+                    <div class="avatar-foto">${cap.foto?`<img src="${cap.foto}">`:'<div class="avatar-placeholder">👤</div>'}</div>
+                    <div class="avatar-nome">${cap.nome} ${cap.sobrenome}</div>
+                    <div class="avatar-status ${status}">${label}</div>
+                    ${cap.desejos?.length?`<div class="avatar-desejos">${cap.desejos.slice(0,3).map(d=>`<span class="avatar-desejo-tag">${d}</span>`).join('')}</div>`:''}
+                    ${cap.aberta?`<button class="avatar-btn ver" onclick="verCapsula('${cap.id}')">👁️ Ver</button>`:`<button class="avatar-btn liberar" onclick="solicitarSenha('${cap.id}')">${cap.liberada?'✨ Já liberada':'🔓 Liberar'}</button>`}`;
+                grid.appendChild(card);
+            });
+        }
+
+        async function liberarTodas(eventoId) {
+            const senha = prompt('Senha do guardião:');
+            if (senha?.toLowerCase() !== SENHA) return mostrarToast('Senha incorreta', 'error');
+            const caps = Object.entries(capsulasData).filter(([,c]) => c.eventoId === eventoId && !c.liberada);
+            for (const [id] of caps) await database.ref(`capsulas/${id}/liberada`).set(true);
+            mostrarToast(`🔓 ${caps.length} cápsulas liberadas!`); criarConfetes();
+        }
+
+        function solicitarSenha(id) { capsulaLiberar = id; document.getElementById('senhaInput').value = ''; document.getElementById('modalSenha').classList.add('active'); document.getElementById('senhaInput').focus(); }
+
+        async function verificarSenha() {
+            if (document.getElementById('senhaInput').value.toLowerCase() === SENHA) {
+                await database.ref(`capsulas/${capsulaLiberar}/liberada`).set(true);
+                fecharModal('modalSenha'); mostrarToast('🔓 Cápsula liberada!'); criarConfetes();
+            } else mostrarToast('Senha incorreta', 'error');
+        }
+
+        function verCapsula(id) { window.open(`${window.location.origin}${window.location.pathname.replace('index.html','')}capsula.html?id=${id}&guardiao=true`, '_blank'); }
+
+        function verLista(eventoId) {
+            const caps = Object.entries(capsulasData).filter(([,c]) => c.eventoId === eventoId).map(([id,c]) => ({id,...c}));
+            const c = document.getElementById('listaParticipantes'), base = window.location.origin + window.location.pathname.replace('index.html','');
+            if (!caps.length) c.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Nenhum participante ainda</p>';
+            else c.innerHTML = caps.map(cap => `<div class="lista-item"><div class="lista-item-foto">${cap.foto?`<img src="${cap.foto}">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center">👤</div>'}</div><div class="lista-item-info"><div class="lista-item-nome">${cap.nome} ${cap.sobrenome}</div><div class="lista-item-status">${cap.aberta?'✅ Aberta':(cap.liberada?'🔓 Liberada':'🔒 Lacrada')}</div></div><button class="btn-sm btn-copy" onclick="copiarLink('${base}capsula.html?id=${cap.id}')">📋</button></div>`).join('');
+            document.getElementById('modalLista').classList.add('active');
+        }
+
+        function abrirBusca() { document.getElementById('buscaInput').value = ''; document.getElementById('buscaResultados').innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Digite para buscar</p>'; document.getElementById('modalBusca').classList.add('active'); document.getElementById('buscaInput').focus(); }
+
+        function buscarCapsulas() {
+            const termo = document.getElementById('buscaInput').value.toLowerCase().trim(), c = document.getElementById('buscaResultados');
+            if (termo.length < 2) { c.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Mínimo 2 caracteres</p>'; return; }
+            const res = Object.entries(capsulasData).filter(([,cp]) => `${cp.nome} ${cp.sobrenome}`.toLowerCase().includes(termo)).map(([id,cp]) => ({id,...cp}));
+            if (!res.length) { c.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Nenhum resultado</p>'; return; }
+            const base = window.location.origin + window.location.pathname.replace('index.html','');
+            c.innerHTML = res.map(cap => `<div class="lista-item"><div class="lista-item-foto">${cap.foto?`<img src="${cap.foto}">`:'<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center">👤</div>'}</div><div class="lista-item-info"><div class="lista-item-nome">${cap.nome} ${cap.sobrenome}</div><div class="lista-item-status">📦 ${eventosData[cap.eventoId]?.nome||'Evento'}</div></div><button class="btn-sm btn-copy" onclick="copiarLink('${base}capsula.html?id=${cap.id}')">📋 Copiar</button></div>`).join('');
+        }
+
+        function ampliarQR(id, nome) {
+            document.getElementById('qrTitulo').textContent = nome;
+            const c = document.getElementById('qrAmpliado'); c.innerHTML = '';
+            new QRCode(c, {text:`${window.location.origin}${window.location.pathname.replace('index.html','')}jogador.html?evento=${id}`,width:280,height:280,colorDark:"#165b33",correctLevel:QRCode.CorrectLevel.H});
+            document.getElementById('modalQR').classList.add('active');
+        }
+
+        const fecharModal = id => document.getElementById(id).classList.remove('active');
+        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); }));
+        document.addEventListener('keydown', e => { if(e.key==='Escape') { document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); fecharCerimoniaFechamento(); fecharCerimoniaAbertura(); } });
+    </script>
+</body>
+</html>
