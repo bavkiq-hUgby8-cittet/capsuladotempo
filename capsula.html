@@ -22,7 +22,7 @@
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle ease-in-out infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+        .container { max-width: 520px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
         .tela { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.5s ease; }
         .tela.active { display: flex; }
@@ -30,84 +30,139 @@
 
         /* TELA LACRADA */
         .tela-lacrada { align-items: center; text-align: center; padding: 30px 20px; }
-        .foto-lacrada { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--natal-gold); overflow: hidden; margin-bottom: 16px; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+        .foto-lacrada { width: 160px; height: 160px; border-radius: 50%; border: 5px solid var(--natal-gold); overflow: hidden; margin-bottom: 20px; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4.5rem; box-shadow: 0 0 50px rgba(255,215,0,0.4); }
         .foto-lacrada img { width: 100%; height: 100%; object-fit: cover; }
-        .nome-lacrada { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 4px; }
-        .evento-lacrada { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 24px; }
+        .nome-lacrada { font-size: 2rem; color: var(--natal-gold); margin-bottom: 6px; }
+        .evento-lacrada { color: rgba(255,255,255,0.7); font-size: 1rem; margin-bottom: 28px; }
 
         .capsula-3d { position: relative; width: 180px; height: 220px; margin: 20px auto; }
         .capsula-corpo { position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #ffd700 0%, #ffaa00 50%, #cc8800 100%); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -20px -20px 40px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4); animation: float 4s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .capsula-tampa { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 120px; height: 50px; background: linear-gradient(135deg, #ffcc00, #ff9900); border-radius: 50% 50% 0 0; }
-        .capsula-lacre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; z-index: 2; }
+        .capsula-lacre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; z-index: 2; }
         .capsula-brilho { position: absolute; top: 20%; left: 20%; width: 30px; height: 30px; background: rgba(255,255,255,0.6); border-radius: 50%; filter: blur(5px); }
 
-        .status-badge { padding: 12px 24px; border-radius: 20px; font-weight: 600; margin: 20px 0; }
+        .status-badge { padding: 14px 28px; border-radius: 20px; font-weight: 700; margin: 24px 0; font-size: 1.1rem; }
         .status-lacrada { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
-        .status-liberada { background: rgba(255,215,0,0.2); color: var(--natal-gold); animation: pulse 2s infinite; }
+        .status-liberada { background: rgba(255,215,0,0.2); color: var(--natal-gold); animation: pulse 2s infinite; border: 2px solid var(--natal-gold); }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        .countdown { display: flex; justify-content: center; gap: 12px; margin: 24px 0; }
+        .countdown { display: flex; justify-content: center; gap: 14px; margin: 28px 0; }
         .countdown-item { text-align: center; }
-        .countdown-value { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: var(--natal-gold); background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; min-width: 60px; }
-        .countdown-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .countdown-value { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; color: var(--natal-gold); background: rgba(0,0,0,0.4); padding: 14px 18px; border-radius: 14px; min-width: 65px; border: 2px solid rgba(255,215,0,0.3); }
+        .countdown-label { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 6px; font-weight: 500; }
 
-        .btn-abrir { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; margin-top: 20px; }
+        .btn-abrir { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 20px 52px; border-radius: 16px; font-size: 1.3rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; margin-top: 24px; }
         .btn-abrir:hover { transform: translateY(-3px) scale(1.02); }
         .btn-abrir:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .msg-aguarde { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 16px; }
+        .msg-aguarde { color: rgba(255,255,255,0.6); font-size: 1rem; margin-top: 20px; line-height: 1.5; }
 
         /* TELA ABERTA */
         .tela-aberta { padding: 20px 0; }
-        .header-aberta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .foto-mini { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 3px solid var(--natal-gold); flex-shrink: 0; }
+        .header-aberta { display: flex; align-items: center; gap: 18px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .foto-mini { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 4px solid var(--natal-gold); flex-shrink: 0; }
         .foto-mini img { width: 100%; height: 100%; object-fit: cover; }
-        .info-header h2 { font-size: 1.4rem; color: var(--natal-gold); }
-        .info-header p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .info-header h2 { font-size: 1.5rem; color: var(--natal-gold); }
+        .info-header p { font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
 
-        .secao { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
-        .secao-titulo { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: var(--natal-gold); margin-bottom: 12px; font-weight: 600; }
-        .secao-conteudo { color: rgba(255,255,255,0.9); line-height: 1.6; }
+        .secao { background: rgba(255,255,255,0.06); border-radius: 18px; padding: 22px; margin-bottom: 18px; border: 2px solid rgba(255,255,255,0.1); }
+        .secao-titulo { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; color: var(--natal-gold); margin-bottom: 14px; font-weight: 600; }
+        .secao-conteudo { color: rgba(255,255,255,0.9); line-height: 1.7; font-size: 1.05rem; }
 
-        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag-item { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 6px 14px; border-radius: 15px; font-size: 0.85rem; }
+        .tags-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag-item { background: rgba(255,215,0,0.18); color: var(--natal-gold); padding: 8px 16px; border-radius: 16px; font-size: 0.95rem; font-weight: 500; border: 1px solid rgba(255,215,0,0.3); }
 
-        /* ÁUDIO */
-        .audio-player { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; }
-        .audio-player audio { width: 100%; }
-        .audio-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .audio-icon { font-size: 2rem; }
-        .audio-text { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+        /* ÁUDIO - MELHORADO */
+        .audio-player { background: rgba(0,0,0,0.35); border-radius: 16px; padding: 20px; border: 2px solid rgba(255,215,0,0.2); }
+        .audio-player audio { width: 100%; height: 55px; border-radius: 8px; }
+        .audio-info { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+        .audio-icon { font-size: 2.5rem; }
+        .audio-text { color: rgba(255,255,255,0.8); font-size: 1rem; line-height: 1.4; }
+        .audio-error { background: rgba(196,30,58,0.2); border: 2px solid var(--natal-red); border-radius: 12px; padding: 16px; margin-top: 12px; text-align: center; display: none; }
+        .audio-error p { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
 
         /* PERGUNTAS */
-        .pergunta-item { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 3px solid var(--natal-gold); }
-        .pergunta-label { font-size: 0.8rem; color: var(--natal-gold); margin-bottom: 6px; }
-        .pergunta-resposta { color: white; }
-        .felicidade-display { display: flex; align-items: center; gap: 8px; }
-        .felicidade-nota { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--natal-gold); }
-        .felicidade-barra { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .felicidade-fill { height: 100%; background: var(--natal-gold); border-radius: 4px; }
+        .pergunta-item { background: rgba(0,0,0,0.25); border-radius: 14px; padding: 18px; margin-bottom: 14px; border-left: 4px solid var(--natal-gold); }
+        .pergunta-label { font-size: 0.9rem; color: var(--natal-gold); margin-bottom: 8px; font-weight: 600; }
+        .pergunta-resposta { color: white; font-size: 1.1rem; line-height: 1.5; }
+        .felicidade-display { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+        .felicidade-nota { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--natal-gold); font-weight: 900; }
+        .felicidade-barra { flex: 1; height: 12px; background: rgba(255,255,255,0.15); border-radius: 6px; overflow: hidden; }
+        .felicidade-fill { height: 100%; background: linear-gradient(90deg, var(--natal-gold), #ffaa00); border-radius: 6px; transition: width 1s ease; }
 
         /* MENSAGEM */
-        .mensagem-texto { white-space: pre-wrap; font-size: 1rem; line-height: 1.7; }
-        .mensagem-chars { text-align: right; font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 8px; }
+        .mensagem-texto { white-space: pre-wrap; font-size: 1.1rem; line-height: 1.8; }
+        .mensagem-chars { text-align: right; font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-top: 12px; }
 
         /* REFLEXÃO */
-        .reflexao-form textarea { width: 100%; padding: 14px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; resize: none; min-height: 100px; }
-        .reflexao-form textarea:focus { outline: none; border-color: var(--natal-gold); }
-        .btn-salvar { background: var(--natal-green); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: 'Poppins', sans-serif; }
-        .reflexao-salva { background: rgba(22,91,51,0.2); border-radius: 12px; padding: 16px; border-left: 3px solid var(--natal-green); }
-        .reflexao-salva-titulo { color: var(--natal-green); font-size: 0.85rem; margin-bottom: 8px; }
+        .reflexao-form textarea { 
+            width: 100%; 
+            padding: 18px; 
+            border: 3px solid rgba(255,255,255,0.25); 
+            border-radius: 14px; 
+            background: rgba(255,255,255,0.12); 
+            color: white; 
+            font-size: 1.1rem; 
+            font-family: 'Poppins', sans-serif; 
+            resize: none; 
+            min-height: 130px; 
+            line-height: 1.6;
+        }
+        .reflexao-form textarea:focus { 
+            outline: none; 
+            border-color: var(--natal-gold); 
+            background: rgba(255,255,255,0.15);
+        }
+        .reflexao-form textarea::placeholder {
+            color: rgba(255,255,255,0.45);
+            font-size: 1rem;
+        }
+        .btn-salvar { 
+            background: var(--natal-green); 
+            color: white; 
+            border: none; 
+            padding: 16px 28px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 14px; 
+            font-family: 'Poppins', sans-serif; 
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .btn-salvar:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(22,91,51,0.4); }
+        
+        .reflexao-salva { 
+            background: rgba(22,91,51,0.2); 
+            border-radius: 14px; 
+            padding: 20px; 
+            border-left: 4px solid var(--natal-green); 
+        }
+        .reflexao-salva-titulo { color: var(--natal-green); font-size: 1rem; margin-bottom: 10px; font-weight: 600; }
+        .reflexao-salva-texto { color: white; font-size: 1.05rem; line-height: 1.6; }
 
-        .btn-compartilhar { width: 100%; background: transparent; border: 2px solid var(--natal-gold); color: var(--natal-gold); padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 16px; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .btn-compartilhar { 
+            width: 100%; 
+            background: transparent; 
+            border: 3px solid var(--natal-gold); 
+            color: var(--natal-gold); 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            font-family: 'Poppins', sans-serif; 
+            font-size: 1.1rem;
+            transition: all 0.3s; 
+        }
         .btn-compartilhar:hover { background: var(--natal-gold); color: var(--midnight); }
 
         /* ANIMAÇÃO ABERTURA */
         .abertura-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s; }
         .abertura-overlay.active { opacity: 1; visibility: visible; }
-        .abertura-capsula { font-size: 8rem; }
+        .abertura-capsula { font-size: 9rem; }
         .abertura-capsula.shake { animation: shakeOpen 0.5s ease; }
-        @keyframes shakeOpen { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        @keyframes shakeOpen { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
         .abertura-capsula.explode { animation: explodeOpen 0.8s ease forwards; }
         @keyframes explodeOpen { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); } 100% { transform: scale(3); opacity: 0; } }
         .flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; z-index: 1001; pointer-events: none; }
@@ -120,12 +175,21 @@
         @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
 
         /* TOAST */
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 3000; opacity: 0; transition: all 0.4s; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 16px 28px; border-radius: 14px; font-weight: 600; z-index: 3000; opacity: 0; transition: all 0.4s; font-size: 1.05rem; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
         /* ERRO */
         .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
-        .erro-icon { font-size: 5rem; margin-bottom: 20px; }
+        .erro-icon { font-size: 5rem; margin-bottom: 24px; }
+        .erro-titulo { color: var(--natal-gold); font-size: 1.5rem; margin-bottom: 12px; }
+        .erro-msg { color: rgba(255,255,255,0.7); font-size: 1.1rem; }
+
+        /* RESPONSIVO */
+        @media (max-width: 400px) {
+            .container { padding: 16px; }
+            .countdown-value { font-size: 1.8rem; padding: 12px 14px; min-width: 55px; }
+            .foto-lacrada { width: 140px; height: 140px; }
+        }
     </style>
 </head>
 <body>
@@ -170,7 +234,7 @@
             </div>
             
             <button class="btn-abrir" id="btnAbrir" onclick="iniciarAbertura()" disabled>🎁 ABRIR CÁPSULA</button>
-            <p class="msg-aguarde" id="msgAguarde">Aguardando liberação do guardião...</p>
+            <p class="msg-aguarde" id="msgAguarde">⏳ Aguardando o guardião liberar sua cápsula...</p>
         </div>
 
         <!-- TELA ABERTA -->
@@ -185,7 +249,7 @@
             </div>
             
             <div class="secao" id="secaoDesejos">
-                <div class="secao-titulo">🌟 Desejos para o futuro</div>
+                <div class="secao-titulo">🌟 Prioridades para o ano</div>
                 <div class="tags-container" id="desejosContainer"></div>
             </div>
             
@@ -199,9 +263,14 @@
                 <div class="audio-player">
                     <div class="audio-info">
                         <span class="audio-icon">🎙️</span>
-                        <span class="audio-text">Ouça a mensagem que você gravou</span>
+                        <span class="audio-text">Ouça a mensagem que você gravou para si mesmo</span>
                     </div>
-                    <audio id="audioPlayer" controls></audio>
+                    <audio id="audioPlayer" controls preload="auto">
+                        Seu navegador não suporta áudio.
+                    </audio>
+                    <div class="audio-error" id="audioError">
+                        <p>⚠️ Não foi possível carregar o áudio. Tente em outro navegador.</p>
+                    </div>
                 </div>
             </div>
             
@@ -221,12 +290,16 @@
             <div class="secao" id="secaoReflexao">
                 <div class="secao-titulo">✍️ Sua reflexão agora</div>
                 <div class="reflexao-form" id="reflexaoForm">
-                    <textarea id="reflexaoInput" placeholder="O que você sente ao ler isso? Suas previsões se realizaram? O que mudou?"></textarea>
-                    <button class="btn-salvar" onclick="salvarReflexao()">💾 Salvar reflexão</button>
+                    <textarea id="reflexaoInput" placeholder="O que você sente ao ler isso? 
+
+Suas previsões se realizaram? 
+O que mudou na sua vida?
+O que você aprendeu?"></textarea>
+                    <button class="btn-salvar" onclick="salvarReflexao()">💾 Salvar minha reflexão</button>
                 </div>
                 <div class="reflexao-salva" id="reflexaoSalva" style="display:none">
                     <div class="reflexao-salva-titulo">📝 Sua reflexão:</div>
-                    <div id="reflexaoTexto"></div>
+                    <div class="reflexao-salva-texto" id="reflexaoTexto"></div>
                 </div>
             </div>
             
@@ -236,8 +309,8 @@
         <!-- TELA ERRO -->
         <div class="tela tela-erro" id="telaErro">
             <div class="erro-icon">😕</div>
-            <h2 style="color:var(--natal-gold);margin-bottom:12px">Cápsula não encontrada</h2>
-            <p style="color:rgba(255,255,255,0.6)">Verifique o link e tente novamente</p>
+            <h2 class="erro-titulo">Cápsula não encontrada</h2>
+            <p class="erro-msg">Verifique o link e tente novamente</p>
         </div>
     </div>
 
@@ -426,9 +499,9 @@
             
             if (diff <= 0) {
                 document.getElementById('dias').textContent = '0';
-                document.getElementById('horas').textContent = '0';
-                document.getElementById('minutos').textContent = '0';
-                document.getElementById('segundos').textContent = '0';
+                document.getElementById('horas').textContent = '00';
+                document.getElementById('minutos').textContent = '00';
+                document.getElementById('segundos').textContent = '00';
                 return;
             }
             
@@ -502,7 +575,7 @@
             if (capsulaData.foto) {
                 fotoAberta.innerHTML = `<img src="${capsulaData.foto}">`;
             } else {
-                fotoAberta.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2rem">👤</div>';
+                fotoAberta.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2.5rem">👤</div>';
             }
             
             document.getElementById('nomeAberta').textContent = `${capsulaData.nome} ${capsulaData.sobrenome}`;
@@ -521,10 +594,28 @@
                 document.getElementById('pessoasContainer').innerHTML = capsulaData.pessoas.map(p => `<span class="tag-item">${p}</span>`).join('');
             }
             
-            // Áudio
+            // Áudio - CORRIGIDO
             if (capsulaData.audio) {
                 document.getElementById('secaoAudio').style.display = 'block';
-                document.getElementById('audioPlayer').src = capsulaData.audio;
+                const audioPlayer = document.getElementById('audioPlayer');
+                const audioError = document.getElementById('audioError');
+                
+                // Configurar o player
+                audioPlayer.src = capsulaData.audio;
+                
+                // Listener para erro
+                audioPlayer.onerror = function(e) {
+                    console.error('Erro ao carregar áudio:', e);
+                    audioError.style.display = 'block';
+                };
+                
+                // Listener para sucesso
+                audioPlayer.oncanplay = function() {
+                    audioError.style.display = 'none';
+                };
+                
+                // Tentar carregar
+                audioPlayer.load();
             }
             
             // Perguntas
@@ -539,13 +630,13 @@
                     html += `<div class="pergunta-item"><div class="pergunta-label">✨ Momento marcante daquele ano:</div><div class="pergunta-resposta">${p.momento}</div></div>`;
                 }
                 if (p.palavra) {
-                    html += `<div class="pergunta-item"><div class="pergunta-label">📝 Palavra que definia o momento:</div><div class="pergunta-resposta" style="font-size:1.3rem;color:var(--natal-gold)">${p.palavra}</div></div>`;
+                    html += `<div class="pergunta-item"><div class="pergunta-label">📝 Palavra que definia o momento:</div><div class="pergunta-resposta" style="font-size:1.4rem;color:var(--natal-gold);font-weight:600">"${p.palavra}"</div></div>`;
                 }
                 if (p.felicidade) {
-                    html += `<div class="pergunta-item"><div class="pergunta-label">😊 Felicidade naquela época:</div><div class="felicidade-display"><span class="felicidade-nota">${p.felicidade}</span><div class="felicidade-barra"><div class="felicidade-fill" style="width:${p.felicidade*10}%"></div></div></div></div>`;
+                    html += `<div class="pergunta-item"><div class="pergunta-label">😊 Felicidade naquela época:</div><div class="felicidade-display"><span class="felicidade-nota">${p.felicidade}</span><div class="felicidade-barra"><div class="felicidade-fill" style="width:${p.felicidade*10}%"></div></div><span style="color:rgba(255,255,255,0.5)">/10</span></div></div>`;
                 }
                 if (p.previsao) {
-                    html += `<div class="pergunta-item"><div class="pergunta-label">🔮 Previsão para o futuro:</div><div class="pergunta-resposta">"${p.previsao}"</div></div>`;
+                    html += `<div class="pergunta-item"><div class="pergunta-label">🔮 Previsão que você fez:</div><div class="pergunta-resposta" style="font-style:italic">"${p.previsao}"</div></div>`;
                 }
                 
                 if (html) {
@@ -555,7 +646,7 @@
             }
             
             // Mensagem
-            document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal || '(Sem mensagem)';
+            document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal || '(Sem mensagem escrita)';
             document.getElementById('mensagemChars').textContent = `${(capsulaData.mensagemPessoal || '').length} caracteres`;
             
             // Reflexão

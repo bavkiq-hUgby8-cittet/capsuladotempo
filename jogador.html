@@ -23,7 +23,7 @@
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle ease-in-out infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+        .container { max-width: 520px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
         .tela { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.5s ease; }
         .tela.active { display: flex; }
@@ -31,7 +31,7 @@
 
         /* PROGRESSO */
         .progress-bar { display: flex; gap: 6px; margin-bottom: 24px; padding: 0 10px; }
-        .progress-step { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .progress-step { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.2); transition: all 0.3s; }
         .progress-step.active { background: var(--natal-gold); }
         .progress-step.done { background: var(--natal-green); }
 
@@ -40,140 +40,376 @@
         .icone-presente { font-size: 5rem; animation: bounce 2s ease-in-out infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         .titulo-evento { font-size: 2.2rem; color: var(--natal-gold); margin: 24px 0 12px; text-shadow: 0 0 30px rgba(255,215,0,0.5); }
-        .subtitulo { color: rgba(255,255,255,0.8); margin-bottom: 8px; }
-        .data-abertura { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 12px 24px; border-radius: 12px; margin: 20px 0 40px; font-weight: 600; }
-        .btn-iniciar { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; }
+        .subtitulo { color: rgba(255,255,255,0.8); margin-bottom: 8px; font-size: 1.1rem; }
+        .data-abertura { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 14px 28px; border-radius: 12px; margin: 20px 0 40px; font-weight: 600; font-size: 1.1rem; }
+        .btn-iniciar { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 20px 52px; border-radius: 16px; font-size: 1.3rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; }
         .btn-iniciar:hover { transform: translateY(-3px) scale(1.02); }
 
         /* HEADER TELA */
-        .header-tela { text-align: center; margin-bottom: 24px; }
-        .header-tela h2 { font-size: 1.6rem; color: var(--natal-gold); margin-bottom: 8px; }
-        .header-tela p { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
-        .passo { font-size: 0.8rem; color: var(--natal-gold); margin-bottom: 8px; opacity: 0.8; }
+        .header-tela { text-align: center; margin-bottom: 28px; }
+        .header-tela h2 { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 10px; }
+        .header-tela p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
+        .passo { font-size: 0.9rem; color: var(--natal-gold); margin-bottom: 8px; opacity: 0.9; font-weight: 500; }
 
         /* FOTO */
-        .foto-section { text-align: center; margin-bottom: 24px; }
-        .foto-container { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 12px; position: relative; cursor: pointer; overflow: hidden; border: 4px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.05); transition: all 0.3s; }
-        .foto-container:hover { border-color: var(--natal-gold); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+        .foto-section { text-align: center; margin-bottom: 28px; }
+        .foto-container { width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 16px; position: relative; cursor: pointer; overflow: hidden; border: 5px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.08); transition: all 0.3s; }
+        .foto-container:hover { border-color: var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); }
         .foto-container.has-photo { border-color: var(--natal-gold); }
         .foto-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--natal-gold); }
-        .foto-placeholder span { font-size: 2.5rem; }
-        .foto-placeholder p { font-size: 0.75rem; margin-top: 4px; }
+        .foto-placeholder span { font-size: 3rem; }
+        .foto-placeholder p { font-size: 0.9rem; margin-top: 8px; font-weight: 500; }
         .foto-preview { width: 100%; height: 100%; object-fit: cover; }
         .foto-input { display: none; }
 
-        /* FORM */
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255,255,255,0.9); font-size: 0.95rem; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
-        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.4); }
-        .form-group textarea { resize: none; min-height: 100px; }
-        .char-counter { text-align: right; font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        /* FORM - MELHORADO PARA IDOSOS */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: 600; 
+            color: #ffffff; 
+            font-size: 1.1rem; 
+        }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; 
+            padding: 18px 20px; 
+            border: 3px solid rgba(255,255,255,0.3); 
+            border-radius: 14px; 
+            background: rgba(255,255,255,0.15); 
+            color: #ffffff; 
+            font-size: 1.15rem; 
+            font-family: 'Poppins', sans-serif; 
+            transition: all 0.3s; 
+        }
+        .form-group input:focus, .form-group textarea:focus { 
+            outline: none; 
+            border-color: var(--natal-gold); 
+            background: rgba(255,255,255,0.2); 
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { 
+            color: rgba(255,255,255,0.5); 
+            font-size: 1rem;
+        }
+        .form-group textarea { 
+            resize: none; 
+            min-height: 140px; 
+            line-height: 1.6;
+        }
+        .char-counter { 
+            text-align: right; 
+            font-size: 0.95rem; 
+            color: rgba(255,255,255,0.6); 
+            margin-top: 8px; 
+            font-weight: 500;
+        }
 
         /* BOTÕES */
-        .btn-continuar { width: 100%; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 16px; transition: all 0.3s; }
+        .btn-continuar { 
+            width: 100%; 
+            background: linear-gradient(135deg, var(--natal-gold), #ffaa00); 
+            color: var(--midnight); 
+            border: none; 
+            padding: 18px; 
+            border-radius: 14px; 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            margin-top: 20px; 
+            transition: all 0.3s; 
+        }
         .btn-continuar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.4); }
         .btn-continuar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         
-        .btn-voltar { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 12px; transition: all 0.3s; }
+        .btn-voltar { 
+            background: transparent; 
+            border: 3px solid rgba(255,255,255,0.4); 
+            color: white; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            margin-top: 12px; 
+            transition: all 0.3s; 
+        }
         .btn-voltar:hover { border-color: white; background: rgba(255,255,255,0.1); }
 
-        .btn-lacrar { width: 100%; background: linear-gradient(135deg, var(--natal-red), #a01830); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(196,30,58,0.4); transition: all 0.3s; margin-top: 20px; }
+        .btn-lacrar { 
+            width: 100%; 
+            background: linear-gradient(135deg, var(--natal-red), #a01830); 
+            color: white; 
+            border: none; 
+            padding: 20px; 
+            border-radius: 14px; 
+            font-size: 1.3rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            box-shadow: 0 8px 30px rgba(196,30,58,0.4); 
+            transition: all 0.3s; 
+            margin-top: 24px; 
+        }
         .btn-lacrar:hover { transform: translateY(-2px); }
         .btn-lacrar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* TAGS / SELEÇÃO */
-        .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-        .tag { padding: 10px 18px; border-radius: 20px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
-        .tag:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.1); }
-        .tag.selected { background: rgba(255,215,0,0.2); border-color: var(--natal-gold); color: var(--natal-gold); font-weight: 600; transform: scale(1.05); }
+        .tags-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+        .tag { 
+            padding: 12px 20px; 
+            border-radius: 25px; 
+            background: rgba(255,255,255,0.1); 
+            border: 3px solid rgba(255,255,255,0.25); 
+            color: #ffffff; 
+            font-size: 1.05rem; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-family: 'Poppins', sans-serif; 
+            font-weight: 500;
+        }
+        .tag:hover { border-color: rgba(255,215,0,0.6); background: rgba(255,215,0,0.15); }
+        .tag.selected { 
+            background: rgba(255,215,0,0.25); 
+            border-color: var(--natal-gold); 
+            color: var(--natal-gold); 
+            font-weight: 700; 
+            transform: scale(1.05); 
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
 
-        .categoria { margin-bottom: 20px; }
-        .categoria-titulo { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1rem; color: var(--natal-gold); font-weight: 600; }
+        .categoria { margin-bottom: 24px; }
+        .categoria-titulo { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-bottom: 12px; 
+            font-size: 1.15rem; 
+            color: var(--natal-gold); 
+            font-weight: 600; 
+        }
         
-        .contador-selecao { text-align: center; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px; color: var(--natal-gold); font-weight: 600; margin-bottom: 16px; font-size: 0.9rem; }
+        .contador-selecao { 
+            text-align: center; 
+            padding: 14px; 
+            background: rgba(255,215,0,0.15); 
+            border-radius: 12px; 
+            color: var(--natal-gold); 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+            font-size: 1.1rem; 
+            border: 2px solid rgba(255,215,0,0.3);
+        }
 
         /* PESSOAS */
-        .pessoas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
-        .pessoa-card { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s; }
-        .pessoa-card:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.05); }
-        .pessoa-card.selected { border-color: var(--natal-gold); background: rgba(255,215,0,0.15); }
-        .pessoa-card .emoji { font-size: 2rem; margin-bottom: 8px; }
-        .pessoa-card .nome { font-size: 0.9rem; font-weight: 500; }
+        .pessoas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+        .pessoa-card { 
+            background: rgba(255,255,255,0.08); 
+            border: 3px solid rgba(255,255,255,0.2); 
+            border-radius: 18px; 
+            padding: 20px 16px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .pessoa-card:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.08); }
+        .pessoa-card.selected { 
+            border-color: var(--natal-gold); 
+            background: rgba(255,215,0,0.2); 
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
+        }
+        .pessoa-card .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+        .pessoa-card .nome { font-size: 1.05rem; font-weight: 600; }
 
         /* ÁUDIO */
-        .audio-section { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; text-align: center; border: 2px solid rgba(255,255,255,0.1); }
-        .audio-icon { font-size: 4rem; margin-bottom: 16px; }
-        .audio-title { font-size: 1.1rem; color: var(--natal-gold); margin-bottom: 8px; }
-        .audio-desc { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 20px; }
+        .audio-section { 
+            background: rgba(255,255,255,0.08); 
+            border-radius: 24px; 
+            padding: 28px; 
+            text-align: center; 
+            border: 3px solid rgba(255,255,255,0.15); 
+        }
+        .audio-icon { font-size: 4.5rem; margin-bottom: 16px; }
+        .audio-title { font-size: 1.3rem; color: var(--natal-gold); margin-bottom: 10px; font-weight: 600; }
+        .audio-desc { color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-bottom: 24px; line-height: 1.5; }
         
-        .btn-gravar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--natal-red), #ff4444); border: none; color: white; font-size: 2.5rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 30px rgba(196,30,58,0.4); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+        .btn-gravar { 
+            width: 110px; 
+            height: 110px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, var(--natal-red), #ff4444); 
+            border: none; 
+            color: white; 
+            font-size: 2.8rem; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            box-shadow: 0 8px 30px rgba(196,30,58,0.5); 
+            margin: 0 auto 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
         .btn-gravar:hover { transform: scale(1.1); }
         .btn-gravar.gravando { animation: pulseRecord 1s infinite; background: #ff0000; }
-        @keyframes pulseRecord { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255,0,0,0); } }
+        @keyframes pulseRecord { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(255,0,0,0); } }
         
-        .tempo-gravacao { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--natal-gold); margin-bottom: 16px; }
-        .tempo-limite { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+        .tempo-gravacao { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--natal-gold); margin-bottom: 16px; }
+        .tempo-limite { font-size: 1rem; color: rgba(255,255,255,0.6); font-weight: 500; }
         
-        .audio-preview { margin-top: 20px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 12px; }
-        .audio-preview audio { width: 100%; margin-bottom: 12px; }
-        .audio-actions { display: flex; gap: 10px; }
-        .audio-actions button { flex: 1; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
-        .btn-regravar { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
+        .audio-preview { margin-top: 24px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 16px; }
+        .audio-preview audio { width: 100%; height: 50px; margin-bottom: 16px; }
+        .audio-actions { display: flex; gap: 12px; }
+        .audio-actions button { 
+            flex: 1; 
+            padding: 14px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            transition: all 0.3s; 
+            font-size: 1rem;
+        }
+        .btn-regravar { background: transparent; border: 3px solid rgba(255,255,255,0.4); color: white; }
         .btn-confirmar-audio { background: var(--natal-green); border: none; color: white; }
         
-        .audio-confirmado { display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(22,91,51,0.2); border-radius: 12px; margin-top: 16px; }
-        .audio-confirmado .check { font-size: 1.5rem; }
+        .audio-confirmado { 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            padding: 18px; 
+            background: rgba(22,91,51,0.25); 
+            border-radius: 14px; 
+            margin-top: 20px; 
+            border: 2px solid rgba(22,91,51,0.5);
+        }
+        .audio-confirmado .check { font-size: 2rem; }
         .audio-confirmado .info { flex: 1; text-align: left; }
-        .audio-confirmado .duracao { color: var(--natal-gold); font-size: 0.85rem; }
+        .audio-confirmado .info strong { font-size: 1.1rem; }
+        .audio-confirmado .duracao { color: var(--natal-gold); font-size: 1rem; margin-top: 4px; }
 
-        .btn-pular { background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 0.9rem; cursor: pointer; margin-top: 16px; text-decoration: underline; }
+        .btn-pular { 
+            background: transparent; 
+            border: none; 
+            color: rgba(255,255,255,0.6); 
+            font-size: 1rem; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            text-decoration: underline; 
+            font-weight: 500;
+        }
 
-        /* PERGUNTAS */
-        .pergunta-box { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; border-left: 4px solid var(--natal-gold); }
-        .pergunta-box label { display: block; margin-bottom: 12px; font-weight: 500; color: var(--natal-gold); }
-        .pergunta-box input, .pergunta-box textarea { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        /* PERGUNTAS - MELHORADO */
+        .pergunta-box { 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 18px; 
+            padding: 22px; 
+            margin-bottom: 20px; 
+            border-left: 5px solid var(--natal-gold); 
+        }
+        .pergunta-box label { 
+            display: block; 
+            margin-bottom: 14px; 
+            font-weight: 600; 
+            color: var(--natal-gold); 
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+        .pergunta-box input, .pergunta-box textarea { 
+            background: rgba(0,0,0,0.3); 
+            border: 3px solid rgba(255,255,255,0.25); 
+            color: #ffffff;
+            font-size: 1.15rem;
+            padding: 16px 18px;
+        }
+        .pergunta-box input:focus, .pergunta-box textarea:focus {
+            border-color: var(--natal-gold);
+            background: rgba(0,0,0,0.4);
+        }
+        .pergunta-box input::placeholder, .pergunta-box textarea::placeholder {
+            color: rgba(255,255,255,0.45);
+            font-size: 1rem;
+        }
         
-        .escala-felicidade { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
-        .escala-num { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-        .escala-num:hover { border-color: var(--natal-gold); }
-        .escala-num.selected { background: var(--natal-gold); color: var(--midnight); border-color: var(--natal-gold); }
+        .escala-felicidade { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+        .escala-num { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.15); 
+            border: 3px solid rgba(255,255,255,0.3); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-size: 1.2rem;
+            transition: all 0.3s; 
+        }
+        .escala-num:hover { border-color: var(--natal-gold); background: rgba(255,215,0,0.2); }
+        .escala-num.selected { 
+            background: var(--natal-gold); 
+            color: var(--midnight); 
+            border-color: var(--natal-gold); 
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255,215,0,0.5);
+        }
 
         /* RESUMO */
-        .resumo-section { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-        .resumo-section h4 { color: var(--natal-gold); margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
-        .resumo-item { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; }
-        .mini-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .mini-tag { background: var(--natal-gold); color: var(--midnight); padding: 4px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        .resumo-section { 
+            background: rgba(255,255,255,0.08); 
+            border-radius: 18px; 
+            padding: 22px; 
+            margin-bottom: 20px; 
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        .resumo-section h4 { 
+            color: var(--natal-gold); 
+            margin-bottom: 14px; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .resumo-item { color: rgba(255,255,255,0.9); font-size: 1rem; margin-bottom: 10px; }
+        .mini-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .mini-tag { 
+            background: var(--natal-gold); 
+            color: var(--midnight); 
+            padding: 6px 12px; 
+            border-radius: 12px; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+        }
 
         /* LOADING */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .loading-overlay.active { opacity: 1; visibility: visible; }
-        .loading-capsula { font-size: 5rem; animation: shake 0.5s infinite; }
+        .loading-capsula { font-size: 6rem; animation: shake 0.5s infinite; }
         @keyframes shake { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-        .loading-text { margin-top: 20px; font-size: 1.2rem; color: var(--natal-gold); animation: pulse 1.5s infinite; }
+        .loading-text { margin-top: 24px; font-size: 1.4rem; color: var(--natal-gold); animation: pulse 1.5s infinite; }
 
         /* SUCESSO */
         .tela-sucesso { align-items: center; justify-content: center; text-align: center; padding: 30px 20px; }
-        .sucesso-foto { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--natal-gold); overflow: hidden; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 3rem; animation: successPop 0.6s ease; }
+        .sucesso-foto { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 24px; border: 5px solid var(--natal-gold); overflow: hidden; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; animation: successPop 0.6s ease; }
         @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        .sucesso-titulo { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 12px; }
-        .sucesso-msg { color: rgba(255,255,255,0.8); margin-bottom: 20px; }
-        .sucesso-data { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 12px 20px; border-radius: 12px; margin-bottom: 8px; font-weight: 600; }
-        .sucesso-dias { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 24px; }
-        .link-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px; }
-        .link-box input { width: 100%; background: transparent; border: none; color: white; font-size: 0.8rem; text-align: center; font-family: monospace; }
-        .sucesso-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .sucesso-btns button { padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .sucesso-titulo { font-size: 2rem; color: var(--natal-gold); margin-bottom: 14px; }
+        .sucesso-msg { color: rgba(255,255,255,0.85); margin-bottom: 24px; font-size: 1.1rem; line-height: 1.5; }
+        .sucesso-data { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 14px 24px; border-radius: 12px; margin-bottom: 10px; font-weight: 700; font-size: 1.1rem; }
+        .sucesso-dias { color: rgba(255,255,255,0.6); font-size: 1rem; margin-bottom: 28px; }
+        .link-box { background: rgba(0,0,0,0.35); border-radius: 14px; padding: 14px; margin-bottom: 24px; border: 2px solid rgba(255,255,255,0.1); }
+        .link-box input { width: 100%; background: transparent; border: none; color: white; font-size: 0.85rem; text-align: center; font-family: monospace; }
+        .sucesso-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .sucesso-btns button { padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; font-size: 1.1rem; }
         .btn-copiar { background: var(--natal-green); border: none; color: white; }
-        .btn-compartilhar { background: transparent; border: 2px solid var(--natal-gold); color: var(--natal-gold); }
+        .btn-compartilhar { background: transparent; border: 3px solid var(--natal-gold); color: var(--natal-gold); }
         .btn-ver { background: var(--natal-gold); border: none; color: var(--midnight); }
 
         /* ERRO */
         .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
         .erro-icon { font-size: 5rem; margin-bottom: 20px; }
-        .erro-msg { color: rgba(255,255,255,0.7); }
+        .erro-msg { color: rgba(255,255,255,0.7); font-size: 1.1rem; }
 
         /* CONFETES */
         .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
@@ -181,9 +417,17 @@
         @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
 
         /* TOAST */
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 3000; opacity: 0; transition: all 0.4s; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 16px 28px; border-radius: 14px; font-weight: 600; z-index: 3000; opacity: 0; transition: all 0.4s; font-size: 1.05rem; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.error { background: var(--natal-red); }
+
+        /* RESPONSIVO */
+        @media (max-width: 400px) {
+            .container { padding: 16px; }
+            .header-tela h2 { font-size: 1.5rem; }
+            .pessoas-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .escala-num { width: 42px; height: 42px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -214,13 +458,13 @@
             <div class="header-tela">
                 <p class="passo">Passo 1 de 6</p>
                 <h2>📸 Quem é você?</h2>
-                <p>Uma foto sua para reconhecer no futuro</p>
+                <p>Tire uma foto para reconhecer no futuro</p>
             </div>
             <div class="foto-section">
                 <div class="foto-container" id="fotoContainer" onclick="document.getElementById('fotoInput').click()">
                     <div class="foto-placeholder" id="fotoPlaceholder">
                         <span>📷</span>
-                        <p>Tirar foto</p>
+                        <p>Toque para tirar foto</p>
                     </div>
                 </div>
                 <input type="file" id="fotoInput" class="foto-input" accept="image/*" capture="user" onchange="processarFoto(event)">
@@ -236,7 +480,7 @@
             <button class="btn-continuar" onclick="irParaDesejos()">Continuar →</button>
         </div>
 
-        <!-- PASSO 2: DESEJOS -->
+        <!-- PASSO 2: DESEJOS / PRIORIDADES -->
         <div class="tela" id="telaDesejos">
             <div class="progress-bar">
                 <div class="progress-step done"></div>
@@ -248,10 +492,10 @@
             </div>
             <div class="header-tela">
                 <p class="passo">Passo 2 de 6</p>
-                <h2>🌟 Seus desejos</h2>
-                <p>O que você quer conquistar?</p>
+                <h2>🌟 Suas Prioridades</h2>
+                <p>Quais são suas prioridades para o ano que vem chegando?</p>
             </div>
-            <div class="contador-selecao">Selecionados: <span id="contadorDesejos">0</span> / 10</div>
+            <div class="contador-selecao">✨ Selecionados: <span id="contadorDesejos">0</span> / 10</div>
             
             <div class="categoria">
                 <div class="categoria-titulo">❤️ Vida Pessoal</div>
@@ -313,7 +557,7 @@
             </div>
             <div class="header-tela">
                 <p class="passo">Passo 3 de 6</p>
-                <h2>👥 Pessoas importantes</h2>
+                <h2>👥 Pessoas Importantes</h2>
                 <p>Quem você quer se dedicar mais este ano?</p>
             </div>
             
@@ -361,26 +605,26 @@
             <div class="header-tela">
                 <p class="passo">Passo 4 de 6</p>
                 <h2>💭 Reflexões</h2>
-                <p>Perguntas para seu eu do futuro</p>
+                <p>Responda para seu eu do futuro</p>
             </div>
             
             <div class="pergunta-box">
                 <label>🎯 O que você acha que vai conquistar até lá?</label>
-                <input type="text" id="perguntaConquista" placeholder="Ex: Falar inglês fluente, dirigir...">
+                <input type="text" id="perguntaConquista" placeholder="Ex: Falar inglês, aprender a dirigir...">
             </div>
             
             <div class="pergunta-box">
-                <label>✨ Momento mais marcante do seu ano até agora?</label>
-                <input type="text" id="perguntaMomento" placeholder="O que te marcou esse ano?">
+                <label>✨ Qual foi o momento mais marcante do seu ano até agora?</label>
+                <textarea id="perguntaMomento" placeholder="Conte aqui o que te marcou esse ano..." rows="3"></textarea>
             </div>
             
             <div class="pergunta-box">
                 <label>📝 Uma palavra que define seu momento atual:</label>
-                <input type="text" id="perguntaPalavra" placeholder="Esperança, Luta, Gratidão..." maxlength="20">
+                <input type="text" id="perguntaPalavra" placeholder="Esperança, Gratidão, Luta, Fé..." maxlength="25">
             </div>
             
             <div class="pergunta-box">
-                <label>😊 Sua felicidade hoje de 1 a 10:</label>
+                <label>😊 De 1 a 10, qual sua felicidade hoje?</label>
                 <div class="escala-felicidade" id="escalaFelicidade">
                     <div class="escala-num" onclick="selecionarNota(1)">1</div>
                     <div class="escala-num" onclick="selecionarNota(2)">2</div>
@@ -396,8 +640,8 @@
             </div>
             
             <div class="pergunta-box">
-                <label>🔮 Uma previsão para o ano que vem:</label>
-                <input type="text" id="perguntaPrevisao" placeholder="Acho que vou...">
+                <label>🔮 Faça uma previsão para o ano que vem:</label>
+                <textarea id="perguntaPrevisao" placeholder="O que você acha que vai acontecer? Pode ser sobre você, sua família, o mundo..." rows="3"></textarea>
             </div>
             
             <button class="btn-continuar" onclick="irParaAudio()">Continuar →</button>
@@ -416,34 +660,34 @@
             </div>
             <div class="header-tela">
                 <p class="passo">Passo 5 de 6</p>
-                <h2>🎤 Mensagem de voz</h2>
+                <h2>🎤 Mensagem de Voz</h2>
                 <p>Grave um recado para seu eu do futuro!</p>
             </div>
             
             <div class="audio-section">
                 <div class="audio-icon">🎙️</div>
-                <div class="audio-title">Fale para você mesmo</div>
-                <div class="audio-desc">E aí, futuro eu! O que você gostaria de dizer? Conte seus sonhos, medos, esperanças...</div>
+                <div class="audio-title">Fale para você mesmo!</div>
+                <div class="audio-desc">E aí, futuro eu! O que você gostaria de dizer?<br>Conte seus sonhos, medos, esperanças...</div>
                 
                 <div class="tempo-gravacao" id="tempoGravacao">00:00</div>
                 <button class="btn-gravar" id="btnGravar" onclick="toggleGravacao()">🎤</button>
-                <div class="tempo-limite">Máximo: 60 segundos</div>
+                <div class="tempo-limite">⏱️ Máximo: 60 segundos</div>
                 
                 <div class="audio-preview" id="audioPreview" style="display:none">
                     <audio id="audioPlayer" controls></audio>
                     <div class="audio-actions">
                         <button class="btn-regravar" onclick="regravar()">🔄 Regravar</button>
-                        <button class="btn-confirmar-audio" onclick="confirmarAudio()">✓ Confirmar</button>
+                        <button class="btn-confirmar-audio" onclick="confirmarAudio()">✓ Usar este</button>
                     </div>
                 </div>
                 
                 <div class="audio-confirmado" id="audioConfirmado" style="display:none">
                     <span class="check">✅</span>
                     <div class="info">
-                        <strong>Áudio gravado!</strong>
+                        <strong>Áudio gravado com sucesso!</strong>
                         <div class="duracao" id="duracaoAudio">00:00</div>
                     </div>
-                    <button style="background:transparent;border:none;color:white;cursor:pointer" onclick="regravar()">🔄</button>
+                    <button style="background:transparent;border:none;color:white;cursor:pointer;font-size:1.3rem" onclick="regravar()">🔄</button>
                 </div>
             </div>
             
@@ -463,16 +707,16 @@
                 <div class="progress-step active"></div>
             </div>
             <div class="header-tela">
-                <p class="passo">Passo 6 de 6</p>
-                <h2>💌 Carta para o futuro</h2>
+                <p class="passo">Passo 6 de 6 - Último!</p>
+                <h2>💌 Carta para o Futuro</h2>
                 <p>Escreva uma mensagem especial</p>
             </div>
             
             <div class="resumo-section">
                 <h4>📋 Resumo da sua cápsula</h4>
-                <div class="resumo-item"><strong>Desejos:</strong></div>
+                <div class="resumo-item"><strong>Prioridades:</strong></div>
                 <div class="mini-tags" id="resumoDesejos"></div>
-                <div class="resumo-item" style="margin-top:12px"><strong>Dedicação:</strong> <span id="resumoPessoas">-</span></div>
+                <div class="resumo-item" style="margin-top:14px"><strong>Dedicação:</strong> <span id="resumoPessoas">-</span></div>
                 <div class="resumo-item"><strong>Felicidade atual:</strong> <span id="resumoFelicidade">-</span>/10</div>
                 <div class="resumo-item"><strong>Áudio:</strong> <span id="resumoAudio">Não gravado</span></div>
             </div>
@@ -481,9 +725,12 @@
                 <label>✍️ Sua mensagem para o futuro:</label>
                 <textarea id="mensagem" placeholder="Querido eu do futuro...
 
-O que você está sentindo agora? O que espera? O que tem medo? O que te faz feliz?
+O que você está sentindo agora? 
+O que espera para o próximo ano?
+O que te faz feliz hoje?
+Tem algum medo ou preocupação?
 
-Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizarContador()"></textarea>
+Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" rows="10" oninput="atualizarContador()"></textarea>
                 <div class="char-counter"><span id="charCounter">0</span> / 5000</div>
             </div>
             
@@ -555,13 +802,14 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
         let pessoasSelecionadas = [];
         let notaFelicidade = null;
         
-        // Áudio
+        // Áudio - CORRIGIDO
         let mediaRecorder = null;
         let audioChunks = [];
         let audioBlob = null;
         let audioConfirmadoFlag = false;
         let tempoInicio = null;
         let timerInterval = null;
+        let duracaoFinal = 0;
 
         // ==========================================
         // INICIALIZAÇÃO
@@ -715,7 +963,7 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
                 desejosSelecionados = desejosSelecionados.filter(d => d !== el.textContent);
             } else {
                 if (desejosSelecionados.length >= 10) {
-                    mostrarToast('Máximo 10 desejos!', 'error');
+                    mostrarToast('Máximo 10 prioridades!', 'error');
                     return;
                 }
                 el.classList.add('selected');
@@ -726,7 +974,7 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
 
         function irParaPessoas() {
             if (desejosSelecionados.length === 0) {
-                mostrarToast('Selecione pelo menos 1 desejo', 'error');
+                mostrarToast('Selecione pelo menos 1 prioridade', 'error');
                 return;
             }
             mostrarTela('telaPessoas');
@@ -765,33 +1013,74 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
         }
 
         // ==========================================
-        // PASSO 5: ÁUDIO
+        // PASSO 5: ÁUDIO - CORRIGIDO
         // ==========================================
+        function getSupportedMimeType() {
+            const types = [
+                'audio/mp4',
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/ogg;codecs=opus',
+                'audio/ogg',
+                'audio/wav'
+            ];
+            for (const type of types) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    return type;
+                }
+            }
+            return 'audio/webm';
+        }
+
         async function toggleGravacao() {
             const btn = document.getElementById('btnGravar');
             
             if (!mediaRecorder || mediaRecorder.state === 'inactive') {
                 // Iniciar gravação
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            sampleRate: 44100
+                        } 
+                    });
+                    
+                    const mimeType = getSupportedMimeType();
+                    console.log('Usando formato:', mimeType);
+                    
+                    mediaRecorder = new MediaRecorder(stream, { mimeType });
                     audioChunks = [];
                     
                     mediaRecorder.ondataavailable = (e) => {
-                        audioChunks.push(e.data);
+                        if (e.data.size > 0) {
+                            audioChunks.push(e.data);
+                        }
                     };
                     
                     mediaRecorder.onstop = () => {
-                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        duracaoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
+                        
+                        // Criar blob com o tipo correto
+                        const mType = mediaRecorder.mimeType || 'audio/webm';
+                        audioBlob = new Blob(audioChunks, { type: mType });
+                        
+                        console.log('Áudio gravado:', audioBlob.size, 'bytes, tipo:', mType);
+                        
+                        // Criar URL e mostrar preview
                         const url = URL.createObjectURL(audioBlob);
-                        document.getElementById('audioPlayer').src = url;
+                        const audioPlayer = document.getElementById('audioPlayer');
+                        audioPlayer.src = url;
+                        
                         document.getElementById('audioPreview').style.display = 'block';
                         document.getElementById('btnGravar').style.display = 'none';
                         document.getElementById('tempoGravacao').style.display = 'none';
+                        
+                        // Parar todas as tracks
                         stream.getTracks().forEach(t => t.stop());
                     };
                     
-                    mediaRecorder.start();
+                    mediaRecorder.start(100); // Coleta dados a cada 100ms
                     btn.classList.add('gravando');
                     btn.innerHTML = '⏹️';
                     
@@ -806,8 +1095,8 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
                     }, 60000);
                     
                 } catch (err) {
-                    console.error(err);
-                    mostrarToast('Não foi possível acessar o microfone', 'error');
+                    console.error('Erro ao acessar microfone:', err);
+                    mostrarToast('Não foi possível acessar o microfone. Verifique as permissões.', 'error');
                 }
             } else {
                 pararGravacao();
@@ -832,19 +1121,22 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
         function regravar() {
             audioBlob = null;
             audioConfirmadoFlag = false;
+            mediaRecorder = null;
+            
             document.getElementById('audioPreview').style.display = 'none';
             document.getElementById('audioConfirmado').style.display = 'none';
             document.getElementById('btnGravar').style.display = 'flex';
             document.getElementById('btnGravar').innerHTML = '🎤';
+            document.getElementById('btnGravar').classList.remove('gravando');
             document.getElementById('tempoGravacao').style.display = 'block';
             document.getElementById('tempoGravacao').textContent = '00:00';
         }
 
         function confirmarAudio() {
             audioConfirmadoFlag = true;
-            const elapsed = Math.floor((Date.now() - tempoInicio) / 1000);
-            const min = Math.floor(elapsed / 60).toString().padStart(2, '0');
-            const sec = (elapsed % 60).toString().padStart(2, '0');
+            
+            const min = Math.floor(duracaoFinal / 60).toString().padStart(2, '0');
+            const sec = (duracaoFinal % 60).toString().padStart(2, '0');
             
             document.getElementById('audioPreview').style.display = 'none';
             document.getElementById('audioConfirmado').style.display = 'flex';
@@ -864,7 +1156,7 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
             document.getElementById('resumoDesejos').innerHTML = desejosSelecionados.map(d => `<span class="mini-tag">${d}</span>`).join('');
             document.getElementById('resumoPessoas').textContent = pessoasSelecionadas.length > 0 ? pessoasSelecionadas.join(', ') : 'Não selecionado';
             document.getElementById('resumoFelicidade').textContent = notaFelicidade || '-';
-            document.getElementById('resumoAudio').textContent = audioConfirmadoFlag ? '✓ Gravado' : 'Não gravado';
+            document.getElementById('resumoAudio').textContent = audioConfirmadoFlag ? '✅ Gravado' : '❌ Não gravado';
             
             mostrarTela('telaMensagem');
         }
@@ -906,11 +1198,24 @@ Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizar
                     fotoUrl = await fotoRef.getDownloadURL();
                 }
 
-                // Upload áudio
+                // Upload áudio - CORRIGIDO
                 if (audioBlob && audioConfirmadoFlag) {
-                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio.webm`);
-                    await audioRef.put(audioBlob);
+                    // Determinar extensão baseada no tipo
+                    let ext = 'webm';
+                    if (audioBlob.type.includes('mp4')) ext = 'mp4';
+                    else if (audioBlob.type.includes('ogg')) ext = 'ogg';
+                    else if (audioBlob.type.includes('wav')) ext = 'wav';
+                    
+                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio.${ext}`);
+                    
+                    // Upload com metadata
+                    const metadata = {
+                        contentType: audioBlob.type
+                    };
+                    
+                    await audioRef.put(audioBlob, metadata);
                     audioUrl = await audioRef.getDownloadURL();
+                    console.log('Áudio salvo:', audioUrl);
                 }
 
                 // Salvar no banco
