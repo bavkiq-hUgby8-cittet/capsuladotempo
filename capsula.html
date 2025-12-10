@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Minha Cápsula do Tempo</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --natal-red: #c41e3a;
+            --natal-green: #165b33;
+            --natal-gold: #ffd700;
+            --midnight: #0a0e14;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; overflow-x: hidden; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0e14 100%);
+            color: var(--white);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Pacifico', cursive; }
+
+        /* ESTRELAS */
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, white, transparent);
+            animation: shoot 3s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(-100px) translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            30% { transform: translateX(300px) translateY(100px); opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        /* ===== CÁPSULA LACRADA ===== */
+        .capsula-lacrada {
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .capsula-foto {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 24px;
+            border: 4px solid var(--natal-gold);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .capsula-foto img { width: 100%; height: 100%; object-fit: cover; }
+
+        .capsula-foto-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--natal-red) 0%, var(--natal-green) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .capsula-nome {
+            font-size: 1.8rem;
+            color: var(--natal-gold);
+            margin-bottom: 8px;
+        }
+
+        .capsula-evento {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+        }
+
+        /* CÁPSULA 3D */
+        .capsula-3d {
+            width: 180px;
+            height: 220px;
+            margin: 0 auto 32px;
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .capsula-corpo {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 50%, #8b6914 100%);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            box-shadow: 
+                0 0 60px rgba(255, 215, 0, 0.5),
+                inset 0 20px 40px rgba(255, 255, 255, 0.3),
+                inset 0 -20px 40px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.5), inset 0 20px 40px rgba(255, 255, 255, 0.3), inset 0 -20px 40px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 100px rgba(255, 215, 0, 0.8), inset 0 20px 40px rgba(255, 255, 255, 0.3), inset 0 -20px 40px rgba(0, 0, 0, 0.3); }
+        }
+
+        .capsula-tampa {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 -5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .capsula-lacre {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+        }
+
+        .capsula-brilho {
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+
+        /* STATUS */
+        .status-lacrada {
+            background: rgba(196, 30, 58, 0.2);
+            border: 2px solid var(--natal-red);
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-lacrada span { color: var(--natal-red); font-weight: 600; }
+
+        .status-liberada {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid var(--natal-gold);
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+        }
+
+        .status-liberada span { color: var(--natal-gold); font-weight: 600; }
+
+        /* COUNTDOWN */
+        .countdown {
+            margin-bottom: 32px;
+        }
+
+        .countdown-label {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 16px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .countdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px 12px;
+            border-radius: 12px;
+            min-width: 70px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .countdown-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--natal-gold);
+            line-height: 1;
+        }
+
+        .countdown-unit {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        /* BOTÃO ABRIR */
+        .btn-abrir {
+            background: linear-gradient(135deg, var(--natal-gold) 0%, #ffaa00 100%);
+            color: var(--midnight);
+            border: none;
+            padding: 18px 48px;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-abrir:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 16px 48px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-abrir:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .aguardando-msg {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 16px;
+        }
+
+        /* ===== CÁPSULA ABERTA ===== */
+        .capsula-aberta {
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .aberta-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .aberta-foto {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 16px;
+            border: 4px solid var(--natal-gold);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .aberta-foto img { width: 100%; height: 100%; object-fit: cover; }
+
+        .aberta-nome {
+            font-size: 2rem;
+            color: var(--natal-gold);
+            margin-bottom: 4px;
+        }
+
+        .aberta-data {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* DESEJOS */
+        .desejos-section {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .desejos-title {
+            font-size: 1rem;
+            color: var(--natal-gold);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .desejos-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .desejo-tag {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--natal-gold);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* MENSAGEM */
+        .mensagem-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mensagem-title {
+            font-size: 1rem;
+            color: var(--natal-gold);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mensagem-texto {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.9);
+            white-space: pre-wrap;
+        }
+
+        .mensagem-chars {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            text-align: right;
+        }
+
+        /* REFLEXÃO */
+        .reflexao-section {
+            background: rgba(22, 91, 51, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--natal-green);
+        }
+
+        .reflexao-title {
+            font-size: 1rem;
+            color: #4ade80;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reflexao-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .reflexao-textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .reflexao-textarea:focus { outline: none; border-color: var(--natal-green); }
+
+        .btn-salvar-reflexao {
+            background: var(--natal-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-salvar-reflexao:hover { background: #0f4025; }
+
+        .reflexao-salva {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid #4ade80;
+            padding: 16px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.9);
+            white-space: pre-wrap;
+        }
+
+        /* AÇÕES */
+        .acoes-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-acao {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+        }
+
+        .btn-compartilhar {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-compartilhar:hover { background: rgba(255,255,255,0.2); }
+
+        /* ANIMAÇÃO ABERTURA */
+        .abertura-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--midnight);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+        }
+
+        .abertura-overlay.active { opacity: 1; visibility: visible; }
+
+        .abertura-capsula {
+            width: 200px;
+            height: 240px;
+            position: relative;
+        }
+
+        .abertura-capsula.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            20% { transform: translateX(-10px) rotate(-5deg); }
+            40% { transform: translateX(10px) rotate(5deg); }
+            60% { transform: translateX(-10px) rotate(-5deg); }
+            80% { transform: translateX(10px) rotate(5deg); }
+        }
+
+        .abertura-flash {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: white;
+            opacity: 0;
+            z-index: 101;
+        }
+
+        .abertura-flash.active {
+            animation: flash 0.8s ease-out forwards;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* CONFETES */
+        .confetes {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 102;
+        }
+
+        .confete {
+            position: absolute;
+            animation: confeteFall 3s ease-out forwards;
+        }
+
+        @keyframes confeteFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ERRO */
+        .erro-container {
+            text-align: center;
+        }
+
+        .erro-icon { font-size: 5rem; margin-bottom: 24px; }
+        .erro-title { font-size: 1.8rem; color: var(--natal-red); margin-bottom: 16px; }
+        .erro-desc { font-size: 1rem; color: rgba(255,255,255,0.7); }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--natal-green);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            z-index: 200;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--natal-red); }
+
+        /* LOADING */
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: var(--natal-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text { color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 480px) {
+            .countdown-item { min-width: 60px; padding: 12px 8px; }
+            .countdown-value { font-size: 1.5rem; }
+            .capsula-3d { width: 150px; height: 180px; }
+            .capsula-nome { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="confetes" id="confetes"></div>
+    
+    <div class="abertura-overlay" id="aberturaOverlay">
+        <div class="abertura-flash" id="aberturaFlash"></div>
+        <div class="abertura-capsula" id="aberturaCapsula">
+            <div class="capsula-corpo"></div>
+            <div class="capsula-tampa"></div>
+            <div class="capsula-lacre">🔒</div>
+            <div class="capsula-brilho"></div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <div class="loading" id="loadingState">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Carregando sua cápsula...</p>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let capsulaId = null;
+        let capsulaData = null;
+        let eventoData = null;
+        let isGuardiao = false;
+        let countdownInterval = null;
+
+        function getUrlParam(p) {
+            return new URLSearchParams(window.location.search).get(p);
+        }
+
+        function formatarData(d) {
+            return new Date(d).toLocaleDateString('pt-BR', {
+                day: '2-digit', month: 'long', year: 'numeric'
+            });
+        }
+
+        function mostrarToast(m, t = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = m;
+            toast.className = 'toast show' + (t === 'error' ? ' error' : '');
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        function criarEstrelas() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+            
+            for (let i = 0; i < 3; i++) {
+                const shoot = document.createElement('div');
+                shoot.className = 'shooting-star';
+                shoot.style.top = (Math.random() * 50) + '%';
+                shoot.style.left = (Math.random() * 30) + '%';
+                shoot.style.animationDelay = (i * 5 + Math.random() * 3) + 's';
+                container.appendChild(shoot);
+            }
+        }
+
+        function criarConfetes() {
+            const container = document.getElementById('confetes');
+            container.innerHTML = '';
+            const cores = ['#c41e3a', '#165b33', '#ffd700', '#fff', '#ff6b6b', '#4ecdc4', '#ff9f43'];
+            for (let i = 0; i < 150; i++) {
+                const c = document.createElement('div');
+                c.className = 'confete';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.background = cores[Math.floor(Math.random() * cores.length)];
+                c.style.animationDelay = Math.random() * 2 + 's';
+                c.style.width = (Math.random() * 10 + 6) + 'px';
+                c.style.height = c.style.width;
+                c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(c);
+            }
+        }
+
+        function mostrarErro(msg) {
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="erro-container">
+                    <div class="erro-icon">😕</div>
+                    <h2 class="erro-title">Ops!</h2>
+                    <p class="erro-desc">${msg}</p>
+                </div>
+            `;
+        }
+
+        function renderCapsulaLacrada() {
+            const container = document.getElementById('mainContainer');
+            const podeAbrir = capsulaData.liberada || isGuardiao;
+            const dataAbertura = new Date(capsulaData.dataAbertura);
+            
+            container.innerHTML = `
+                <div class="capsula-lacrada">
+                    <div class="capsula-foto">
+                        ${capsulaData.foto 
+                            ? `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`
+                            : `<div class="capsula-foto-placeholder">👤</div>`
+                        }
+                    </div>
+                    
+                    <h1 class="capsula-nome">${capsulaData.nome} ${capsulaData.sobrenome}</h1>
+                    <p class="capsula-evento">${eventoData?.nome || 'Cápsula do Tempo'}</p>
+                    
+                    <div class="capsula-3d">
+                        <div class="capsula-corpo"></div>
+                        <div class="capsula-tampa"></div>
+                        <div class="capsula-lacre">${podeAbrir ? '🔓' : '🔒'}</div>
+                        <div class="capsula-brilho"></div>
+                    </div>
+                    
+                    ${podeAbrir 
+                        ? `<div class="status-liberada"><span>✨ Cápsula liberada para abertura!</span></div>`
+                        : `<div class="status-lacrada"><span>🔒 Cápsula lacrada</span></div>`
+                    }
+                    
+                    <div class="countdown">
+                        <p class="countdown-label">⏰ ${podeAbrir ? 'Originalmente programada para' : 'Será liberada em'}:</p>
+                        <div class="countdown-timer" id="countdownTimer">
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="dias">--</div>
+                                <div class="countdown-unit">Dias</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="horas">--</div>
+                                <div class="countdown-unit">Horas</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="mins">--</div>
+                                <div class="countdown-unit">Min</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value" id="segs">--</div>
+                                <div class="countdown-unit">Seg</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${podeAbrir 
+                        ? `<button class="btn-abrir" onclick="iniciarAbertura()">🎁 ABRIR CÁPSULA</button>`
+                        : `<button class="btn-abrir" disabled>🔒 AGUARDANDO LIBERAÇÃO</button>
+                           <p class="aguardando-msg">O guardião irá liberar sua cápsula na cerimônia</p>`
+                    }
+                </div>
+            `;
+            
+            iniciarCountdown(dataAbertura);
+        }
+
+        function iniciarCountdown(dataAlvo) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            function atualizar() {
+                const agora = Date.now();
+                const diff = new Date(dataAlvo).getTime() - agora;
+                
+                if (diff <= 0) {
+                    document.getElementById('dias').textContent = '00';
+                    document.getElementById('horas').textContent = '00';
+                    document.getElementById('mins').textContent = '00';
+                    document.getElementById('segs').textContent = '00';
+                    return;
+                }
+                
+                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const segs = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('dias').textContent = String(dias).padStart(2, '0');
+                document.getElementById('horas').textContent = String(horas).padStart(2, '0');
+                document.getElementById('mins').textContent = String(mins).padStart(2, '0');
+                document.getElementById('segs').textContent = String(segs).padStart(2, '0');
+            }
+            
+            atualizar();
+            countdownInterval = setInterval(atualizar, 1000);
+        }
+
+        async function iniciarAbertura() {
+            const overlay = document.getElementById('aberturaOverlay');
+            const capsula = document.getElementById('aberturaCapsula');
+            const flash = document.getElementById('aberturaFlash');
+            
+            overlay.classList.add('active');
+            
+            await new Promise(r => setTimeout(r, 500));
+            capsula.classList.add('shake');
+            
+            await new Promise(r => setTimeout(r, 600));
+            capsula.classList.remove('shake');
+            capsula.classList.add('shake');
+            
+            await new Promise(r => setTimeout(r, 600));
+            flash.classList.add('active');
+            
+            // Marcar como aberta no Firebase
+            await database.ref(`capsulas/${capsulaId}`).update({
+                aberta: true,
+                dataVisualizacao: new Date().toISOString()
+            });
+            
+            await new Promise(r => setTimeout(r, 800));
+            
+            overlay.classList.remove('active');
+            criarConfetes();
+            
+            capsulaData.aberta = true;
+            capsulaData.dataVisualizacao = new Date().toISOString();
+            renderCapsulaAberta();
+        }
+
+        function renderCapsulaAberta() {
+            const container = document.getElementById('mainContainer');
+            
+            const desejosHtml = capsulaData.desejos?.length 
+                ? `<div class="desejos-section">
+                    <h3 class="desejos-title">🌟 Meus Desejos para o Ano</h3>
+                    <div class="desejos-tags">
+                        ${capsulaData.desejos.map(d => `<span class="desejo-tag">${d}</span>`).join('')}
+                    </div>
+                   </div>`
+                : '';
+            
+            const mensagemHtml = capsulaData.mensagemPessoal 
+                ? `<div class="mensagem-section">
+                    <h3 class="mensagem-title">✍️ Mensagem Pessoal</h3>
+                    <p class="mensagem-texto">${capsulaData.mensagemPessoal}</p>
+                    <p class="mensagem-chars">${capsulaData.mensagemPessoal.length} caracteres</p>
+                   </div>`
+                : '';
+            
+            const reflexaoHtml = capsulaData.reflexao 
+                ? `<div class="reflexao-section">
+                    <h3 class="reflexao-title">💭 Minha Reflexão</h3>
+                    <div class="reflexao-salva">${capsulaData.reflexao}</div>
+                   </div>`
+                : `<div class="reflexao-section">
+                    <h3 class="reflexao-title">💭 Escreva sua Reflexão</h3>
+                    <p style="color: rgba(255,255,255,0.6); margin-bottom: 12px; font-size: 0.9rem;">
+                        Agora que abriu sua cápsula, o que você sente? Conseguiu realizar seus planos?
+                    </p>
+                    <textarea class="reflexao-textarea" id="reflexaoTexto" placeholder="Escreva aqui sua reflexão sobre este ano que passou..."></textarea>
+                    <button class="btn-salvar-reflexao" onclick="salvarReflexao()">💾 Salvar Reflexão</button>
+                   </div>`;
+            
+            container.innerHTML = `
+                <div class="capsula-aberta">
+                    <div class="aberta-header">
+                        <div class="aberta-foto">
+                            ${capsulaData.foto 
+                                ? `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`
+                                : `<div class="capsula-foto-placeholder" style="width:100%;height:100%;">👤</div>`
+                            }
+                        </div>
+                        <h1 class="aberta-nome">${capsulaData.nome} ${capsulaData.sobrenome}</h1>
+                        <p class="aberta-data">Criada em ${formatarData(capsulaData.dataCriacao)}</p>
+                    </div>
+                    
+                    ${desejosHtml}
+                    ${mensagemHtml}
+                    ${reflexaoHtml}
+                    
+                    <div class="acoes-section">
+                        <button class="btn-acao btn-compartilhar" onclick="compartilhar()">
+                            📤 Compartilhar Cápsula
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function salvarReflexao() {
+            const texto = document.getElementById('reflexaoTexto').value.trim();
+            if (!texto) {
+                mostrarToast('Escreva algo antes de salvar', 'error');
+                return;
+            }
+            
+            try {
+                await database.ref(`capsulas/${capsulaId}/reflexao`).set(texto);
+                capsulaData.reflexao = texto;
+                mostrarToast('Reflexão salva!');
+                renderCapsulaAberta();
+            } catch (error) {
+                mostrarToast('Erro ao salvar', 'error');
+            }
+        }
+
+        async function compartilhar() {
+            const link = window.location.href;
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Minha Cápsula do Tempo',
+                        text: `${capsulaData.nome} abriu sua cápsula do tempo!`,
+                        url: link
+                    });
+                } catch { copiarLink(link); }
+            } else {
+                copiarLink(link);
+            }
+        }
+
+        async function copiarLink(link) {
+            try {
+                await navigator.clipboard.writeText(link);
+                mostrarToast('Link copiado!');
+            } catch {
+                mostrarToast('Não foi possível copiar', 'error');
+            }
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', async () => {
+            criarEstrelas();
+            
+            capsulaId = getUrlParam('id');
+            isGuardiao = getUrlParam('guardiao') === 'true';
+            
+            if (!capsulaId) {
+                mostrarErro('Link inválido. Verifique se copiou o link corretamente.');
+                return;
+            }
+            
+            try {
+                // Carregar cápsula
+                const capSnap = await database.ref(`capsulas/${capsulaId}`).once('value');
+                capsulaData = capSnap.val();
+                
+                if (!capsulaData) {
+                    mostrarErro('Cápsula não encontrada.');
+                    return;
+                }
+                
+                // Carregar evento
+                if (capsulaData.eventoId) {
+                    const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
+                    eventoData = evtSnap.val();
+                }
+                
+                // Renderizar baseado no estado
+                if (capsulaData.aberta) {
+                    renderCapsulaAberta();
+                    if (!capsulaData.dataVisualizacao) {
+                        criarConfetes();
+                    }
+                } else {
+                    renderCapsulaLacrada();
+                }
+                
+                // Monitorar mudanças em tempo real
+                database.ref(`capsulas/${capsulaId}`).on('value', (snap) => {
+                    const novosDados = snap.val();
+                    if (novosDados) {
+                        const estaAberta = capsulaData.aberta;
+                        capsulaData = novosDados;
+                        
+                        // Se foi liberada agora, atualizar
+                        if (!estaAberta && !capsulaData.aberta) {
+                            renderCapsulaLacrada();
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error(error);
+                mostrarErro('Erro ao carregar a cápsula. Tente novamente.');
+            }
+        });
+    </script>
+</body>
+</html>
