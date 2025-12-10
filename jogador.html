@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨ Cápsula do Tempo</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        /* ===== VARIÁVEIS CSS ===== */
+        :root {
+            --natal-red: #c41e3a;
+            --natal-green: #165b33;
+            --natal-green-dark: #0f4025;
+            --natal-gold: #ffd700;
+            --natal-gold-light: #ffe44d;
+            --midnight: #0f1922;
+            --white: #ffffff;
+            --gray-light: #f8f9fa;
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.2);
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(180deg, #0a0f14 0%, #1a2e1a 40%, #2a1a1a 100%);
+            color: var(--white);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Pacifico', cursive;
+        }
+
+        /* ===== ANIMAÇÃO DE ESTRELAS/NEVE ===== */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .snowflake {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            animation: snowfall linear infinite;
+            top: -20px;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) translateX(50px) rotate(360deg);
+                opacity: 0.2;
+            }
+        }
+
+        /* ===== CONTAINER PRINCIPAL ===== */
+        .app {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TELAS ===== */
+        .tela {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 24px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tela.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TELA 1: BOAS-VINDAS ===== */
+        .tela-boas-vindas {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .bv-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .bv-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--natal-gold) 0%, #ffaa00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .bv-stars {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+
+        .bv-evento {
+            font-size: 1.3rem;
+            color: var(--natal-gold);
+            margin-bottom: 32px;
+            padding: 12px 24px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .bv-desc {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 32px;
+            max-width: 320px;
+        }
+
+        .bv-data {
+            background: rgba(22, 91, 51, 0.3);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--natal-green);
+            margin-bottom: 40px;
+        }
+
+        .bv-data-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+
+        .bv-data-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--natal-gold);
+        }
+
+        /* ===== BOTÕES ===== */
+        .btn {
+            padding: 16px 32px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--natal-gold) 0%, #ffaa00 100%);
+            color: var(--midnight);
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .btn-primary:hover, .btn-primary:active {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ===== TELA 2: CADASTRO ===== */
+        .tela-cadastro {
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .cadastro-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .cadastro-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .cadastro-title {
+            font-size: 2rem;
+            color: var(--natal-gold);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .form-group label .required {
+            color: var(--natal-red);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 14px;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--natal-gold);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+        }
+
+        .form-group input.invalid {
+            border-color: var(--natal-red);
+        }
+
+        .form-footer {
+            margin-top: 32px;
+        }
+
+        /* ===== TELA 3: MENSAGEM ===== */
+        .tela-mensagem {
+            padding: 24px;
+        }
+
+        .mensagem-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .mensagem-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .mensagem-title {
+            font-size: 1.8rem;
+            color: var(--natal-gold);
+        }
+
+        /* Accordion de exemplos */
+        .exemplos-accordion {
+            margin-bottom: 24px;
+        }
+
+        .exemplo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .exemplo-header:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .exemplo-header.active {
+            border-color: var(--natal-gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .exemplo-header-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .exemplo-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .exemplo-header.active .exemplo-arrow {
+            transform: rotate(180deg);
+        }
+
+        .exemplo-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .exemplo-content.active {
+            max-height: 600px;
+        }
+
+        .exemplo-inner {
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 0 0 12px 12px;
+            margin-top: -4px;
+        }
+
+        .exemplo-categoria {
+            margin-bottom: 16px;
+        }
+
+        .exemplo-categoria-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exemplo-lista {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.6;
+            padding-left: 24px;
+        }
+
+        .exemplo-lista li {
+            margin-bottom: 4px;
+        }
+
+        /* Textarea */
+        .textarea-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 18px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            font-size: 1rem;
+            line-height: 1.6;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .textarea-container textarea::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .textarea-container textarea:focus {
+            outline: none;
+            border-color: var(--natal-gold);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .char-counter.warning {
+            color: var(--natal-gold);
+        }
+
+        .char-counter.danger {
+            color: var(--natal-red);
+        }
+
+        /* Upload de fotos */
+        .fotos-section {
+            margin: 24px 0;
+        }
+
+        .fotos-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fotos-label span {
+            color: rgba(255,255,255,0.5);
+            font-weight: 400;
+        }
+
+        .btn-fotos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 14px;
+            color: rgba(255,255,255,0.8);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-fotos:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--natal-gold);
+        }
+
+        .btn-fotos input {
+            display: none;
+        }
+
+        .fotos-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .foto-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .foto-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .foto-item .remove-foto {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 28px;
+            height: 28px;
+            background: rgba(196, 30, 58, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .foto-item .remove-foto:hover {
+            transform: scale(1.1);
+        }
+
+        .foto-uploading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .foto-uploading::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top-color: var(--natal-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Botão lacrar */
+        .btn-lacrar {
+            margin-top: 24px;
+            background: linear-gradient(135deg, var(--natal-red) 0%, #a01830 100%);
+            box-shadow: 0 8px 24px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-lacrar:hover {
+            box-shadow: 0 12px 32px rgba(196, 30, 58, 0.4);
+        }
+
+        /* ===== TELA 4: SUCESSO ===== */
+        .tela-sucesso {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .sucesso-animacao {
+            font-size: 6rem;
+            margin-bottom: 24px;
+            animation: bounce 0.8s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .sucesso-title {
+            font-size: 2.2rem;
+            color: var(--natal-gold);
+            margin-bottom: 24px;
+        }
+
+        .sucesso-info {
+            background: rgba(22, 91, 51, 0.2);
+            border: 1px solid var(--natal-green);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .sucesso-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .sucesso-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .link-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+
+        .link-url {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--natal-gold);
+            word-break: break-all;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .link-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--natal-gold);
+            background: rgba(255, 215, 0, 0.1);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 16px 0;
+            max-width: 340px;
+        }
+
+        .sucesso-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .sucesso-actions .btn {
+            width: 100%;
+        }
+
+        /* ===== CONFETES ===== */
+        .confetes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .confete {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confeteFall 3s ease-out forwards;
+        }
+
+        @keyframes confeteFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 25, 34, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-icon {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: var(--natal-gold);
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--natal-gold);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== ERRO ===== */
+        .tela-erro {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .erro-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+
+        .erro-title {
+            font-size: 1.8rem;
+            color: var(--natal-red);
+            margin-bottom: 16px;
+        }
+
+        .erro-desc {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+            max-width: 300px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--natal-green);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: var(--natal-red);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animação de Estrelas e Neve -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Confetes (aparece no sucesso) -->
+    <div class="confetes" id="confetes"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-icon">✨</div>
+        <p class="loading-text" id="loadingText">Lacrando sua cápsula...</p>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgress" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app">
+        <!-- TELA 1: Boas-vindas -->
+        <div class="tela tela-boas-vindas" id="telaBV">
+            <div class="bv-icon">🎁</div>
+            <h1 class="bv-title">Cápsula do Tempo</h1>
+            <div class="bv-stars">✨ ✨ ✨</div>
+            
+            <div class="bv-evento" id="nomeEvento">
+                Carregando...
+            </div>
+            
+            <p class="bv-desc">
+                Escreva seus sonhos, planos e metas para o próximo ano.
+                <br><br>
+                Sua mensagem ficará <strong>trancada por 365 dias</strong> e só poderá ser aberta no futuro!
+            </p>
+            
+            <div class="bv-data">
+                <p class="bv-data-label">📅 Será aberta em:</p>
+                <p class="bv-data-value" id="dataAberturaBV">--/--/----</p>
+            </div>
+            
+            <button class="btn btn-primary" onclick="irParaTela('cadastro')">
+                🎁 CRIAR MINHA CÁPSULA
+            </button>
+        </div>
+
+        <!-- TELA 2: Cadastro -->
+        <div class="tela tela-cadastro" id="telaCadastro">
+            <div class="cadastro-header">
+                <div class="cadastro-icon">👤</div>
+                <h2 class="cadastro-title">Quem é você?</h2>
+            </div>
+            
+            <form id="formCadastro" onsubmit="irParaMensagem(event)">
+                <div class="form-group">
+                    <label for="nome">Nome <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        placeholder="Seu primeiro nome"
+                        required
+                        maxlength="50"
+                        autocomplete="given-name"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="sobrenome">Sobrenome <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="sobrenome" 
+                        placeholder="Seu sobrenome"
+                        required
+                        maxlength="50"
+                        autocomplete="family-name"
+                    >
+                </div>
+                
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">
+                        CONTINUAR →
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TELA 3: Mensagem -->
+        <div class="tela tela-mensagem" id="telaMensagem">
+            <div class="mensagem-header">
+                <div class="mensagem-icon">✍️</div>
+                <h2 class="mensagem-title">Sua mensagem</h2>
+            </div>
+            
+            <!-- Accordion de Exemplos -->
+            <div class="exemplos-accordion">
+                <div class="exemplo-header" onclick="toggleExemplos()">
+                    <span class="exemplo-header-text">
+                        <span>💭</span> Exemplos de inspiração
+                    </span>
+                    <span class="exemplo-arrow">▼</span>
+                </div>
+                <div class="exemplo-content" id="exemplosContent">
+                    <div class="exemplo-inner">
+                        <div class="exemplo-categoria">
+                            <div class="exemplo-categoria-title">🎯 Metas Profissionais</div>
+                            <ul class="exemplo-lista">
+                                <li>Conseguir promoção ou novo emprego</li>
+                                <li>Aprender uma nova habilidade</li>
+                                <li>Mudar de carreira</li>
+                            </ul>
+                        </div>
+                        <div class="exemplo-categoria">
+                            <div class="exemplo-categoria-title">❤️ Vida Pessoal</div>
+                            <ul class="exemplo-lista">
+                                <li>Viajar para um lugar especial</li>
+                                <li>Melhorar a saúde e bem-estar</li>
+                                <li>Fortalecer relacionamentos</li>
+                            </ul>
+                        </div>
+                        <div class="exemplo-categoria">
+                            <div class="exemplo-categoria-title">💰 Objetivos Financeiros</div>
+                            <ul class="exemplo-lista">
+                                <li>Economizar R$ X até o fim do ano</li>
+                                <li>Quitar dívidas</li>
+                                <li>Começar a investir</li>
+                            </ul>
+                        </div>
+                        <div class="exemplo-categoria">
+                            <div class="exemplo-categoria-title">🙏 Gratidões de 2024</div>
+                            <ul class="exemplo-lista">
+                                <li>Pelo que você é grato este ano?</li>
+                                <li>Quais foram suas conquistas?</li>
+                                <li>Mensagem para seu eu do futuro</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Textarea -->
+            <div class="textarea-container">
+                <textarea 
+                    id="mensagem" 
+                    placeholder="Escreva aqui seus planos, sonhos e metas para o próximo ano...
+
+O que você quer conquistar?
+O que te deixaria orgulhoso(a)?
+Que mensagem você gostaria de ler daqui a 1 ano?"
+                    maxlength="5000"
+                    oninput="atualizarContador()"
+                ></textarea>
+            </div>
+            <p class="char-counter" id="charCounter">0 / 5000 caracteres</p>
+            
+            <!-- Upload de Fotos -->
+            <div class="fotos-section">
+                <p class="fotos-label">
+                    📷 Adicionar Fotos <span>(opcional, até 5)</span>
+                </p>
+                <label class="btn-fotos">
+                    <input 
+                        type="file" 
+                        id="inputFotos" 
+                        accept="image/*" 
+                        multiple
+                        capture="environment"
+                        onchange="handleFotos(event)"
+                    >
+                    📷 Escolher Fotos ou Tirar Foto
+                </label>
+                <div class="fotos-preview" id="fotosPreview"></div>
+            </div>
+            
+            <!-- Botão Lacrar -->
+            <button class="btn btn-primary btn-lacrar" onclick="lacrarCapsula()">
+                🔒 LACRAR CÁPSULA
+            </button>
+        </div>
+
+        <!-- TELA 4: Sucesso -->
+        <div class="tela tela-sucesso" id="telaSucesso">
+            <div class="sucesso-animacao">🎁</div>
+            <h2 class="sucesso-title">Cápsula Lacrada!</h2>
+            
+            <div class="sucesso-info">
+                <div class="sucesso-info-item">
+                    <span>📅</span>
+                    <span>Será aberta em: <strong id="dataAberturaFinal">--/--/----</strong></span>
+                </div>
+                <div class="sucesso-info-item">
+                    <span>⏰</span>
+                    <span>Daqui a: <strong id="tempoRestante">-- dias</strong></span>
+                </div>
+            </div>
+            
+            <div class="link-box">
+                <p class="link-label">🔗 Seu link único:</p>
+                <div class="link-url" id="linkCapsula">https://...</div>
+                <button class="btn btn-primary" style="width: 100%; font-size: 1rem;" onclick="copiarLink()">
+                    📋 COPIAR LINK
+                </button>
+            </div>
+            
+            <div class="link-warning">
+                <span>⚠️</span>
+                <span>Salve este link! Você precisará dele para abrir a cápsula.</span>
+            </div>
+            
+            <div class="sucesso-actions">
+                <button class="btn btn-secondary" onclick="compartilhar()">
+                    📤 COMPARTILHAR
+                </button>
+                <button class="btn btn-secondary" onclick="verCapsula()">
+                    👁️ VER CÁPSULA
+                </button>
+                <button class="btn btn-secondary" onclick="criarOutra()">
+                    ➕ CRIAR OUTRA
+                </button>
+            </div>
+        </div>
+
+        <!-- TELA ERRO -->
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 class="erro-title">Ops!</h2>
+            <p class="erro-desc" id="erroDesc">
+                Não foi possível carregar o evento. Verifique se o link está correto.
+            </p>
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                🔄 Tentar Novamente
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== CONFIGURAÇÃO FIREBASE =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91",
+            measurementId: "G-0PZ0W3X3PE"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        // ===== VARIÁVEIS GLOBAIS =====
+        let eventoId = null;
+        let eventoData = null;
+        let fotosParaUpload = [];
+        let capsulaIdCriada = null;
+
+        // ===== FUNÇÕES UTILITÁRIAS =====
+        
+        // Obter parâmetro da URL
+        function getUrlParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Gerar ID único
+        function gerarID(prefixo) {
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substr(2, 9);
+            return `${prefixo}_${timestamp}_${random}`;
+        }
+
+        // Formatar data
+        function formatarData(dataISO) {
+            const data = new Date(dataISO);
+            return data.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        // Calcular dias restantes
+        function calcularDiasRestantes(dataAbertura) {
+            const agora = new Date().getTime();
+            const abertura = new Date(dataAbertura).getTime();
+            const diferenca = abertura - agora;
+            
+            if (diferenca <= 0) return 0;
+            return Math.ceil(diferenca / (1000 * 60 * 60 * 24));
+        }
+
+        // Mostrar toast
+        function mostrarToast(mensagem, tipo = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = mensagem;
+            toast.className = 'toast show' + (tipo === 'error' ? ' error' : '');
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // ===== ANIMAÇÕES =====
+        
+        // Criar estrelas e neve
+        function criarEstrelas() {
+            const container = document.getElementById('stars');
+            
+            // Estrelas
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+            
+            // Flocos de neve
+            const flakes = ['❄', '❅', '❆', '✧'];
+            for (let i = 0; i < 30; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.textContent = flakes[Math.floor(Math.random() * flakes.length)];
+                flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                flake.style.animationDelay = Math.random() * 10 + 's';
+                flake.style.fontSize = (Math.random() * 0.8 + 0.6) + 'rem';
+                container.appendChild(flake);
+            }
+        }
+
+        // Criar confetes
+        function criarConfetes() {
+            const container = document.getElementById('confetes');
+            container.innerHTML = '';
+            
+            const cores = ['#c41e3a', '#165b33', '#ffd700', '#ffffff', '#ff6b6b', '#4ecdc4'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confete = document.createElement('div');
+                confete.className = 'confete';
+                confete.style.left = Math.random() * 100 + 'vw';
+                confete.style.background = cores[Math.floor(Math.random() * cores.length)];
+                confete.style.animationDelay = Math.random() * 2 + 's';
+                confete.style.width = (Math.random() * 8 + 6) + 'px';
+                confete.style.height = (Math.random() * 8 + 6) + 'px';
+                confete.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(confete);
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            criarEstrelas();
+            
+            eventoId = getUrlParam('evento');
+            
+            if (!eventoId) {
+                mostrarErro('Link inválido. Verifique se você escaneou o QR code correto.');
+                return;
+            }
+            
+            try {
+                const snapshot = await database.ref(`eventos/${eventoId}`).once('value');
+                eventoData = snapshot.val();
+                
+                if (!eventoData || eventoData.ativo === false) {
+                    mostrarErro('Este evento não existe ou foi encerrado.');
+                    return;
+                }
+                
+                // Preencher dados na tela de boas-vindas
+                document.getElementById('nomeEvento').textContent = eventoData.nome;
+                document.getElementById('dataAberturaBV').textContent = formatarData(eventoData.dataAbertura);
+                
+                // Mostrar tela de boas-vindas
+                mostrarTela('telaBV');
+                
+            } catch (error) {
+                console.error('Erro ao carregar evento:', error);
+                mostrarErro('Erro ao carregar o evento. Tente novamente.');
+            }
+        });
+
+        // ===== NAVEGAÇÃO =====
+        
+        function mostrarTela(telaId) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(telaId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('erroDesc').textContent = mensagem;
+            mostrarTela('telaErro');
+        }
+
+        function irParaTela(tela) {
+            if (tela === 'cadastro') {
+                mostrarTela('telaCadastro');
+            }
+        }
+
+        function irParaMensagem(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            
+            if (!nome || !sobrenome) {
+                mostrarToast('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            mostrarTela('telaMensagem');
+        }
+
+        // ===== EXEMPLOS ACCORDION =====
+        function toggleExemplos() {
+            const header = document.querySelector('.exemplo-header');
+            const content = document.getElementById('exemplosContent');
+            
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // ===== CONTADOR DE CARACTERES =====
+        function atualizarContador() {
+            const textarea = document.getElementById('mensagem');
+            const counter = document.getElementById('charCounter');
+            const length = textarea.value.length;
+            
+            counter.textContent = `${length} / 5000 caracteres`;
+            
+            if (length > 4500) {
+                counter.className = 'char-counter danger';
+            } else if (length > 4000) {
+                counter.className = 'char-counter warning';
+            } else {
+                counter.className = 'char-counter';
+            }
+        }
+
+        // ===== UPLOAD DE FOTOS =====
+        
+        // Redimensionar imagem
+        function resizeImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        const maxDim = 1920;
+                        if (width > height && width > maxDim) {
+                            height = (height * maxDim) / width;
+                            width = maxDim;
+                        } else if (height > maxDim) {
+                            width = (width * maxDim) / height;
+                            height = maxDim;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob(resolve, 'image/jpeg', 0.8);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Handler de seleção de fotos
+        async function handleFotos(event) {
+            const files = Array.from(event.target.files);
+            
+            if (fotosParaUpload.length + files.length > 5) {
+                mostrarToast('Máximo de 5 fotos permitidas', 'error');
+                return;
+            }
+            
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                
+                const resized = await resizeImage(file);
+                const preview = URL.createObjectURL(resized);
+                
+                fotosParaUpload.push({
+                    blob: resized,
+                    preview: preview
+                });
+            }
+            
+            renderizarPreviews();
+            event.target.value = '';
+        }
+
+        // Renderizar previews
+        function renderizarPreviews() {
+            const container = document.getElementById('fotosPreview');
+            
+            container.innerHTML = fotosParaUpload.map((foto, index) => `
+                <div class="foto-item">
+                    <img src="${foto.preview}" alt="Foto ${index + 1}">
+                    <button class="remove-foto" onclick="removerFoto(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // Remover foto
+        function removerFoto(index) {
+            URL.revokeObjectURL(fotosParaUpload[index].preview);
+            fotosParaUpload.splice(index, 1);
+            renderizarPreviews();
+        }
+
+        // ===== LACRAR CÁPSULA =====
+        async function lacrarCapsula() {
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            const mensagem = document.getElementById('mensagem').value.trim();
+            
+            if (!mensagem) {
+                mostrarToast('Escreva uma mensagem para sua cápsula', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            const loading = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const loadingProgress = document.getElementById('loadingProgress');
+            
+            loading.classList.add('active');
+            loadingText.textContent = '✨ Lacrando sua cápsula...';
+            loadingProgress.style.width = '10%';
+            
+            try {
+                capsulaIdCriada = gerarID('cap');
+                let fotosUrls = [];
+                
+                // Upload de fotos
+                if (fotosParaUpload.length > 0) {
+                    loadingText.textContent = `📤 Enviando fotos... 0/${fotosParaUpload.length}`;
+                    
+                    for (let i = 0; i < fotosParaUpload.length; i++) {
+                        const foto = fotosParaUpload[i];
+                        const timestamp = Date.now();
+                        const fotoRef = storage.ref().child(`capsulas/${capsulaIdCriada}/foto_${timestamp}_${i}.jpg`);
+                        
+                        await fotoRef.put(foto.blob);
+                        const url = await fotoRef.getDownloadURL();
+                        fotosUrls.push(url);
+                        
+                        loadingText.textContent = `📤 Enviando fotos... ${i + 1}/${fotosParaUpload.length}`;
+                        loadingProgress.style.width = `${10 + ((i + 1) / fotosParaUpload.length) * 50}%`;
+                    }
+                }
+                
+                loadingText.textContent = '💾 Salvando cápsula...';
+                loadingProgress.style.width = '70%';
+                
+                // Salvar cápsula no Firebase
+                await database.ref(`capsulas/${capsulaIdCriada}`).set({
+                    eventoId: eventoId,
+                    nome: nome,
+                    sobrenome: sobrenome,
+                    mensagem: mensagem,
+                    fotos: fotosUrls,
+                    dataCriacao: new Date().toISOString(),
+                    dataAbertura: eventoData.dataAbertura,
+                    aberta: false,
+                    dataVisualizacao: null,
+                    reflexao: null
+                });
+                
+                loadingProgress.style.width = '85%';
+                
+                // Atualizar contador do evento
+                await database.ref(`eventos/${eventoId}/totalCapsulas`).transaction(count => {
+                    return (count || 0) + 1;
+                });
+                
+                loadingProgress.style.width = '100%';
+                loadingText.textContent = '🎉 Cápsula lacrada!';
+                
+                // Preparar tela de sucesso
+                const baseUrl = window.location.origin + window.location.pathname.replace('jogador.html', '');
+                const linkCapsula = `${baseUrl}capsula.html?id=${capsulaIdCriada}`;
+                
+                document.getElementById('linkCapsula').textContent = linkCapsula;
+                document.getElementById('dataAberturaFinal').textContent = formatarData(eventoData.dataAbertura);
+                document.getElementById('tempoRestante').textContent = `${calcularDiasRestantes(eventoData.dataAbertura)} dias`;
+                
+                // Delay para mostrar 100%
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                loading.classList.remove('active');
+                mostrarTela('telaSucesso');
+                criarConfetes();
+                
+            } catch (error) {
+                console.error('Erro ao lacrar cápsula:', error);
+                loading.classList.remove('active');
+                mostrarToast('Erro ao lacrar cápsula. Tente novamente.', 'error');
+            }
+        }
+
+        // ===== AÇÕES PÓS-SUCESSO =====
+        
+        // Copiar link
+        async function copiarLink() {
+            const link = document.getElementById('linkCapsula').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(link);
+                mostrarToast('✓ Link copiado!');
+            } catch (err) {
+                const input = document.createElement('input');
+                input.value = link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                mostrarToast('✓ Link copiado!');
+            }
+        }
+
+        // Compartilhar
+        async function compartilhar() {
+            const link = document.getElementById('linkCapsula').textContent;
+            const nome = document.getElementById('nome').value;
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Minha Cápsula do Tempo',
+                        text: `${nome} criou uma cápsula do tempo! Será aberta em ${formatarData(eventoData.dataAbertura)}.`,
+                        url: link
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        copiarLink();
+                    }
+                }
+            } else {
+                copiarLink();
+            }
+        }
+
+        // Ver cápsula
+        function verCapsula() {
+            const link = document.getElementById('linkCapsula').textContent;
+            window.open(link, '_blank');
+        }
+
+        // Criar outra
+        function criarOutra() {
+            // Limpar dados
+            document.getElementById('nome').value = '';
+            document.getElementById('sobrenome').value = '';
+            document.getElementById('mensagem').value = '';
+            fotosParaUpload = [];
+            document.getElementById('fotosPreview').innerHTML = '';
+            atualizarContador();
+            
+            // Voltar para boas-vindas
+            mostrarTela('telaBV');
+        }
+    </script>
+</body>
+</html>
