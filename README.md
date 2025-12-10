@@ -1,112 +1,116 @@
-# 🎄 Cápsula do Tempo - Sistema Completo
+# 🎁 Cápsula do Tempo - Sistema Completo
 
-Sistema interativo de cápsulas do tempo para eventos de Natal/Ano Novo. Perfeito para famílias, empresas, grupos de amigos e comunidades.
+Sistema interativo para criar cápsulas do tempo em eventos como Natal e Ano Novo. Os participantes guardam memórias, desejos, áudios e mensagens para abrir no futuro!
 
-## 🌟 Funcionalidades
+## ✨ Novas Funcionalidades
 
-### Para o Guardião (Operador)
-- ✅ Criar eventos com QR Code automático
-- ✅ Monitoramento em tempo real de novas cápsulas
-- ✅ **Notificações visuais** quando participantes lacram (foto + confetes)
-- ✅ **Cerimônia de Fechamento** com avatares em círculo e nuvem de palavras
-- ✅ **Cerimônia de Abertura** estilo Mario Party (20 segundos de animação)
-- ✅ Liberação individual ou em massa com senha
-- ✅ Busca de participantes por nome
-- ✅ Lista completa de participantes por evento
+### 🎤 Gravação de Áudio
+- Grave uma mensagem de voz para seu eu do futuro
+- Limite de 60 segundos
+- Preview antes de confirmar
+- Pode pular se preferir
 
-### Para os Participantes
-- ✅ Interface mobile-first otimizada
-- ✅ Captura de foto como avatar
-- ✅ 24 tags de desejos em 4 categorias
-- ✅ Mensagem pessoal de até 3000 caracteres
-- ✅ Link único para acessar a cápsula
-- ✅ Contador regressivo até abertura
-- ✅ Animação de abertura com shake + explosão
-- ✅ Campo de reflexão após abertura
+### 💭 Perguntas Reflexivas
+- **O que você acha que vai conquistar?** - Ex: "Falar inglês fluente"
+- **Momento mais marcante do ano** - Memórias importantes
+- **Uma palavra que define seu momento** - Para nuvem de palavras
+- **Nota de felicidade (1-10)** - Comparar com o futuro
+- **Uma previsão para o ano que vem** - Ver se acertou!
 
-## 📁 Estrutura de Arquivos
+### 👥 Pessoas Importantes
+Escolha quem você quer se dedicar mais:
+- 👨‍👩‍👧‍👦 Família
+- 👯 Amigos
+- 💑 Parceiro(a)
+- 👶 Filhos
+- 💼 Colegas
+- 🪞 Eu mesmo
 
-```
-capsula-do-tempo/
-├── index.html      # Painel do Guardião
-├── jogador.html    # Interface do Participante
-├── capsula.html    # Visualização da Cápsula
-└── README.md       # Este arquivo
-```
+### 🌟 Desejos (24 opções)
+**Vida Pessoal:** Saúde, Família, Romance, Amizades, Paz interior, Felicidade
+
+**Conquistas:** Viajar, Carreira, Estudos, Promoção, Negócio próprio, Casa própria
+
+**Financeiro:** Economizar, Investir, Quitar dívidas, Carro novo, Renda extra
+
+**Bem-estar:** Exercícios, Meditação, Terapia, Hobby novo, Menos stress, Ler mais, Dormir melhor
+
+---
+
+## 📁 Arquivos
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `index.html` | Painel do Guardião/Operador |
+| `jogador.html` | Interface do Participante (6 passos) |
+| `capsula.html` | Visualização da Cápsula |
+
+---
 
 ## 🚀 Como Usar
 
-### 1. Deploy no GitHub Pages
+### Deploy no GitHub Pages
 
 1. Crie um repositório no GitHub
-2. Faça upload dos 4 arquivos
-3. Vá em Settings > Pages
-4. Selecione "main" branch e pasta "/ (root)"
-5. Aguarde alguns minutos e acesse seu site!
+2. Faça upload dos 3 arquivos HTML
+3. Vá em **Settings** → **Pages**
+4. Selecione **Branch: main** → **Save**
+5. Aguarde 2 minutos e acesse: `seu-usuario.github.io/nome-do-repo`
 
-### 2. Fluxo do Evento
+### Fluxo do Evento
 
-```
-1. CRIAÇÃO
-   Guardião acessa index.html → Cria evento → Gera QR Code
+1. **Operador** cria evento no painel → QR Code gerado
+2. **Participantes** escaneiam QR → Criam cápsula em 6 passos
+3. Cada lacramento aparece **animado com confetes** no painel
+4. **Operador** clica "🔒 Lacrar" → Cerimônia de Fechamento
+5. Quando chegar a data, **Operador** clica "🎊 Abrir!" → Cerimônia de Abertura (20s)
+6. **Operador** libera cápsulas (senha: `otacilia`)
+7. **Participantes** abrem suas cápsulas pelo link
 
-2. PARTICIPAÇÃO
-   Participantes escaneiam QR → Tiram foto → Selecionam desejos → Escrevem mensagem → Lacram
+---
 
-3. FECHAMENTO
-   Guardião clica "🔒 Lacrar" → Cerimônia com avatares em círculo
-
-4. ABERTURA (1 ano depois)
-   Guardião clica "🎊 Abrir!" → Animação 20s → Libera cápsulas → Participantes abrem
-```
-
-## 🔐 Senha do Guardião
-
-A senha padrão é: **otacilia**
-
-Para alterar, edite a variável `SENHA` no arquivo `index.html`:
-```javascript
-const SENHA = 'suanovasenha';
-```
-
-## 🎨 Animações
+## 🎬 Animações
 
 ### Notificação de Nova Cápsula
-- Foto com zoom animado
-- Nome com glow dourado
-- Tags dos desejos
+- Foto circular 200px com zoom + rotação
+- Nome em dourado com glow
+- Tags de desejos
 - 150 confetes coloridos
 - Auto-fecha em 6 segundos
 
 ### Cerimônia de Fechamento
-- Avatares posicionados em círculo
+- Avatares em círculo flutuando
 - Nuvem de palavras (top 10 desejos)
 - Contador animado
-- Confetes durante toda animação
+- Confetes
 
-### Cerimônia de Abertura
-- Avatares voando (estilo Mario Party)
-- Palavras flutuando da tela
+### Cerimônia de Abertura (20s)
+- Avatares voando estilo Mario Party
+- Palavras subindo na tela
 - Stats finais (cápsulas, desejos, caracteres)
-- 20 segundos de duração
-- Redireciona automaticamente para gerenciamento
 
 ### Abertura da Cápsula
-- Cápsula 3D com shake progressivo
-- Explosão com flash branco
-- Confetes na revelação
+- Shake 3 vezes
+- Explosão
+- Flash branco
+- Confetes
 
-## ⚙️ Configuração Firebase
+---
 
-O projeto usa Firebase Realtime Database. A configuração atual aponta para um projeto de demonstração.
+## 🔐 Configurações
 
-Para usar seu próprio Firebase:
+### Senha do Guardião
+A senha padrão é `otacilia`. Para alterar, edite no `index.html`:
+```javascript
+const SENHA_GUARDIAO = 'sua-nova-senha';
+```
 
-1. Crie um projeto em [console.firebase.google.com](https://console.firebase.google.com)
-2. Ative Realtime Database e Storage
+### Firebase
+O projeto usa Firebase já configurado. Para usar seu próprio:
+
+1. Crie projeto em [console.firebase.google.com](https://console.firebase.google.com)
+2. Ative **Realtime Database** e **Storage**
 3. Configure as regras:
-
-**Realtime Database Rules:**
 ```json
 {
   "rules": {
@@ -115,108 +119,76 @@ Para usar seu próprio Firebase:
   }
 }
 ```
-
-**Storage Rules:**
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-
-4. Substitua a configuração nos 3 arquivos HTML:
-```javascript
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJETO.firebaseapp.com",
-    databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-    projectId: "SEU_PROJETO",
-    storageBucket: "SEU_PROJETO.appspot.com",
-    messagingSenderId: "SEU_ID",
-    appId: "SEU_APP_ID"
-};
-```
-
-## 📱 Responsivo
-
-- **Desktop**: Grid de cards, cerimônia 500px
-- **Tablet**: Layout em coluna única
-- **Mobile**: Interface touch-friendly, elementos reduzidos
-
-## 🎯 Tags de Desejos Disponíveis
-
-### ❤️ Vida Pessoal
-Saúde, Família, Romance, Amizades, Paz, Felicidade
-
-### 🎯 Conquistas
-Viagens, Carreira, Estudos, Promoção, Negócio, Casa própria
-
-### 💰 Financeiro
-Economizar, Investir, Quitar dívidas, Carro, Renda extra
-
-### 🌈 Bem-estar
-Exercícios, Meditação, Terapia, Hobby novo, Menos stress, Ler mais, Dormir melhor
-
-## 🛠️ Tecnologias
-
-- **Frontend**: HTML5, CSS3, JavaScript ES6+
-- **Backend**: Firebase Realtime Database
-- **Storage**: Firebase Storage (fotos)
-- **QR Code**: QRCode.js
-- **Fonts**: Pacifico, Poppins, Orbitron (Google Fonts)
-- **Animações**: CSS Keyframes puras
-
-## 📊 Estrutura de Dados
-
-### Eventos
-```json
-{
-  "evt_123": {
-    "nome": "Natal 2024",
-    "dataCriacao": "2024-12-01T12:00:00Z",
-    "dataAbertura": "2025-12-25T12:00:00Z",
-    "arquivado": false
-  }
-}
-```
-
-### Cápsulas
-```json
-{
-  "cap_456": {
-    "eventoId": "evt_123",
-    "nome": "João",
-    "sobrenome": "Silva",
-    "foto": "https://...",
-    "desejos": ["Saúde", "Viagens", "Paz"],
-    "mensagemPessoal": "Querido eu do futuro...",
-    "dataCriacao": "2024-12-15T18:30:00Z",
-    "dataAbertura": "2025-12-25T12:00:00Z",
-    "liberada": false,
-    "aberta": false,
-    "reflexao": null
-  }
-}
-```
-
-## 🎉 Dicas de Uso
-
-1. **Teste antes do evento**: Crie um evento de teste para familiarizar-se
-2. **Projete na cerimônia**: Use uma TV/projetor para mostrar as animações
-3. **Backup dos dados**: Exporte os dados do Firebase periodicamente
-4. **Personalize a senha**: Mude "otacilia" para algo significativo
-5. **Salve os links**: Envie os links das cápsulas por email/WhatsApp
-
-## 📝 Licença
-
-Projeto livre para uso pessoal e comercial. Créditos são apreciados mas não obrigatórios.
+4. Substitua `firebaseConfig` nos 3 arquivos
 
 ---
 
-Feito com ❤️ para momentos especiais
+## 📱 Experiência do Participante (6 Passos)
 
-🎄 Feliz Natal e Próspero Ano Novo! 🎊
+1. **📸 Quem é você?** - Foto e nome
+2. **🌟 Seus desejos** - Selecionar até 10 tags
+3. **👥 Pessoas importantes** - Quem se dedicar
+4. **💭 Reflexões** - Perguntas sobre o momento atual
+5. **🎤 Mensagem de voz** - Gravar áudio (opcional)
+6. **💌 Carta para o futuro** - Mensagem escrita
+
+---
+
+## 📊 Dados Salvos
+
+```json
+{
+  "nome": "João",
+  "sobrenome": "Silva",
+  "foto": "https://...",
+  "desejos": ["Saúde", "Viajar", "Paz interior"],
+  "pessoas": ["Família", "Amigos"],
+  "perguntas": {
+    "conquista": "Falar inglês fluente",
+    "momento": "Nascimento do filho",
+    "palavra": "Gratidão",
+    "felicidade": 8,
+    "previsao": "Vou mudar de emprego"
+  },
+  "audio": "https://...",
+  "mensagemPessoal": "Querido eu do futuro...",
+  "dataCriacao": "2024-12-25T10:00:00Z",
+  "dataAbertura": "2025-12-25T12:00:00Z",
+  "liberada": false,
+  "aberta": false,
+  "reflexao": null
+}
+```
+
+---
+
+## 🎨 Tecnologias
+
+- **Firebase** - Realtime Database + Storage
+- **QRCode.js** - Geração de QR codes
+- **Web Audio API** - Gravação de áudio
+- **CSS Animations** - Todas as animações
+- **Google Fonts** - Pacifico, Poppins, Orbitron
+
+---
+
+## 💡 Dicas de Uso
+
+1. **Teste antes** - Crie um evento de teste para validar
+2. **Conexão estável** - Garanta boa internet para upload de fotos/áudios
+3. **Backup dos links** - Use a busca por nome para recuperar links perdidos
+4. **Cerimônia coletiva** - Projete o painel em uma TV durante a abertura
+5. **Liberação gradual** - Libere uma cápsula por vez para mais emoção!
+
+---
+
+## 📞 Suporte
+
+Problemas comuns:
+- **Página não atualiza**: Limpe o cache (Ctrl+Shift+R)
+- **Erro no Firebase**: Verifique as regras do Realtime Database
+- **Áudio não grava**: Permita acesso ao microfone no navegador
+
+---
+
+Feito com ❤️ para momentos especiais 🎄✨

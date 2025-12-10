@@ -29,6 +29,12 @@
         .tela.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* PROGRESSO */
+        .progress-bar { display: flex; gap: 6px; margin-bottom: 24px; padding: 0 10px; }
+        .progress-step { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .progress-step.active { background: var(--natal-gold); }
+        .progress-step.done { background: var(--natal-green); }
+
         /* TELA BOAS VINDAS */
         .tela-boas { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
         .icone-presente { font-size: 5rem; animation: bounce 2s ease-in-out infinite; }
@@ -39,109 +45,145 @@
         .btn-iniciar { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; }
         .btn-iniciar:hover { transform: translateY(-3px) scale(1.02); }
 
-        /* TELA CADASTRO */
-        .tela-cadastro { padding: 20px 0; }
-        .header-tela { text-align: center; margin-bottom: 32px; }
-        .header-tela h2 { font-size: 1.8rem; color: var(--natal-gold); }
-        .header-tela p { color: rgba(255,255,255,0.7); margin-top: 8px; }
-        .passo { font-size: 0.85rem; color: var(--natal-gold); margin-bottom: 8px; }
+        /* HEADER TELA */
+        .header-tela { text-align: center; margin-bottom: 24px; }
+        .header-tela h2 { font-size: 1.6rem; color: var(--natal-gold); margin-bottom: 8px; }
+        .header-tela p { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+        .passo { font-size: 0.8rem; color: var(--natal-gold); margin-bottom: 8px; opacity: 0.8; }
 
-        .foto-section { text-align: center; margin-bottom: 32px; }
-        .foto-container { width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 16px; position: relative; cursor: pointer; overflow: hidden; border: 4px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.05); transition: all 0.3s; }
+        /* FOTO */
+        .foto-section { text-align: center; margin-bottom: 24px; }
+        .foto-container { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 12px; position: relative; cursor: pointer; overflow: hidden; border: 4px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.05); transition: all 0.3s; }
         .foto-container:hover { border-color: var(--natal-gold); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
         .foto-container.has-photo { border-color: var(--natal-gold); }
         .foto-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--natal-gold); }
-        .foto-placeholder span { font-size: 3rem; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .foto-placeholder p { font-size: 0.8rem; margin-top: 8px; }
+        .foto-placeholder span { font-size: 2.5rem; }
+        .foto-placeholder p { font-size: 0.75rem; margin-top: 4px; }
         .foto-preview { width: 100%; height: 100%; object-fit: cover; }
         .foto-input { display: none; }
-        .foto-label { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
 
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255,255,255,0.9); }
-        .form-group input { width: 100%; padding: 16px 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 14px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
-        .form-group input:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
-        .form-group input::placeholder { color: rgba(255,255,255,0.4); }
+        /* FORM */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255,255,255,0.9); font-size: 0.95rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px 18px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .form-group textarea { resize: none; min-height: 100px; }
+        .char-counter { text-align: right; font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
 
-        .btn-continuar { width: 100%; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 20px; transition: all 0.3s; }
+        /* BOTÕES */
+        .btn-continuar { width: 100%; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 16px; transition: all 0.3s; }
         .btn-continuar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.4); }
         .btn-continuar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .btn-voltar { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 12px; transition: all 0.3s; }
+        .btn-voltar:hover { border-color: white; background: rgba(255,255,255,0.1); }
 
-        /* TELA DESEJOS */
-        .tela-desejos { padding: 20px 0; }
-        .desejos-contador { text-align: center; margin-bottom: 20px; padding: 12px; background: rgba(255,215,0,0.1); border-radius: 12px; color: var(--natal-gold); font-weight: 600; }
+        .btn-lacrar { width: 100%; background: linear-gradient(135deg, var(--natal-red), #a01830); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(196,30,58,0.4); transition: all 0.3s; margin-top: 20px; }
+        .btn-lacrar:hover { transform: translateY(-2px); }
+        .btn-lacrar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .categoria { margin-bottom: 24px; }
-        .categoria-titulo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 1.1rem; color: var(--natal-gold); font-weight: 600; }
-        .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        /* TAGS / SELEÇÃO */
+        .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tag { padding: 10px 18px; border-radius: 20px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
         .tag:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.1); }
         .tag.selected { background: rgba(255,215,0,0.2); border-color: var(--natal-gold); color: var(--natal-gold); font-weight: 600; transform: scale(1.05); }
 
-        /* TELA MENSAGEM */
-        .tela-mensagem { padding: 20px 0; }
-        .desejos-selecionados { background: rgba(255,215,0,0.1); border-radius: 16px; padding: 16px; margin-bottom: 24px; }
-        .desejos-selecionados h4 { color: var(--natal-gold); margin-bottom: 12px; font-size: 0.9rem; }
-        .mini-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-        .mini-tag { background: var(--natal-gold); color: var(--midnight); padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .categoria { margin-bottom: 20px; }
+        .categoria-titulo { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1rem; color: var(--natal-gold); font-weight: 600; }
+        
+        .contador-selecao { text-align: center; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 10px; color: var(--natal-gold); font-weight: 600; margin-bottom: 16px; font-size: 0.9rem; }
 
-        .textarea-group { margin-bottom: 20px; }
-        .textarea-group label { display: block; margin-bottom: 10px; font-weight: 500; }
-        .textarea-group textarea { width: 100%; height: 200px; padding: 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; resize: none; transition: all 0.3s; }
-        .textarea-group textarea:focus { outline: none; border-color: var(--natal-gold); background: rgba(255,255,255,0.12); }
-        .textarea-group textarea::placeholder { color: rgba(255,255,255,0.4); }
-        .char-counter { text-align: right; font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 8px; }
-        .char-counter.warning { color: var(--natal-gold); }
-        .char-counter.limit { color: var(--natal-red); }
+        /* PESSOAS */
+        .pessoas-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+        .pessoa-card { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .pessoa-card:hover { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.05); }
+        .pessoa-card.selected { border-color: var(--natal-gold); background: rgba(255,215,0,0.15); }
+        .pessoa-card .emoji { font-size: 2rem; margin-bottom: 8px; }
+        .pessoa-card .nome { font-size: 0.9rem; font-weight: 500; }
 
-        .btn-lacrar { width: 100%; background: linear-gradient(135deg, var(--natal-red), #a01830); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(196,30,58,0.4); transition: all 0.3s; }
-        .btn-lacrar:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(196,30,58,0.5); }
-        .btn-lacrar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        /* ÁUDIO */
+        .audio-section { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; text-align: center; border: 2px solid rgba(255,255,255,0.1); }
+        .audio-icon { font-size: 4rem; margin-bottom: 16px; }
+        .audio-title { font-size: 1.1rem; color: var(--natal-gold); margin-bottom: 8px; }
+        .audio-desc { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 20px; }
+        
+        .btn-gravar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--natal-red), #ff4444); border: none; color: white; font-size: 2.5rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 30px rgba(196,30,58,0.4); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+        .btn-gravar:hover { transform: scale(1.1); }
+        .btn-gravar.gravando { animation: pulseRecord 1s infinite; background: #ff0000; }
+        @keyframes pulseRecord { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255,0,0,0); } }
+        
+        .tempo-gravacao { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--natal-gold); margin-bottom: 16px; }
+        .tempo-limite { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+        
+        .audio-preview { margin-top: 20px; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 12px; }
+        .audio-preview audio { width: 100%; margin-bottom: 12px; }
+        .audio-actions { display: flex; gap: 10px; }
+        .audio-actions button { flex: 1; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .btn-regravar { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
+        .btn-confirmar-audio { background: var(--natal-green); border: none; color: white; }
+        
+        .audio-confirmado { display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(22,91,51,0.2); border-radius: 12px; margin-top: 16px; }
+        .audio-confirmado .check { font-size: 1.5rem; }
+        .audio-confirmado .info { flex: 1; text-align: left; }
+        .audio-confirmado .duracao { color: var(--natal-gold); font-size: 0.85rem; }
 
-        /* TELA SUCESSO */
-        .tela-sucesso { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
-        .sucesso-foto { width: 140px; height: 140px; border-radius: 50%; overflow: hidden; margin: 0 auto 24px; border: 4px solid var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); animation: successPop 0.6s ease-out; }
-        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .sucesso-foto img { width: 100%; height: 100%; object-fit: cover; }
-        .sucesso-foto-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4rem; }
-        .sucesso-titulo { font-size: 2rem; color: var(--natal-gold); margin-bottom: 12px; }
-        .sucesso-msg { color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.6; }
-        .sucesso-data { background: rgba(255,215,0,0.15); padding: 16px 24px; border-radius: 16px; margin-bottom: 24px; }
-        .sucesso-data .label { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        .sucesso-data .value { font-size: 1.3rem; font-weight: 700; color: var(--natal-gold); margin-top: 4px; }
-        .sucesso-data .dias { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+        .btn-pular { background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 0.9rem; cursor: pointer; margin-top: 16px; text-decoration: underline; }
 
-        .link-box { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; width: 100%; }
-        .link-box label { font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px; }
-        .link-box input { width: 100%; background: transparent; border: none; color: var(--natal-gold); font-family: monospace; font-size: 0.85rem; text-align: center; }
+        /* PERGUNTAS */
+        .pergunta-box { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; border-left: 4px solid var(--natal-gold); }
+        .pergunta-box label { display: block; margin-bottom: 12px; font-weight: 500; color: var(--natal-gold); }
+        .pergunta-box input, .pergunta-box textarea { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        
+        .escala-felicidade { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+        .escala-num { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .escala-num:hover { border-color: var(--natal-gold); }
+        .escala-num.selected { background: var(--natal-gold); color: var(--midnight); border-color: var(--natal-gold); }
 
-        .sucesso-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-        .btn-sucesso { padding: 14px 24px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; border: none; }
-        .btn-copiar { background: var(--natal-gold); color: var(--midnight); }
-        .btn-compartilhar { background: var(--natal-green); color: white; }
-        .btn-ver { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; }
+        /* RESUMO */
+        .resumo-section { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+        .resumo-section h4 { color: var(--natal-gold); margin-bottom: 12px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+        .resumo-item { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; }
+        .mini-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .mini-tag { background: var(--natal-gold); color: var(--midnight); padding: 4px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
 
         /* LOADING */
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .loading-overlay.active { opacity: 1; visibility: visible; }
-        .loading-capsula { width: 120px; height: 150px; position: relative; animation: shake 0.5s ease-in-out infinite; }
-        @keyframes shake { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-        .capsula-corpo { position: absolute; width: 100%; height: 100%; background: linear-gradient(180deg, #ffd700 0%, #b8860b 50%, #8b6914 100%); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; box-shadow: 0 0 60px rgba(255,215,0,0.5); }
-        .loading-texto { margin-top: 30px; font-size: 1.2rem; color: var(--natal-gold); animation: pulse 1s infinite; }
+        .loading-capsula { font-size: 5rem; animation: shake 0.5s infinite; }
+        @keyframes shake { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        .loading-text { margin-top: 20px; font-size: 1.2rem; color: var(--natal-gold); animation: pulse 1.5s infinite; }
 
-        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+        /* SUCESSO */
+        .tela-sucesso { align-items: center; justify-content: center; text-align: center; padding: 30px 20px; }
+        .sucesso-foto { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--natal-gold); overflow: hidden; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 3rem; animation: successPop 0.6s ease; }
+        @keyframes successPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .sucesso-titulo { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 12px; }
+        .sucesso-msg { color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+        .sucesso-data { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 12px 20px; border-radius: 12px; margin-bottom: 8px; font-weight: 600; }
+        .sucesso-dias { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 24px; }
+        .link-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 20px; }
+        .link-box input { width: 100%; background: transparent; border: none; color: white; font-size: 0.8rem; text-align: center; font-family: monospace; }
+        .sucesso-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .sucesso-btns button { padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .btn-copiar { background: var(--natal-green); border: none; color: white; }
+        .btn-compartilhar { background: transparent; border: 2px solid var(--natal-gold); color: var(--natal-gold); }
+        .btn-ver { background: var(--natal-gold); border: none; color: var(--midnight); }
+
+        /* ERRO */
+        .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+        .erro-icon { font-size: 5rem; margin-bottom: 20px; }
+        .erro-msg { color: rgba(255,255,255,0.7); }
+
+        /* CONFETES */
+        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
         .confete { position: absolute; animation: confeteFall 3s ease-out forwards; }
         @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
 
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 2000; opacity: 0; transition: all 0.4s; }
+        /* TOAST */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 3000; opacity: 0; transition: all 0.4s; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .toast.error { background: var(--natal-red); }
-
-        .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
-        .erro-icon { font-size: 5rem; margin-bottom: 24px; }
-        .erro-titulo { font-size: 1.8rem; color: var(--natal-red); margin-bottom: 12px; }
-        .erro-msg { color: rgba(255,255,255,0.7); }
     </style>
 </head>
 <body>
@@ -152,172 +194,340 @@
         <!-- TELA BOAS VINDAS -->
         <div class="tela tela-boas active" id="telaBoas">
             <div class="icone-presente">🎁</div>
-            <h1 class="titulo-evento" id="nomeEvento">Carregando...</h1>
-            <p class="subtitulo">Crie sua cápsula do tempo!</p>
-            <div class="data-abertura">📅 Abre em: <strong id="dataEvento">--/--/----</strong></div>
-            <button class="btn-iniciar" onclick="irParaCadastro()">🎁 CRIAR MINHA CÁPSULA</button>
+            <h1 class="titulo-evento" id="nomeEvento">Cápsula do Tempo</h1>
+            <p class="subtitulo">Guarde suas memórias, sonhos e desejos</p>
+            <p class="subtitulo">para o seu eu do futuro! ✨</p>
+            <div class="data-abertura">📅 Abertura: <span id="dataEvento">--/--/----</span></div>
+            <button class="btn-iniciar" onclick="iniciar()">🎁 CRIAR MINHA CÁPSULA</button>
         </div>
 
-        <!-- TELA CADASTRO -->
-        <div class="tela tela-cadastro" id="telaCadastro">
-            <div class="header-tela">
-                <p class="passo">Passo 1 de 3</p>
-                <h2>📸 Sua Identificação</h2>
-                <p>Tire uma foto e preencha seu nome</p>
+        <!-- PASSO 1: FOTO E NOME -->
+        <div class="tela" id="telaCadastro">
+            <div class="progress-bar">
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
             </div>
-
+            <div class="header-tela">
+                <p class="passo">Passo 1 de 6</p>
+                <h2>📸 Quem é você?</h2>
+                <p>Uma foto sua para reconhecer no futuro</p>
+            </div>
             <div class="foto-section">
                 <div class="foto-container" id="fotoContainer" onclick="document.getElementById('fotoInput').click()">
                     <div class="foto-placeholder" id="fotoPlaceholder">
                         <span>📷</span>
-                        <p>Toque para foto</p>
+                        <p>Tirar foto</p>
                     </div>
-                    <img class="foto-preview" id="fotoPreview" style="display:none">
                 </div>
-                <input type="file" class="foto-input" id="fotoInput" accept="image/*" capture="user" onchange="processarFoto(event)">
-                <p class="foto-label">Esta foto será seu avatar na cerimônia!</p>
+                <input type="file" id="fotoInput" class="foto-input" accept="image/*" capture="user" onchange="processarFoto(event)">
             </div>
-
             <div class="form-group">
-                <label for="nome">Nome</label>
-                <input type="text" id="nome" placeholder="Seu primeiro nome" maxlength="30">
+                <label>Seu nome</label>
+                <input type="text" id="nome" placeholder="Como você se chama?" maxlength="30">
             </div>
-
             <div class="form-group">
-                <label for="sobrenome">Sobrenome</label>
+                <label>Seu sobrenome</label>
                 <input type="text" id="sobrenome" placeholder="Seu sobrenome" maxlength="30">
             </div>
-
             <button class="btn-continuar" onclick="irParaDesejos()">Continuar →</button>
         </div>
 
-        <!-- TELA DESEJOS -->
-        <div class="tela tela-desejos" id="telaDesejos">
-            <div class="header-tela">
-                <p class="passo">Passo 2 de 3</p>
-                <h2>✨ Seus Desejos</h2>
-                <p>Selecione o que deseja para o próximo ano</p>
+        <!-- PASSO 2: DESEJOS -->
+        <div class="tela" id="telaDesejos">
+            <div class="progress-bar">
+                <div class="progress-step done"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
             </div>
-
-            <div class="desejos-contador">Selecionados: <span id="contadorDesejos">0</span> / 10</div>
-
+            <div class="header-tela">
+                <p class="passo">Passo 2 de 6</p>
+                <h2>🌟 Seus desejos</h2>
+                <p>O que você quer conquistar?</p>
+            </div>
+            <div class="contador-selecao">Selecionados: <span id="contadorDesejos">0</span> / 10</div>
+            
             <div class="categoria">
                 <div class="categoria-titulo">❤️ Vida Pessoal</div>
                 <div class="tags-grid">
-                    <button class="tag" onclick="toggleTag(this)">Saúde</button>
-                    <button class="tag" onclick="toggleTag(this)">Família</button>
-                    <button class="tag" onclick="toggleTag(this)">Romance</button>
-                    <button class="tag" onclick="toggleTag(this)">Amizades</button>
-                    <button class="tag" onclick="toggleTag(this)">Paz</button>
-                    <button class="tag" onclick="toggleTag(this)">Felicidade</button>
+                    <span class="tag" onclick="toggleTag(this)">Saúde</span>
+                    <span class="tag" onclick="toggleTag(this)">Família</span>
+                    <span class="tag" onclick="toggleTag(this)">Romance</span>
+                    <span class="tag" onclick="toggleTag(this)">Amizades</span>
+                    <span class="tag" onclick="toggleTag(this)">Paz interior</span>
+                    <span class="tag" onclick="toggleTag(this)">Felicidade</span>
                 </div>
             </div>
-
             <div class="categoria">
                 <div class="categoria-titulo">🎯 Conquistas</div>
                 <div class="tags-grid">
-                    <button class="tag" onclick="toggleTag(this)">Viagens</button>
-                    <button class="tag" onclick="toggleTag(this)">Carreira</button>
-                    <button class="tag" onclick="toggleTag(this)">Estudos</button>
-                    <button class="tag" onclick="toggleTag(this)">Promoção</button>
-                    <button class="tag" onclick="toggleTag(this)">Negócio</button>
-                    <button class="tag" onclick="toggleTag(this)">Casa própria</button>
+                    <span class="tag" onclick="toggleTag(this)">Viajar</span>
+                    <span class="tag" onclick="toggleTag(this)">Carreira</span>
+                    <span class="tag" onclick="toggleTag(this)">Estudos</span>
+                    <span class="tag" onclick="toggleTag(this)">Promoção</span>
+                    <span class="tag" onclick="toggleTag(this)">Negócio próprio</span>
+                    <span class="tag" onclick="toggleTag(this)">Casa própria</span>
                 </div>
             </div>
-
             <div class="categoria">
                 <div class="categoria-titulo">💰 Financeiro</div>
                 <div class="tags-grid">
-                    <button class="tag" onclick="toggleTag(this)">Economizar</button>
-                    <button class="tag" onclick="toggleTag(this)">Investir</button>
-                    <button class="tag" onclick="toggleTag(this)">Quitar dívidas</button>
-                    <button class="tag" onclick="toggleTag(this)">Carro</button>
-                    <button class="tag" onclick="toggleTag(this)">Renda extra</button>
+                    <span class="tag" onclick="toggleTag(this)">Economizar</span>
+                    <span class="tag" onclick="toggleTag(this)">Investir</span>
+                    <span class="tag" onclick="toggleTag(this)">Quitar dívidas</span>
+                    <span class="tag" onclick="toggleTag(this)">Carro novo</span>
+                    <span class="tag" onclick="toggleTag(this)">Renda extra</span>
                 </div>
             </div>
-
             <div class="categoria">
                 <div class="categoria-titulo">🌈 Bem-estar</div>
                 <div class="tags-grid">
-                    <button class="tag" onclick="toggleTag(this)">Exercícios</button>
-                    <button class="tag" onclick="toggleTag(this)">Meditação</button>
-                    <button class="tag" onclick="toggleTag(this)">Terapia</button>
-                    <button class="tag" onclick="toggleTag(this)">Hobby novo</button>
-                    <button class="tag" onclick="toggleTag(this)">Menos stress</button>
-                    <button class="tag" onclick="toggleTag(this)">Ler mais</button>
-                    <button class="tag" onclick="toggleTag(this)">Dormir melhor</button>
+                    <span class="tag" onclick="toggleTag(this)">Exercícios</span>
+                    <span class="tag" onclick="toggleTag(this)">Meditação</span>
+                    <span class="tag" onclick="toggleTag(this)">Terapia</span>
+                    <span class="tag" onclick="toggleTag(this)">Hobby novo</span>
+                    <span class="tag" onclick="toggleTag(this)">Menos stress</span>
+                    <span class="tag" onclick="toggleTag(this)">Ler mais</span>
+                    <span class="tag" onclick="toggleTag(this)">Dormir melhor</span>
                 </div>
             </div>
-
-            <button class="btn-continuar" onclick="irParaMensagem()">Continuar →</button>
+            <button class="btn-continuar" onclick="irParaPessoas()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaCadastro')">← Voltar</button>
         </div>
 
-        <!-- TELA MENSAGEM -->
-        <div class="tela tela-mensagem" id="telaMensagem">
+        <!-- PASSO 3: PESSOAS -->
+        <div class="tela" id="telaPessoas">
+            <div class="progress-bar">
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
             <div class="header-tela">
-                <p class="passo">Passo 3 de 3</p>
-                <h2>💌 Sua Mensagem</h2>
-                <p>Escreva para o seu eu do futuro</p>
+                <p class="passo">Passo 3 de 6</p>
+                <h2>👥 Pessoas importantes</h2>
+                <p>Quem você quer se dedicar mais este ano?</p>
             </div>
-
-            <div class="desejos-selecionados">
-                <h4>🎯 Seus desejos selecionados:</h4>
-                <div class="mini-tags" id="miniTags"></div>
+            
+            <div class="pessoas-grid">
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Família">
+                    <div class="emoji">👨‍👩‍👧‍👦</div>
+                    <div class="nome">Família</div>
+                </div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Amigos">
+                    <div class="emoji">👯</div>
+                    <div class="nome">Amigos</div>
+                </div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Parceiro(a)">
+                    <div class="emoji">💑</div>
+                    <div class="nome">Parceiro(a)</div>
+                </div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Filhos">
+                    <div class="emoji">👶</div>
+                    <div class="nome">Filhos</div>
+                </div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Colegas">
+                    <div class="emoji">💼</div>
+                    <div class="nome">Colegas</div>
+                </div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Eu mesmo">
+                    <div class="emoji">🪞</div>
+                    <div class="nome">Eu mesmo</div>
+                </div>
             </div>
+            
+            <button class="btn-continuar" onclick="irParaPerguntas()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaDesejos')">← Voltar</button>
+        </div>
 
-            <div class="textarea-group">
-                <label>Mensagem para você do futuro:</label>
+        <!-- PASSO 4: PERGUNTAS -->
+        <div class="tela" id="telaPerguntas">
+            <div class="progress-bar">
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+            <div class="header-tela">
+                <p class="passo">Passo 4 de 6</p>
+                <h2>💭 Reflexões</h2>
+                <p>Perguntas para seu eu do futuro</p>
+            </div>
+            
+            <div class="pergunta-box">
+                <label>🎯 O que você acha que vai conquistar até lá?</label>
+                <input type="text" id="perguntaConquista" placeholder="Ex: Falar inglês fluente, dirigir...">
+            </div>
+            
+            <div class="pergunta-box">
+                <label>✨ Momento mais marcante do seu ano até agora?</label>
+                <input type="text" id="perguntaMomento" placeholder="O que te marcou esse ano?">
+            </div>
+            
+            <div class="pergunta-box">
+                <label>📝 Uma palavra que define seu momento atual:</label>
+                <input type="text" id="perguntaPalavra" placeholder="Esperança, Luta, Gratidão..." maxlength="20">
+            </div>
+            
+            <div class="pergunta-box">
+                <label>😊 Sua felicidade hoje de 1 a 10:</label>
+                <div class="escala-felicidade" id="escalaFelicidade">
+                    <div class="escala-num" onclick="selecionarNota(1)">1</div>
+                    <div class="escala-num" onclick="selecionarNota(2)">2</div>
+                    <div class="escala-num" onclick="selecionarNota(3)">3</div>
+                    <div class="escala-num" onclick="selecionarNota(4)">4</div>
+                    <div class="escala-num" onclick="selecionarNota(5)">5</div>
+                    <div class="escala-num" onclick="selecionarNota(6)">6</div>
+                    <div class="escala-num" onclick="selecionarNota(7)">7</div>
+                    <div class="escala-num" onclick="selecionarNota(8)">8</div>
+                    <div class="escala-num" onclick="selecionarNota(9)">9</div>
+                    <div class="escala-num" onclick="selecionarNota(10)">10</div>
+                </div>
+            </div>
+            
+            <div class="pergunta-box">
+                <label>🔮 Uma previsão para o ano que vem:</label>
+                <input type="text" id="perguntaPrevisao" placeholder="Acho que vou...">
+            </div>
+            
+            <button class="btn-continuar" onclick="irParaAudio()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaPessoas')">← Voltar</button>
+        </div>
+
+        <!-- PASSO 5: ÁUDIO -->
+        <div class="tela" id="telaAudio">
+            <div class="progress-bar">
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+            </div>
+            <div class="header-tela">
+                <p class="passo">Passo 5 de 6</p>
+                <h2>🎤 Mensagem de voz</h2>
+                <p>Grave um recado para seu eu do futuro!</p>
+            </div>
+            
+            <div class="audio-section">
+                <div class="audio-icon">🎙️</div>
+                <div class="audio-title">Fale para você mesmo</div>
+                <div class="audio-desc">E aí, futuro eu! O que você gostaria de dizer? Conte seus sonhos, medos, esperanças...</div>
+                
+                <div class="tempo-gravacao" id="tempoGravacao">00:00</div>
+                <button class="btn-gravar" id="btnGravar" onclick="toggleGravacao()">🎤</button>
+                <div class="tempo-limite">Máximo: 60 segundos</div>
+                
+                <div class="audio-preview" id="audioPreview" style="display:none">
+                    <audio id="audioPlayer" controls></audio>
+                    <div class="audio-actions">
+                        <button class="btn-regravar" onclick="regravar()">🔄 Regravar</button>
+                        <button class="btn-confirmar-audio" onclick="confirmarAudio()">✓ Confirmar</button>
+                    </div>
+                </div>
+                
+                <div class="audio-confirmado" id="audioConfirmado" style="display:none">
+                    <span class="check">✅</span>
+                    <div class="info">
+                        <strong>Áudio gravado!</strong>
+                        <div class="duracao" id="duracaoAudio">00:00</div>
+                    </div>
+                    <button style="background:transparent;border:none;color:white;cursor:pointer" onclick="regravar()">🔄</button>
+                </div>
+            </div>
+            
+            <button class="btn-continuar" onclick="irParaMensagem()">Continuar →</button>
+            <button class="btn-pular" onclick="pularAudio()">Pular esta etapa</button>
+            <button class="btn-voltar" onclick="voltarPara('telaPerguntas')">← Voltar</button>
+        </div>
+
+        <!-- PASSO 6: MENSAGEM FINAL -->
+        <div class="tela" id="telaMensagem">
+            <div class="progress-bar">
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step done"></div>
+                <div class="progress-step active"></div>
+            </div>
+            <div class="header-tela">
+                <p class="passo">Passo 6 de 6</p>
+                <h2>💌 Carta para o futuro</h2>
+                <p>Escreva uma mensagem especial</p>
+            </div>
+            
+            <div class="resumo-section">
+                <h4>📋 Resumo da sua cápsula</h4>
+                <div class="resumo-item"><strong>Desejos:</strong></div>
+                <div class="mini-tags" id="resumoDesejos"></div>
+                <div class="resumo-item" style="margin-top:12px"><strong>Dedicação:</strong> <span id="resumoPessoas">-</span></div>
+                <div class="resumo-item"><strong>Felicidade atual:</strong> <span id="resumoFelicidade">-</span>/10</div>
+                <div class="resumo-item"><strong>Áudio:</strong> <span id="resumoAudio">Não gravado</span></div>
+            </div>
+            
+            <div class="form-group">
+                <label>✍️ Sua mensagem para o futuro:</label>
                 <textarea id="mensagem" placeholder="Querido eu do futuro...
 
-O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial para si mesmo..." maxlength="3000" oninput="atualizarContador()"></textarea>
-                <div class="char-counter" id="charCounter">0 / 3000</div>
-            </div>
+O que você está sentindo agora? O que espera? O que tem medo? O que te faz feliz?
 
+Escreva tudo que quiser lembrar..." maxlength="5000" rows="8" oninput="atualizarContador()"></textarea>
+                <div class="char-counter"><span id="charCounter">0</span> / 5000</div>
+            </div>
+            
             <button class="btn-lacrar" id="btnLacrar" onclick="lacrarCapsula()">🔒 LACRAR MINHA CÁPSULA</button>
+            <button class="btn-voltar" onclick="voltarPara('telaAudio')">← Voltar</button>
         </div>
 
         <!-- TELA SUCESSO -->
         <div class="tela tela-sucesso" id="telaSucesso">
-            <div class="sucesso-foto" id="sucessoFoto">
-                <div class="sucesso-foto-placeholder">👤</div>
-            </div>
-            <h2 class="sucesso-titulo">🎉 Cápsula Lacrada!</h2>
-            <p class="sucesso-msg" id="sucessoMsg">Sua mensagem está segura até a data de abertura.</p>
-            
-            <div class="sucesso-data">
-                <div class="label">📅 Data de abertura:</div>
-                <div class="value" id="sucessoData">--/--/----</div>
-                <div class="dias" id="sucessoDias">-- dias restantes</div>
-            </div>
-
+            <div class="sucesso-foto" id="sucessoFoto">🎉</div>
+            <h2 class="sucesso-titulo">Cápsula Lacrada!</h2>
+            <p class="sucesso-msg" id="sucessoMsg">Sua cápsula está segura até a cerimônia!</p>
+            <div class="sucesso-data">📅 <span id="sucessoData">--/--/----</span></div>
+            <div class="sucesso-dias" id="sucessoDias">-- dias restantes</div>
             <div class="link-box">
-                <label>🔗 Seu link único (guarde bem!):</label>
                 <input type="text" id="linkCapsula" readonly>
             </div>
-
-            <div class="sucesso-actions">
-                <button class="btn-sucesso btn-copiar" onclick="copiarLink()">📋 Copiar Link</button>
-                <button class="btn-sucesso btn-compartilhar" onclick="compartilhar()">📤 Compartilhar</button>
-                <button class="btn-sucesso btn-ver" onclick="verCapsula()">👁️ Ver Cápsula</button>
+            <div class="sucesso-btns">
+                <button class="btn-copiar" onclick="copiarLink()">📋 Copiar Link</button>
+                <button class="btn-compartilhar" onclick="compartilhar()">📤 Compartilhar</button>
+                <button class="btn-ver" onclick="verCapsula()">👁️ Ver Cápsula</button>
             </div>
         </div>
 
         <!-- TELA ERRO -->
         <div class="tela tela-erro" id="telaErro">
             <div class="erro-icon">😕</div>
-            <h2 class="erro-titulo">Evento não encontrado</h2>
-            <p class="erro-msg">Verifique se o link está correto ou peça um novo ao organizador.</p>
+            <h2 style="color:var(--natal-gold);margin-bottom:12px">Ops!</h2>
+            <p class="erro-msg">Evento não encontrado ou já encerrado.</p>
         </div>
     </div>
 
+    <!-- LOADING -->
     <div class="loading-overlay" id="loading">
-        <div class="loading-capsula"><div class="capsula-corpo"></div></div>
-        <p class="loading-texto">Lacrando sua cápsula...</p>
+        <div class="loading-capsula">🎁</div>
+        <div class="loading-text">Lacrando sua cápsula...</div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
+        // ==========================================
+        // FIREBASE CONFIG
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
             authDomain: "capsuladotempo-f86bf.firebaseapp.com",
@@ -327,54 +537,145 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
             messagingSenderId: "43014678980",
             appId: "1:43014678980:web:0c84f48037ee6924afdc91"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const storage = firebase.storage();
 
-        let eventoId = null, eventoData = null, fotoBase64 = null, desejosSelecionados = [], capsulaId = null;
+        // ==========================================
+        // VARIÁVEIS GLOBAIS
+        // ==========================================
+        let eventoId = null;
+        let eventoData = null;
+        let capsulaId = null;
+        let fotoBase64 = null;
+        
+        // Dados coletados
+        let desejosSelecionados = [];
+        let pessoasSelecionadas = [];
+        let notaFelicidade = null;
+        
+        // Áudio
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioConfirmadoFlag = false;
+        let tempoInicio = null;
+        let timerInterval = null;
 
-        const mostrarToast = (m, t='success') => { const toast = document.getElementById('toast'); toast.textContent = m; toast.className = 'toast show' + (t==='error'?' error':''); setTimeout(() => toast.className = 'toast', 3000); };
-        const formatarData = d => new Date(d).toLocaleDateString('pt-BR');
-        const gerarID = p => `${p}_${Date.now()}_${Math.random().toString(36).substr(2,9)}`;
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        const gerarID = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2,9)}`;
+        const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
+        
+        const mostrarToast = (msg, tipo='success') => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (tipo === 'error' ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 3000);
+        };
 
         function criarParticulas() {
             const c = document.getElementById('particles');
-            ['❄','❅','❆','✧'].forEach(f => { for(let i=0;i<5;i++) { const el = document.createElement('div'); el.className = 'snowflake'; el.textContent = f; el.style.cssText = `left:${Math.random()*100}vw;animation-duration:${8+Math.random()*5}s;animation-delay:${Math.random()*10}s;font-size:${0.5+Math.random()*0.8}rem`; c.appendChild(el); } });
-            for(let i=0;i<30;i++) { const s = document.createElement('div'); s.className = 'star'; s.style.cssText = `left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${1+Math.random()*2}px;height:${s.style.width};animation-duration:${2+Math.random()*3}s`; c.appendChild(s); }
+            ['❄','❅','❆','✧'].forEach(f => {
+                for(let i=0;i<6;i++) {
+                    const e = document.createElement('div');
+                    e.className = 'snowflake';
+                    e.textContent = f;
+                    e.style.left = Math.random()*100+'vw';
+                    e.style.animationDuration = (8+Math.random()*5)+'s';
+                    e.style.animationDelay = Math.random()*10+'s';
+                    e.style.fontSize = (0.5+Math.random()*0.8)+'rem';
+                    c.appendChild(e);
+                }
+            });
+            for(let i=0;i<30;i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random()*100+'vw';
+                s.style.top = Math.random()*100+'vh';
+                const sz = 1+Math.random()*2;
+                s.style.width = sz+'px';
+                s.style.height = sz+'px';
+                s.style.animationDuration = (2+Math.random()*3)+'s';
+                c.appendChild(s);
+            }
         }
 
         function criarConfetes() {
-            const c = document.getElementById('confetes'); c.innerHTML = '';
+            const c = document.getElementById('confetes');
+            c.innerHTML = '';
             const cores = ['#c41e3a','#165b33','#ffd700','#fff','#ff6b6b','#4ecdc4'];
-            for(let i=0;i<100;i++) { const cf = document.createElement('div'); cf.className = 'confete'; cf.style.cssText = `left:${Math.random()*100}vw;background:${cores[Math.floor(Math.random()*cores.length)]};animation-delay:${Math.random()*2}s;width:${5+Math.random()*10}px;height:${cf.style.width};border-radius:${Math.random()>0.5?'50%':'0'}`; c.appendChild(cf); }
+            for(let i=0;i<100;i++) {
+                const cf = document.createElement('div');
+                cf.className = 'confete';
+                cf.style.left = Math.random()*100+'vw';
+                cf.style.background = cores[Math.floor(Math.random()*cores.length)];
+                cf.style.animationDelay = Math.random()*2+'s';
+                const sz = 5+Math.random()*10;
+                cf.style.width = sz+'px';
+                cf.style.height = sz+'px';
+                cf.style.borderRadius = Math.random()>0.5?'50%':'0';
+                c.appendChild(cf);
+            }
         }
 
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function voltarPara(id) {
+            mostrarTela(id);
+        }
+
+        // ==========================================
+        // CARREGAR EVENTO
+        // ==========================================
         document.addEventListener('DOMContentLoaded', async () => {
             criarParticulas();
+            
             const params = new URLSearchParams(window.location.search);
             eventoId = params.get('evento');
-            if (!eventoId) { mostrarTela('telaErro'); return; }
-
+            
+            if (!eventoId) {
+                mostrarTela('telaErro');
+                return;
+            }
+            
             try {
                 const snap = await database.ref(`eventos/${eventoId}`).once('value');
                 eventoData = snap.val();
-                if (!eventoData || eventoData.arquivado) { mostrarTela('telaErro'); return; }
+                
+                if (!eventoData || eventoData.arquivado) {
+                    mostrarTela('telaErro');
+                    return;
+                }
+                
                 document.getElementById('nomeEvento').textContent = eventoData.nome;
                 document.getElementById('dataEvento').textContent = formatarData(eventoData.dataAbertura);
-                mostrarTela('telaBoas');
-            } catch { mostrarTela('telaErro'); }
+                
+            } catch (err) {
+                console.error(err);
+                mostrarTela('telaErro');
+            }
         });
 
-        function mostrarTela(id) { document.querySelectorAll('.tela').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function iniciar() {
+            mostrarTela('telaCadastro');
+        }
 
-        function irParaCadastro() { mostrarTela('telaCadastro'); }
-
-        function processarFoto(e) {
-            const file = e.target.files[0];
+        // ==========================================
+        // PASSO 1: FOTO E NOME
+        // ==========================================
+        function processarFoto(event) {
+            const file = event.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
-            reader.onload = ev => {
+            reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
@@ -386,12 +687,11 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
                     
-                    document.getElementById('fotoPreview').src = fotoBase64;
-                    document.getElementById('fotoPreview').style.display = 'block';
-                    document.getElementById('fotoPlaceholder').style.display = 'none';
-                    document.getElementById('fotoContainer').classList.add('has-photo');
+                    const container = document.getElementById('fotoContainer');
+                    container.classList.add('has-photo');
+                    container.innerHTML = `<img class="foto-preview" src="${fotoBase64}">`;
                 };
-                img.src = ev.target.result;
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -399,41 +699,194 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
         function irParaDesejos() {
             const nome = document.getElementById('nome').value.trim();
             const sobrenome = document.getElementById('sobrenome').value.trim();
-            if (!nome || !sobrenome) { mostrarToast('Preencha nome e sobrenome', 'error'); return; }
+            if (!nome || !sobrenome) {
+                mostrarToast('Preencha nome e sobrenome', 'error');
+                return;
+            }
             mostrarTela('telaDesejos');
         }
 
+        // ==========================================
+        // PASSO 2: DESEJOS
+        // ==========================================
         function toggleTag(el) {
             if (el.classList.contains('selected')) {
                 el.classList.remove('selected');
                 desejosSelecionados = desejosSelecionados.filter(d => d !== el.textContent);
             } else {
-                if (desejosSelecionados.length >= 10) { mostrarToast('Máximo 10 desejos!', 'error'); return; }
+                if (desejosSelecionados.length >= 10) {
+                    mostrarToast('Máximo 10 desejos!', 'error');
+                    return;
+                }
                 el.classList.add('selected');
                 desejosSelecionados.push(el.textContent);
             }
             document.getElementById('contadorDesejos').textContent = desejosSelecionados.length;
         }
 
+        function irParaPessoas() {
+            if (desejosSelecionados.length === 0) {
+                mostrarToast('Selecione pelo menos 1 desejo', 'error');
+                return;
+            }
+            mostrarTela('telaPessoas');
+        }
+
+        // ==========================================
+        // PASSO 3: PESSOAS
+        // ==========================================
+        function togglePessoa(el) {
+            const pessoa = el.dataset.pessoa;
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                pessoasSelecionadas = pessoasSelecionadas.filter(p => p !== pessoa);
+            } else {
+                el.classList.add('selected');
+                pessoasSelecionadas.push(pessoa);
+            }
+        }
+
+        function irParaPerguntas() {
+            mostrarTela('telaPerguntas');
+        }
+
+        // ==========================================
+        // PASSO 4: PERGUNTAS
+        // ==========================================
+        function selecionarNota(n) {
+            notaFelicidade = n;
+            document.querySelectorAll('.escala-num').forEach((el, i) => {
+                el.classList.toggle('selected', i+1 === n);
+            });
+        }
+
+        function irParaAudio() {
+            mostrarTela('telaAudio');
+        }
+
+        // ==========================================
+        // PASSO 5: ÁUDIO
+        // ==========================================
+        async function toggleGravacao() {
+            const btn = document.getElementById('btnGravar');
+            
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                // Iniciar gravação
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (e) => {
+                        audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const url = URL.createObjectURL(audioBlob);
+                        document.getElementById('audioPlayer').src = url;
+                        document.getElementById('audioPreview').style.display = 'block';
+                        document.getElementById('btnGravar').style.display = 'none';
+                        document.getElementById('tempoGravacao').style.display = 'none';
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                    
+                    mediaRecorder.start();
+                    btn.classList.add('gravando');
+                    btn.innerHTML = '⏹️';
+                    
+                    tempoInicio = Date.now();
+                    timerInterval = setInterval(atualizarTempo, 100);
+                    
+                    // Auto-parar em 60 segundos
+                    setTimeout(() => {
+                        if (mediaRecorder && mediaRecorder.state === 'recording') {
+                            pararGravacao();
+                        }
+                    }, 60000);
+                    
+                } catch (err) {
+                    console.error(err);
+                    mostrarToast('Não foi possível acessar o microfone', 'error');
+                }
+            } else {
+                pararGravacao();
+            }
+        }
+
+        function pararGravacao() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                clearInterval(timerInterval);
+                document.getElementById('btnGravar').classList.remove('gravando');
+            }
+        }
+
+        function atualizarTempo() {
+            const elapsed = Math.floor((Date.now() - tempoInicio) / 1000);
+            const min = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const sec = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('tempoGravacao').textContent = `${min}:${sec}`;
+        }
+
+        function regravar() {
+            audioBlob = null;
+            audioConfirmadoFlag = false;
+            document.getElementById('audioPreview').style.display = 'none';
+            document.getElementById('audioConfirmado').style.display = 'none';
+            document.getElementById('btnGravar').style.display = 'flex';
+            document.getElementById('btnGravar').innerHTML = '🎤';
+            document.getElementById('tempoGravacao').style.display = 'block';
+            document.getElementById('tempoGravacao').textContent = '00:00';
+        }
+
+        function confirmarAudio() {
+            audioConfirmadoFlag = true;
+            const elapsed = Math.floor((Date.now() - tempoInicio) / 1000);
+            const min = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const sec = (elapsed % 60).toString().padStart(2, '0');
+            
+            document.getElementById('audioPreview').style.display = 'none';
+            document.getElementById('audioConfirmado').style.display = 'flex';
+            document.getElementById('duracaoAudio').textContent = `Duração: ${min}:${sec}`;
+            
+            mostrarToast('✓ Áudio confirmado!');
+        }
+
+        function pularAudio() {
+            audioBlob = null;
+            audioConfirmadoFlag = false;
+            irParaMensagem();
+        }
+
         function irParaMensagem() {
-            if (desejosSelecionados.length === 0) { mostrarToast('Selecione pelo menos 1 desejo', 'error'); return; }
-            document.getElementById('miniTags').innerHTML = desejosSelecionados.map(d => `<span class="mini-tag">${d}</span>`).join('');
+            // Atualizar resumo
+            document.getElementById('resumoDesejos').innerHTML = desejosSelecionados.map(d => `<span class="mini-tag">${d}</span>`).join('');
+            document.getElementById('resumoPessoas').textContent = pessoasSelecionadas.length > 0 ? pessoasSelecionadas.join(', ') : 'Não selecionado';
+            document.getElementById('resumoFelicidade').textContent = notaFelicidade || '-';
+            document.getElementById('resumoAudio').textContent = audioConfirmadoFlag ? '✓ Gravado' : 'Não gravado';
+            
             mostrarTela('telaMensagem');
         }
 
+        // ==========================================
+        // PASSO 6: MENSAGEM E LACRAR
+        // ==========================================
         function atualizarContador() {
             const len = document.getElementById('mensagem').value.length;
-            const counter = document.getElementById('charCounter');
-            counter.textContent = `${len} / 3000`;
-            counter.className = 'char-counter' + (len > 2700 ? ' warning' : '') + (len >= 3000 ? ' limit' : '');
+            document.getElementById('charCounter').textContent = len;
         }
 
         async function lacrarCapsula() {
             const nome = document.getElementById('nome').value.trim();
             const sobrenome = document.getElementById('sobrenome').value.trim();
             const mensagem = document.getElementById('mensagem').value.trim();
-
-            if (!mensagem) { mostrarToast('Escreva uma mensagem', 'error'); return; }
+            
+            // Perguntas
+            const conquista = document.getElementById('perguntaConquista').value.trim();
+            const momento = document.getElementById('perguntaMomento').value.trim();
+            const palavra = document.getElementById('perguntaPalavra').value.trim();
+            const previsao = document.getElementById('perguntaPrevisao').value.trim();
 
             const btn = document.getElementById('btnLacrar');
             btn.disabled = true;
@@ -442,7 +895,9 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
             try {
                 capsulaId = gerarID('cap');
                 let fotoUrl = null;
+                let audioUrl = null;
 
+                // Upload foto
                 if (fotoBase64) {
                     const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
                     const response = await fetch(fotoBase64);
@@ -451,12 +906,29 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
                     fotoUrl = await fotoRef.getDownloadURL();
                 }
 
+                // Upload áudio
+                if (audioBlob && audioConfirmadoFlag) {
+                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio.webm`);
+                    await audioRef.put(audioBlob);
+                    audioUrl = await audioRef.getDownloadURL();
+                }
+
+                // Salvar no banco
                 await database.ref(`capsulas/${capsulaId}`).set({
                     eventoId,
                     nome,
                     sobrenome,
                     foto: fotoUrl,
                     desejos: desejosSelecionados,
+                    pessoas: pessoasSelecionadas,
+                    perguntas: {
+                        conquista,
+                        momento,
+                        palavra,
+                        previsao,
+                        felicidade: notaFelicidade
+                    },
+                    audio: audioUrl,
                     mensagemPessoal: mensagem,
                     dataCriacao: new Date().toISOString(),
                     dataAbertura: eventoData.dataAbertura,
@@ -465,7 +937,8 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
                 });
 
                 document.getElementById('loading').classList.remove('active');
-                mostrarSucesso(fotoUrl, nome, sobrenome);
+                mostrarSucesso(fotoUrl, nome);
+                
             } catch (err) {
                 console.error(err);
                 document.getElementById('loading').classList.remove('active');
@@ -474,10 +947,10 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
             }
         }
 
-        function mostrarSucesso(fotoUrl, nome, sobrenome) {
-            const sucessoFoto = document.getElementById('sucessoFoto');
+        function mostrarSucesso(fotoUrl, nome) {
+            const foto = document.getElementById('sucessoFoto');
             if (fotoUrl) {
-                sucessoFoto.innerHTML = `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover">`;
+                foto.innerHTML = `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover">`;
             }
 
             document.getElementById('sucessoMsg').textContent = `${nome}, sua cápsula está segura até a cerimônia de abertura!`;
@@ -486,7 +959,7 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
             const dias = Math.ceil((new Date(eventoData.dataAbertura) - new Date()) / (1000*60*60*24));
             document.getElementById('sucessoDias').textContent = `${dias} dias restantes`;
 
-            const base = window.location.origin + window.location.pathname.replace('jogador.html','');
+            const base = window.location.origin + window.location.pathname.replace('jogador.html', '');
             const link = `${base}capsula.html?id=${capsulaId}`;
             document.getElementById('linkCapsula').value = link;
 
@@ -500,8 +973,11 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
                 await navigator.clipboard.writeText(link);
                 mostrarToast('✓ Link copiado!');
             } catch {
-                const i = document.createElement('input'); i.value = link;
-                document.body.appendChild(i); i.select(); document.execCommand('copy');
+                const i = document.createElement('input');
+                i.value = link;
+                document.body.appendChild(i);
+                i.select();
+                document.execCommand('copy');
                 document.body.removeChild(i);
                 mostrarToast('✓ Link copiado!');
             }
@@ -510,7 +986,11 @@ O que você quer lembrar? O que espera conquistar? Deixe uma mensagem especial p
         function compartilhar() {
             const link = document.getElementById('linkCapsula').value;
             if (navigator.share) {
-                navigator.share({ title: '🎁 Minha Cápsula do Tempo', text: 'Criei uma cápsula do tempo! Veja quando abrir:', url: link });
+                navigator.share({
+                    title: '🎁 Minha Cápsula do Tempo',
+                    text: 'Criei uma cápsula do tempo! Veja quando abrir:',
+                    url: link
+                });
             } else {
                 copiarLink();
             }

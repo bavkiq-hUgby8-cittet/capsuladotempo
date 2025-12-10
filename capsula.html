@@ -22,95 +22,110 @@
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle ease-in-out infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
-        /* CÁPSULA LACRADA */
-        .capsula-lacrada { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
-        .capsula-foto { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; margin-bottom: 24px; border: 4px solid var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); }
-        .capsula-foto img { width: 100%; height: 100%; object-fit: cover; }
-        .capsula-foto-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4rem; }
-        .capsula-nome { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 8px; }
-        .capsula-evento { color: rgba(255,255,255,0.7); margin-bottom: 32px; }
+        .tela { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.5s ease; }
+        .tela.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CÁPSULA 3D */
-        .capsula-3d { width: 180px; height: 220px; position: relative; margin: 20px auto; animation: float 4s ease-in-out infinite; perspective: 1000px; }
+        /* TELA LACRADA */
+        .tela-lacrada { align-items: center; text-align: center; padding: 30px 20px; }
+        .foto-lacrada { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--natal-gold); overflow: hidden; margin-bottom: 16px; background: linear-gradient(135deg, var(--natal-red), var(--natal-green)); display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+        .foto-lacrada img { width: 100%; height: 100%; object-fit: cover; }
+        .nome-lacrada { font-size: 1.8rem; color: var(--natal-gold); margin-bottom: 4px; }
+        .evento-lacrada { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 24px; }
+
+        .capsula-3d { position: relative; width: 180px; height: 220px; margin: 20px auto; }
+        .capsula-corpo { position: absolute; width: 100%; height: 100%; background: linear-gradient(135deg, #ffd700 0%, #ffaa00 50%, #cc8800 100%); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -20px -20px 40px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4); animation: float 4s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        .capsula-corpo { position: absolute; width: 100%; height: 100%; background: linear-gradient(180deg, #ffd700 0%, #daa520 30%, #b8860b 60%, #8b6914 100%); border-radius: 50% 50% 50% 50% / 35% 35% 65% 65%; box-shadow: inset -20px -20px 40px rgba(0,0,0,0.3), inset 20px 20px 40px rgba(255,255,255,0.2), 0 0 60px rgba(255,215,0,0.5); }
-        .capsula-tampa { position: absolute; top: -10px; left: 10%; width: 80%; height: 40px; background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%); border-radius: 50% 50% 0 0 / 100% 100% 0 0; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2); }
-        .capsula-lacre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; text-shadow: 0 0 30px rgba(255,215,0,0.8); animation: pulse 2s ease-in-out infinite; }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.1); } }
-        .capsula-brilho { position: absolute; top: 20%; left: 15%; width: 30px; height: 60px; background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent); border-radius: 50%; transform: rotate(-30deg); animation: brilho 3s ease-in-out infinite; }
-        @keyframes brilho { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.3; } }
+        .capsula-tampa { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 120px; height: 50px; background: linear-gradient(135deg, #ffcc00, #ff9900); border-radius: 50% 50% 0 0; }
+        .capsula-lacre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; z-index: 2; }
+        .capsula-brilho { position: absolute; top: 20%; left: 20%; width: 30px; height: 30px; background: rgba(255,255,255,0.6); border-radius: 50%; filter: blur(5px); }
 
-        .status-badge { display: inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 600; margin: 24px 0; }
-        .status-lacrada { background: rgba(196,30,58,0.2); color: var(--natal-red); border: 2px solid var(--natal-red); }
-        .status-liberada { background: rgba(255,215,0,0.2); color: var(--natal-gold); border: 2px solid var(--natal-gold); animation: pulseGlow 2s ease-in-out infinite; }
-        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.6); } }
+        .status-badge { padding: 12px 24px; border-radius: 20px; font-weight: 600; margin: 20px 0; }
+        .status-lacrada { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+        .status-liberada { background: rgba(255,215,0,0.2); color: var(--natal-gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        .countdown { text-align: center; margin: 24px 0; }
-        .countdown-titulo { color: rgba(255,255,255,0.7); margin-bottom: 16px; font-size: 1rem; }
-        .countdown-grid { display: flex; justify-content: center; gap: 16px; }
-        .countdown-item { background: rgba(255,255,255,0.05); padding: 16px 12px; border-radius: 12px; min-width: 70px; border: 1px solid rgba(255,255,255,0.1); }
-        .countdown-valor { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--natal-gold); }
-        .countdown-label { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
+        .countdown { display: flex; justify-content: center; gap: 12px; margin: 24px 0; }
+        .countdown-item { text-align: center; }
+        .countdown-value { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; color: var(--natal-gold); background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; min-width: 60px; }
+        .countdown-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
 
-        .btn-abrir { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; margin-top: 24px; }
+        .btn-abrir { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 18px 48px; border-radius: 16px; font-size: 1.2rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; box-shadow: 0 8px 30px rgba(255,215,0,0.4); transition: all 0.3s; margin-top: 20px; }
         .btn-abrir:hover { transform: translateY(-3px) scale(1.02); }
-        .btn-abrir:disabled { opacity: 0.5; cursor: not-allowed; transform: none; background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); }
+        .btn-abrir:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .msg-aguarde { color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 16px; }
 
-        .msg-guardiao { background: rgba(255,215,0,0.1); padding: 16px 24px; border-radius: 12px; margin-top: 24px; color: rgba(255,255,255,0.8); font-size: 0.9rem; max-width: 300px; }
+        /* TELA ABERTA */
+        .tela-aberta { padding: 20px 0; }
+        .header-aberta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .foto-mini { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 3px solid var(--natal-gold); flex-shrink: 0; }
+        .foto-mini img { width: 100%; height: 100%; object-fit: cover; }
+        .info-header h2 { font-size: 1.4rem; color: var(--natal-gold); }
+        .info-header p { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
 
-        /* ANIMAÇÃO DE ABERTURA */
+        .secao { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .secao-titulo { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: var(--natal-gold); margin-bottom: 12px; font-weight: 600; }
+        .secao-conteudo { color: rgba(255,255,255,0.9); line-height: 1.6; }
+
+        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag-item { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 6px 14px; border-radius: 15px; font-size: 0.85rem; }
+
+        /* ÁUDIO */
+        .audio-player { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; }
+        .audio-player audio { width: 100%; }
+        .audio-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .audio-icon { font-size: 2rem; }
+        .audio-text { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+
+        /* PERGUNTAS */
+        .pergunta-item { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 3px solid var(--natal-gold); }
+        .pergunta-label { font-size: 0.8rem; color: var(--natal-gold); margin-bottom: 6px; }
+        .pergunta-resposta { color: white; }
+        .felicidade-display { display: flex; align-items: center; gap: 8px; }
+        .felicidade-nota { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--natal-gold); }
+        .felicidade-barra { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .felicidade-fill { height: 100%; background: var(--natal-gold); border-radius: 4px; }
+
+        /* MENSAGEM */
+        .mensagem-texto { white-space: pre-wrap; font-size: 1rem; line-height: 1.7; }
+        .mensagem-chars { text-align: right; font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 8px; }
+
+        /* REFLEXÃO */
+        .reflexao-form textarea { width: 100%; padding: 14px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.08); color: white; font-size: 1rem; font-family: 'Poppins', sans-serif; resize: none; min-height: 100px; }
+        .reflexao-form textarea:focus { outline: none; border-color: var(--natal-gold); }
+        .btn-salvar { background: var(--natal-green); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: 'Poppins', sans-serif; }
+        .reflexao-salva { background: rgba(22,91,51,0.2); border-radius: 12px; padding: 16px; border-left: 3px solid var(--natal-green); }
+        .reflexao-salva-titulo { color: var(--natal-green); font-size: 0.85rem; margin-bottom: 8px; }
+
+        .btn-compartilhar { width: 100%; background: transparent; border: 2px solid var(--natal-gold); color: var(--natal-gold); padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 16px; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+        .btn-compartilhar:hover { background: var(--natal-gold); color: var(--midnight); }
+
+        /* ANIMAÇÃO ABERTURA */
         .abertura-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s; }
         .abertura-overlay.active { opacity: 1; visibility: visible; }
-        .abertura-capsula { width: 180px; height: 220px; position: relative; }
-        .abertura-capsula.shake { animation: shake 0.5s ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: translateX(0) rotate(0); } 25% { transform: translateX(-20px) rotate(-5deg); } 75% { transform: translateX(20px) rotate(5deg); } }
-        .abertura-capsula.explode { animation: explode 0.8s ease-out forwards; }
-        @keyframes explode { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); } 100% { transform: scale(0); opacity: 0; } }
-        .flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; pointer-events: none; z-index: 1001; }
-        .flash.active { animation: flash 0.8s ease-out; }
-        @keyframes flash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+        .abertura-capsula { font-size: 8rem; }
+        .abertura-capsula.shake { animation: shakeOpen 0.5s ease; }
+        @keyframes shakeOpen { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+        .abertura-capsula.explode { animation: explodeOpen 0.8s ease forwards; }
+        @keyframes explodeOpen { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); } 100% { transform: scale(3); opacity: 0; } }
+        .flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; opacity: 0; z-index: 1001; pointer-events: none; }
+        .flash.active { animation: flashAnim 0.8s ease; }
+        @keyframes flashAnim { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
-        /* CÁPSULA ABERTA */
-        .capsula-aberta { flex: 1; padding: 20px; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .aberta-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .aberta-foto { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid var(--natal-gold); flex-shrink: 0; }
-        .aberta-foto img { width: 100%; height: 100%; object-fit: cover; }
-        .aberta-info h2 { font-size: 1.5rem; color: var(--natal-gold); }
-        .aberta-info p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
-
-        .secao { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .secao-titulo { font-size: 1.1rem; color: var(--natal-gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .desejos-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-        .desejo-tag { background: rgba(255,215,0,0.15); color: var(--natal-gold); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; }
-        .mensagem-texto { line-height: 1.8; color: rgba(255,255,255,0.9); white-space: pre-wrap; word-wrap: break-word; }
-        .mensagem-contador { text-align: right; margin-top: 12px; font-size: 0.8rem; color: rgba(255,255,255,0.4); }
-
-        .reflexao-area { margin-top: 16px; }
-        .reflexao-textarea { width: 100%; height: 120px; padding: 16px; border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.05); color: white; font-family: 'Poppins', sans-serif; resize: none; }
-        .reflexao-textarea:focus { outline: none; border-color: var(--natal-gold); }
-        .reflexao-salva { background: rgba(22,91,51,0.2); padding: 16px; border-radius: 12px; border: 1px solid var(--natal-green); }
-        .btn-salvar-reflexao { margin-top: 12px; background: var(--natal-green); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; }
-        .btn-compartilhar-final { width: 100%; background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 20px; }
-
-        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+        /* CONFETES */
+        .confetes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000; }
         .confete { position: absolute; animation: confeteFall 3s ease-out forwards; }
         @keyframes confeteFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(110vh) rotate(720deg); } }
 
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 2000; opacity: 0; transition: all 0.4s; }
+        /* TOAST */
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--natal-green); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 500; z-index: 3000; opacity: 0; transition: all 0.4s; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: var(--natal-red); }
 
-        .tela-erro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
-        .erro-icon { font-size: 5rem; margin-bottom: 24px; }
-        .erro-titulo { font-size: 1.8rem; color: var(--natal-red); margin-bottom: 12px; }
-        .erro-msg { color: rgba(255,255,255,0.7); }
-
-        .loading { display: flex; align-items: center; justify-content: center; flex: 1; }
-        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--natal-gold); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ERRO */
+        .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+        .erro-icon { font-size: 5rem; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -118,23 +133,125 @@
     <div class="confetes" id="confetes"></div>
     <div class="flash" id="flash"></div>
 
-    <div class="container" id="container">
-        <div class="loading" id="loading"><div class="spinner"></div></div>
+    <div class="container">
+        <!-- TELA LACRADA -->
+        <div class="tela tela-lacrada active" id="telaLacrada">
+            <div class="foto-lacrada" id="fotoLacrada">👤</div>
+            <h1 class="nome-lacrada" id="nomeLacrada">Carregando...</h1>
+            <p class="evento-lacrada" id="eventoLacrada">Evento</p>
+            
+            <div class="capsula-3d">
+                <div class="capsula-corpo">
+                    <div class="capsula-brilho"></div>
+                </div>
+                <div class="capsula-tampa"></div>
+                <div class="capsula-lacre" id="capsulLacre">🔒</div>
+            </div>
+            
+            <div class="status-badge status-lacrada" id="statusBadge">🔒 Cápsula Lacrada</div>
+            
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="dias">--</div>
+                    <div class="countdown-label">DIAS</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="horas">--</div>
+                    <div class="countdown-label">HORAS</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="minutos">--</div>
+                    <div class="countdown-label">MIN</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="segundos">--</div>
+                    <div class="countdown-label">SEG</div>
+                </div>
+            </div>
+            
+            <button class="btn-abrir" id="btnAbrir" onclick="iniciarAbertura()" disabled>🎁 ABRIR CÁPSULA</button>
+            <p class="msg-aguarde" id="msgAguarde">Aguardando liberação do guardião...</p>
+        </div>
+
+        <!-- TELA ABERTA -->
+        <div class="tela tela-aberta" id="telaAberta">
+            <div class="header-aberta">
+                <div class="foto-mini" id="fotoAberta"></div>
+                <div class="info-header">
+                    <h2 id="nomeAberta">Nome</h2>
+                    <p id="dataAberta">Criada em --/--/----</p>
+                    <p id="eventoAberta">Evento</p>
+                </div>
+            </div>
+            
+            <div class="secao" id="secaoDesejos">
+                <div class="secao-titulo">🌟 Desejos para o futuro</div>
+                <div class="tags-container" id="desejosContainer"></div>
+            </div>
+            
+            <div class="secao" id="secaoPessoas" style="display:none">
+                <div class="secao-titulo">👥 Pessoas importantes</div>
+                <div class="tags-container" id="pessoasContainer"></div>
+            </div>
+            
+            <div class="secao" id="secaoAudio" style="display:none">
+                <div class="secao-titulo">🎤 Mensagem de voz</div>
+                <div class="audio-player">
+                    <div class="audio-info">
+                        <span class="audio-icon">🎙️</span>
+                        <span class="audio-text">Ouça a mensagem que você gravou</span>
+                    </div>
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+            </div>
+            
+            <div class="secao" id="secaoPerguntas" style="display:none">
+                <div class="secao-titulo">💭 Reflexões do passado</div>
+                <div id="perguntasContainer"></div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">💌 Mensagem para o futuro</div>
+                <div class="secao-conteudo">
+                    <div class="mensagem-texto" id="mensagemTexto"></div>
+                    <div class="mensagem-chars" id="mensagemChars"></div>
+                </div>
+            </div>
+            
+            <div class="secao" id="secaoReflexao">
+                <div class="secao-titulo">✍️ Sua reflexão agora</div>
+                <div class="reflexao-form" id="reflexaoForm">
+                    <textarea id="reflexaoInput" placeholder="O que você sente ao ler isso? Suas previsões se realizaram? O que mudou?"></textarea>
+                    <button class="btn-salvar" onclick="salvarReflexao()">💾 Salvar reflexão</button>
+                </div>
+                <div class="reflexao-salva" id="reflexaoSalva" style="display:none">
+                    <div class="reflexao-salva-titulo">📝 Sua reflexão:</div>
+                    <div id="reflexaoTexto"></div>
+                </div>
+            </div>
+            
+            <button class="btn-compartilhar" onclick="compartilhar()">📤 Compartilhar minha cápsula</button>
+        </div>
+
+        <!-- TELA ERRO -->
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 style="color:var(--natal-gold);margin-bottom:12px">Cápsula não encontrada</h2>
+            <p style="color:rgba(255,255,255,0.6)">Verifique o link e tente novamente</p>
+        </div>
     </div>
 
     <!-- ANIMAÇÃO ABERTURA -->
     <div class="abertura-overlay" id="aberturaOverlay">
-        <div class="abertura-capsula" id="aberturaCapsula">
-            <div class="capsula-corpo"></div>
-            <div class="capsula-tampa"></div>
-            <div class="capsula-lacre">🔓</div>
-            <div class="capsula-brilho"></div>
-        </div>
+        <div class="abertura-capsula" id="aberturaCapsula">🎁</div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
+        // ==========================================
+        // FIREBASE CONFIG
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
             authDomain: "capsuladotempo-f86bf.firebaseapp.com",
@@ -144,128 +261,191 @@
             messagingSenderId: "43014678980",
             appId: "1:43014678980:web:0c84f48037ee6924afdc91"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let capsulaId = null, capsulaData = null, eventoData = null, isGuardiao = false;
+        // ==========================================
+        // VARIÁVEIS
+        // ==========================================
+        let capsulaId = null;
+        let capsulaData = null;
+        let eventoData = null;
+        let isGuardiao = false;
+        let countdownInterval = null;
 
-        const mostrarToast = (m, t='success') => { const toast = document.getElementById('toast'); toast.textContent = m; toast.className = 'toast show' + (t==='error'?' error':''); setTimeout(() => toast.className = 'toast', 3000); };
-        const formatarData = d => new Date(d).toLocaleDateString('pt-BR');
-        const formatarDataHora = d => new Date(d).toLocaleString('pt-BR');
+        // ==========================================
+        // UTILS
+        // ==========================================
+        const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
+        
+        const mostrarToast = (msg) => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show';
+            setTimeout(() => t.className = 'toast', 3000);
+        };
 
         function criarParticulas() {
             const c = document.getElementById('particles');
-            ['❄','❅','❆','✧'].forEach(f => { for(let i=0;i<5;i++) { const el = document.createElement('div'); el.className = 'snowflake'; el.textContent = f; el.style.cssText = `left:${Math.random()*100}vw;animation-duration:${8+Math.random()*5}s;animation-delay:${Math.random()*10}s;font-size:${0.5+Math.random()*0.8}rem`; c.appendChild(el); } });
-            for(let i=0;i<30;i++) { const s = document.createElement('div'); s.className = 'star'; s.style.cssText = `left:${Math.random()*100}vw;top:${Math.random()*100}vh;width:${1+Math.random()*2}px;height:${s.style.width};animation-duration:${2+Math.random()*3}s`; c.appendChild(s); }
+            ['❄','❅','❆','✧'].forEach(f => {
+                for(let i=0;i<6;i++) {
+                    const e = document.createElement('div');
+                    e.className = 'snowflake';
+                    e.textContent = f;
+                    e.style.left = Math.random()*100+'vw';
+                    e.style.animationDuration = (8+Math.random()*5)+'s';
+                    e.style.animationDelay = Math.random()*10+'s';
+                    e.style.fontSize = (0.5+Math.random()*0.8)+'rem';
+                    c.appendChild(e);
+                }
+            });
+            for(let i=0;i<30;i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random()*100+'vw';
+                s.style.top = Math.random()*100+'vh';
+                const sz = 1+Math.random()*2;
+                s.style.width = sz+'px';
+                s.style.height = sz+'px';
+                s.style.animationDuration = (2+Math.random()*3)+'s';
+                c.appendChild(s);
+            }
         }
 
         function criarConfetes() {
-            const c = document.getElementById('confetes'); c.innerHTML = '';
-            const cores = ['#c41e3a','#165b33','#ffd700','#fff','#ff6b6b','#4ecdc4','#ff69b4'];
-            for(let i=0;i<150;i++) { const cf = document.createElement('div'); cf.className = 'confete'; cf.style.cssText = `left:${Math.random()*100}vw;background:${cores[Math.floor(Math.random()*cores.length)]};animation-delay:${Math.random()*2}s;width:${5+Math.random()*10}px;height:${cf.style.width};border-radius:${Math.random()>0.5?'50%':'0'}`; c.appendChild(cf); }
+            const c = document.getElementById('confetes');
+            c.innerHTML = '';
+            const cores = ['#c41e3a','#165b33','#ffd700','#fff','#ff6b6b','#4ecdc4'];
+            for(let i=0;i<150;i++) {
+                const cf = document.createElement('div');
+                cf.className = 'confete';
+                cf.style.left = Math.random()*100+'vw';
+                cf.style.background = cores[Math.floor(Math.random()*cores.length)];
+                cf.style.animationDelay = Math.random()*2+'s';
+                const sz = 5+Math.random()*10;
+                cf.style.width = sz+'px';
+                cf.style.height = sz+'px';
+                cf.style.borderRadius = Math.random()>0.5?'50%':'0';
+                c.appendChild(cf);
+            }
         }
 
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // ==========================================
+        // CARREGAR CÁPSULA
+        // ==========================================
         document.addEventListener('DOMContentLoaded', async () => {
             criarParticulas();
+            
             const params = new URLSearchParams(window.location.search);
             capsulaId = params.get('id');
             isGuardiao = params.get('guardiao') === 'true';
             
-            if (!capsulaId) { mostrarErro(); return; }
-
+            if (!capsulaId) {
+                mostrarTela('telaErro');
+                return;
+            }
+            
             try {
-                const snap = await database.ref(`capsulas/${capsulaId}`).once('value');
-                capsulaData = snap.val();
-                if (!capsulaData) { mostrarErro(); return; }
-
-                const evSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
-                eventoData = evSnap.val();
-
-                if (capsulaData.aberta) {
-                    mostrarAberta();
-                } else {
-                    mostrarLacrada();
+                // Carregar cápsula
+                const capSnap = await database.ref(`capsulas/${capsulaId}`).once('value');
+                capsulaData = capSnap.val();
+                
+                if (!capsulaData) {
+                    mostrarTela('telaErro');
+                    return;
                 }
-            } catch { mostrarErro(); }
+                
+                // Carregar evento
+                const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
+                eventoData = evtSnap.val();
+                
+                // Se já foi aberta, mostrar conteúdo
+                if (capsulaData.aberta) {
+                    mostrarConteudo();
+                    return;
+                }
+                
+                // Mostrar tela lacrada
+                renderizarLacrada();
+                
+            } catch (err) {
+                console.error(err);
+                mostrarTela('telaErro');
+            }
         });
 
-        function mostrarErro() {
-            document.getElementById('container').innerHTML = `
-                <div class="tela-erro">
-                    <div class="erro-icon">😕</div>
-                    <h2 class="erro-titulo">Cápsula não encontrada</h2>
-                    <p class="erro-msg">Verifique se o link está correto.</p>
-                </div>`;
-        }
-
-        function mostrarLacrada() {
-            const podeAbrir = capsulaData.liberada || isGuardiao;
-            const container = document.getElementById('container');
+        // ==========================================
+        // TELA LACRADA
+        // ==========================================
+        function renderizarLacrada() {
+            // Foto
+            const fotoEl = document.getElementById('fotoLacrada');
+            if (capsulaData.foto) {
+                fotoEl.innerHTML = `<img src="${capsulaData.foto}">`;
+            }
             
-            container.innerHTML = `
-                <div class="capsula-lacrada">
-                    <div class="capsula-foto">
-                        ${capsulaData.foto ? `<img src="${capsulaData.foto}">` : '<div class="capsula-foto-placeholder">👤</div>'}
-                    </div>
-                    <h1 class="capsula-nome">${capsulaData.nome} ${capsulaData.sobrenome}</h1>
-                    <p class="capsula-evento">📦 ${eventoData?.nome || 'Cápsula do Tempo'}</p>
-                    
-                    <div class="capsula-3d">
-                        <div class="capsula-corpo"></div>
-                        <div class="capsula-tampa"></div>
-                        <div class="capsula-lacre">${podeAbrir ? '🔓' : '🔒'}</div>
-                        <div class="capsula-brilho"></div>
-                    </div>
-                    
-                    <div class="status-badge ${podeAbrir ? 'status-liberada' : 'status-lacrada'}">
-                        ${podeAbrir ? '🔓 Liberada para abertura!' : '🔒 Cápsula Lacrada'}
-                    </div>
-                    
-                    <div class="countdown">
-                        <p class="countdown-titulo">⏰ Tempo até abertura:</p>
-                        <div class="countdown-grid">
-                            <div class="countdown-item"><div class="countdown-valor" id="dias">--</div><div class="countdown-label">DIAS</div></div>
-                            <div class="countdown-item"><div class="countdown-valor" id="horas">--</div><div class="countdown-label">HORAS</div></div>
-                            <div class="countdown-item"><div class="countdown-valor" id="mins">--</div><div class="countdown-label">MIN</div></div>
-                            <div class="countdown-item"><div class="countdown-valor" id="segs">--</div><div class="countdown-label">SEG</div></div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn-abrir" onclick="iniciarAbertura()" ${podeAbrir ? '' : 'disabled'}>
-                        ${podeAbrir ? '🎁 ABRIR CÁPSULA' : '🔒 Aguardando liberação'}
-                    </button>
-                    
-                    ${!podeAbrir ? '<p class="msg-guardiao">O guardião irá liberar sua cápsula na cerimônia de abertura.</p>' : ''}
-                </div>`;
+            // Nome
+            document.getElementById('nomeLacrada').textContent = `${capsulaData.nome} ${capsulaData.sobrenome}`;
+            document.getElementById('eventoLacrada').textContent = eventoData?.nome || 'Cápsula do Tempo';
             
+            // Status
+            const statusEl = document.getElementById('statusBadge');
+            const btnAbrir = document.getElementById('btnAbrir');
+            const msgAguarde = document.getElementById('msgAguarde');
+            const lacreEl = document.getElementById('capsulLacre');
+            
+            if (capsulaData.liberada || isGuardiao) {
+                statusEl.className = 'status-badge status-liberada';
+                statusEl.textContent = '🔓 Liberada para abertura!';
+                lacreEl.textContent = '🔓';
+                btnAbrir.disabled = false;
+                msgAguarde.style.display = 'none';
+            } else {
+                statusEl.className = 'status-badge status-lacrada';
+                statusEl.textContent = '🔒 Cápsula Lacrada';
+                lacreEl.textContent = '🔒';
+                btnAbrir.disabled = true;
+                msgAguarde.style.display = 'block';
+            }
+            
+            // Countdown
             atualizarCountdown();
-            setInterval(atualizarCountdown, 1000);
+            countdownInterval = setInterval(atualizarCountdown, 1000);
         }
 
         function atualizarCountdown() {
-            const agora = new Date();
             const abertura = new Date(capsulaData.dataAbertura);
+            const agora = new Date();
             const diff = abertura - agora;
             
             if (diff <= 0) {
                 document.getElementById('dias').textContent = '0';
                 document.getElementById('horas').textContent = '0';
-                document.getElementById('mins').textContent = '0';
-                document.getElementById('segs').textContent = '0';
+                document.getElementById('minutos').textContent = '0';
+                document.getElementById('segundos').textContent = '0';
                 return;
             }
             
             const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
             const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const segs = Math.floor((diff % (1000 * 60)) / 1000);
+            const min = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seg = Math.floor((diff % (1000 * 60)) / 1000);
             
             document.getElementById('dias').textContent = dias;
             document.getElementById('horas').textContent = horas.toString().padStart(2, '0');
-            document.getElementById('mins').textContent = mins.toString().padStart(2, '0');
-            document.getElementById('segs').textContent = segs.toString().padStart(2, '0');
+            document.getElementById('minutos').textContent = min.toString().padStart(2, '0');
+            document.getElementById('segundos').textContent = seg.toString().padStart(2, '0');
         }
 
+        // ==========================================
+        // ANIMAÇÃO DE ABERTURA
+        // ==========================================
         async function iniciarAbertura() {
             const overlay = document.getElementById('aberturaOverlay');
             const capsula = document.getElementById('aberturaCapsula');
@@ -289,95 +469,137 @@
             await new Promise(r => setTimeout(r, 200));
             capsula.classList.add('shake');
             await new Promise(r => setTimeout(r, 300));
+            capsula.classList.remove('shake');
             capsula.classList.add('explode');
+            
+            // Flash
+            await new Promise(r => setTimeout(r, 400));
             flash.classList.add('active');
             
-            // Salvar no Firebase
+            // Salvar como aberta
             await database.ref(`capsulas/${capsulaId}`).update({
                 aberta: true,
                 dataVisualizacao: new Date().toISOString()
             });
-            capsulaData.aberta = true;
-            capsulaData.dataVisualizacao = new Date().toISOString();
             
+            // Mostrar conteúdo
             await new Promise(r => setTimeout(r, 800));
-            overlay.classList.remove('active');
             flash.classList.remove('active');
+            overlay.classList.remove('active');
+            capsula.classList.remove('explode');
             
-            criarConfetes();
-            mostrarAberta();
-        }
-
-        function mostrarAberta() {
-            const container = document.getElementById('container');
-            
-            container.innerHTML = `
-                <div class="capsula-aberta">
-                    <div class="aberta-header">
-                        <div class="aberta-foto">
-                            ${capsulaData.foto ? `<img src="${capsulaData.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2rem">👤</div>'}
-                        </div>
-                        <div class="aberta-info">
-                            <h2>${capsulaData.nome} ${capsulaData.sobrenome}</h2>
-                            <p>📅 Criada em ${formatarData(capsulaData.dataCriacao)}</p>
-                            <p>📦 ${eventoData?.nome || 'Cápsula do Tempo'}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="secao">
-                        <h3 class="secao-titulo">🎯 Desejos para o ano</h3>
-                        <div class="desejos-tags">
-                            ${(capsulaData.desejos || []).map(d => `<span class="desejo-tag">${d}</span>`).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="secao">
-                        <h3 class="secao-titulo">💌 Mensagem do passado</h3>
-                        <p class="mensagem-texto">${escapeHtml(capsulaData.mensagemPessoal || '')}</p>
-                        <p class="mensagem-contador">${(capsulaData.mensagemPessoal || '').length} caracteres</p>
-                    </div>
-                    
-                    <div class="secao">
-                        <h3 class="secao-titulo">✨ Reflexão do presente</h3>
-                        <div id="reflexaoArea">
-                            ${capsulaData.reflexao 
-                                ? `<div class="reflexao-salva"><p>${escapeHtml(capsulaData.reflexao)}</p></div>`
-                                : `<textarea class="reflexao-textarea" id="reflexaoTexto" placeholder="Como você se sente ao ler isso? O que mudou? O que você conquistou?"></textarea>
-                                   <button class="btn-salvar-reflexao" onclick="salvarReflexao()">💾 Salvar reflexão</button>`
-                            }
-                        </div>
-                    </div>
-                    
-                    <button class="btn-compartilhar-final" onclick="compartilhar()">📤 Compartilhar minha cápsula</button>
-                </div>`;
-            
+            clearInterval(countdownInterval);
+            mostrarConteudo();
             criarConfetes();
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        async function salvarReflexao() {
-            const texto = document.getElementById('reflexaoTexto').value.trim();
-            if (!texto) { mostrarToast('Escreva sua reflexão', 'error'); return; }
-            
-            try {
-                await database.ref(`capsulas/${capsulaId}/reflexao`).set(texto);
-                capsulaData.reflexao = texto;
-                document.getElementById('reflexaoArea').innerHTML = `<div class="reflexao-salva"><p>${escapeHtml(texto)}</p></div>`;
-                mostrarToast('✓ Reflexão salva!');
-            } catch { mostrarToast('Erro ao salvar', 'error'); }
-        }
-
-        function compartilhar() {
-            const texto = `🎁 Acabei de abrir minha Cápsula do Tempo!\n\nMeus desejos eram: ${(capsulaData.desejos || []).join(', ')}\n\n${window.location.href}`;
-            if (navigator.share) {
-                navigator.share({ title: '🎁 Minha Cápsula do Tempo', text: texto, url: window.location.href });
+        // ==========================================
+        // MOSTRAR CONTEÚDO
+        // ==========================================
+        function mostrarConteudo() {
+            // Header
+            const fotoAberta = document.getElementById('fotoAberta');
+            if (capsulaData.foto) {
+                fotoAberta.innerHTML = `<img src="${capsulaData.foto}">`;
             } else {
-                navigator.clipboard.writeText(texto);
+                fotoAberta.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2rem">👤</div>';
+            }
+            
+            document.getElementById('nomeAberta').textContent = `${capsulaData.nome} ${capsulaData.sobrenome}`;
+            document.getElementById('dataAberta').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
+            document.getElementById('eventoAberta').textContent = eventoData?.nome || '';
+            
+            // Desejos
+            const desejosContainer = document.getElementById('desejosContainer');
+            if (capsulaData.desejos && capsulaData.desejos.length > 0) {
+                desejosContainer.innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
+            }
+            
+            // Pessoas
+            if (capsulaData.pessoas && capsulaData.pessoas.length > 0) {
+                document.getElementById('secaoPessoas').style.display = 'block';
+                document.getElementById('pessoasContainer').innerHTML = capsulaData.pessoas.map(p => `<span class="tag-item">${p}</span>`).join('');
+            }
+            
+            // Áudio
+            if (capsulaData.audio) {
+                document.getElementById('secaoAudio').style.display = 'block';
+                document.getElementById('audioPlayer').src = capsulaData.audio;
+            }
+            
+            // Perguntas
+            if (capsulaData.perguntas) {
+                const p = capsulaData.perguntas;
+                let html = '';
+                
+                if (p.conquista) {
+                    html += `<div class="pergunta-item"><div class="pergunta-label">🎯 O que achava que ia conquistar:</div><div class="pergunta-resposta">${p.conquista}</div></div>`;
+                }
+                if (p.momento) {
+                    html += `<div class="pergunta-item"><div class="pergunta-label">✨ Momento marcante daquele ano:</div><div class="pergunta-resposta">${p.momento}</div></div>`;
+                }
+                if (p.palavra) {
+                    html += `<div class="pergunta-item"><div class="pergunta-label">📝 Palavra que definia o momento:</div><div class="pergunta-resposta" style="font-size:1.3rem;color:var(--natal-gold)">${p.palavra}</div></div>`;
+                }
+                if (p.felicidade) {
+                    html += `<div class="pergunta-item"><div class="pergunta-label">😊 Felicidade naquela época:</div><div class="felicidade-display"><span class="felicidade-nota">${p.felicidade}</span><div class="felicidade-barra"><div class="felicidade-fill" style="width:${p.felicidade*10}%"></div></div></div></div>`;
+                }
+                if (p.previsao) {
+                    html += `<div class="pergunta-item"><div class="pergunta-label">🔮 Previsão para o futuro:</div><div class="pergunta-resposta">"${p.previsao}"</div></div>`;
+                }
+                
+                if (html) {
+                    document.getElementById('secaoPerguntas').style.display = 'block';
+                    document.getElementById('perguntasContainer').innerHTML = html;
+                }
+            }
+            
+            // Mensagem
+            document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal || '(Sem mensagem)';
+            document.getElementById('mensagemChars').textContent = `${(capsulaData.mensagemPessoal || '').length} caracteres`;
+            
+            // Reflexão
+            if (capsulaData.reflexao) {
+                document.getElementById('reflexaoForm').style.display = 'none';
+                document.getElementById('reflexaoSalva').style.display = 'block';
+                document.getElementById('reflexaoTexto').textContent = capsulaData.reflexao;
+            }
+            
+            mostrarTela('telaAberta');
+        }
+
+        // ==========================================
+        // REFLEXÃO
+        // ==========================================
+        async function salvarReflexao() {
+            const texto = document.getElementById('reflexaoInput').value.trim();
+            if (!texto) {
+                mostrarToast('Escreva sua reflexão');
+                return;
+            }
+            
+            await database.ref(`capsulas/${capsulaId}/reflexao`).set(texto);
+            
+            document.getElementById('reflexaoForm').style.display = 'none';
+            document.getElementById('reflexaoSalva').style.display = 'block';
+            document.getElementById('reflexaoTexto').textContent = texto;
+            
+            mostrarToast('✓ Reflexão salva!');
+        }
+
+        // ==========================================
+        // COMPARTILHAR
+        // ==========================================
+        function compartilhar() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: `🎁 Cápsula de ${capsulaData.nome}`,
+                    text: 'Veja minha cápsula do tempo!',
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(url);
                 mostrarToast('✓ Link copiado!');
             }
         }
