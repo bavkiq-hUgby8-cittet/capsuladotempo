@@ -51,15 +51,95 @@
         .header-tela p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
         .passo { font-size: 0.9rem; color: var(--natal-gold); margin-bottom: 8px; opacity: 0.9; font-weight: 500; }
 
-        /* FOTO */
+        /* FOTO / CÂMERA - MELHORADO */
         .foto-section { text-align: center; margin-bottom: 28px; }
-        .foto-container { width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 16px; position: relative; cursor: pointer; overflow: hidden; border: 5px solid rgba(255,215,0,0.5); background: rgba(255,255,255,0.08); transition: all 0.3s; }
-        .foto-container:hover { border-color: var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); }
-        .foto-container.has-photo { border-color: var(--natal-gold); }
-        .foto-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--natal-gold); }
-        .foto-placeholder span { font-size: 3rem; }
-        .foto-placeholder p { font-size: 0.9rem; margin-top: 8px; font-weight: 500; }
+        .foto-container { 
+            width: 180px; 
+            height: 180px; 
+            border-radius: 50%; 
+            margin: 0 auto 20px; 
+            position: relative; 
+            overflow: hidden; 
+            border: 5px solid rgba(255,215,0,0.5); 
+            background: rgba(255,255,255,0.08); 
+            transition: all 0.3s; 
+        }
+        .foto-container.has-photo { border-color: var(--natal-gold); box-shadow: 0 0 40px rgba(255,215,0,0.4); }
+        .foto-placeholder { 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--natal-gold); 
+            cursor: pointer;
+        }
+        .foto-placeholder span { font-size: 3.5rem; }
+        .foto-placeholder p { font-size: 1rem; margin-top: 8px; font-weight: 500; }
         .foto-preview { width: 100%; height: 100%; object-fit: cover; }
+        
+        .foto-opcoes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-foto { 
+            background: rgba(255,255,255,0.1); 
+            border: 3px solid rgba(255,255,255,0.3); 
+            color: white; 
+            padding: 14px 24px; 
+            border-radius: 14px; 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-family: 'Poppins', sans-serif; 
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-foto:hover { border-color: var(--natal-gold); background: rgba(255,215,0,0.1); }
+        .btn-foto.active { border-color: var(--natal-gold); background: rgba(255,215,0,0.2); }
+        
+        .camera-container { 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .camera-container.active { display: flex; }
+        .camera-video { 
+            width: 100%; 
+            max-width: 300px; 
+            border-radius: 16px; 
+            background: #000;
+            transform: scaleX(-1);
+        }
+        .camera-actions { display: flex; gap: 12px; margin-top: 16px; }
+        .btn-capturar { 
+            width: 70px; 
+            height: 70px; 
+            border-radius: 50%; 
+            background: var(--natal-red); 
+            border: 4px solid white; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .btn-capturar:hover { transform: scale(1.1); }
+        .btn-cancelar-camera { 
+            background: transparent; 
+            border: 2px solid rgba(255,255,255,0.4); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 10px; 
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+        
         .foto-input { display: none; }
 
         /* FORM - MELHORADO PARA IDOSOS */
@@ -427,6 +507,7 @@
             .header-tela h2 { font-size: 1.5rem; }
             .pessoas-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .escala-num { width: 42px; height: 42px; font-size: 1rem; }
+            .foto-opcoes { flex-direction: column; }
         }
     </style>
 </head>
@@ -460,15 +541,36 @@
                 <h2>📸 Quem é você?</h2>
                 <p>Tire uma foto para reconhecer no futuro</p>
             </div>
+            
             <div class="foto-section">
-                <div class="foto-container" id="fotoContainer" onclick="document.getElementById('fotoInput').click()">
-                    <div class="foto-placeholder" id="fotoPlaceholder">
+                <div class="foto-container" id="fotoContainer">
+                    <div class="foto-placeholder" id="fotoPlaceholder" onclick="mostrarOpcoesFoto()">
                         <span>📷</span>
-                        <p>Toque para tirar foto</p>
+                        <p>Toque para adicionar foto</p>
                     </div>
                 </div>
-                <input type="file" id="fotoInput" class="foto-input" accept="image/*" capture="user" onchange="processarFoto(event)">
+                
+                <div class="foto-opcoes" id="fotoOpcoes">
+                    <button class="btn-foto" onclick="abrirCamera()">
+                        <span>📸</span> Tirar Selfie
+                    </button>
+                    <button class="btn-foto" onclick="abrirGaleria()">
+                        <span>🖼️</span> Escolher da Galeria
+                    </button>
+                </div>
+                
+                <div class="camera-container" id="cameraContainer">
+                    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+                    <div class="camera-actions">
+                        <button class="btn-cancelar-camera" onclick="fecharCamera()">Cancelar</button>
+                        <button class="btn-capturar" onclick="capturarFoto()">📷</button>
+                    </div>
+                </div>
+                
+                <input type="file" id="fotoInput" class="foto-input" accept="image/*" onchange="processarFotoGaleria(event)">
+                <canvas id="fotoCanvas" style="display:none"></canvas>
             </div>
+            
             <div class="form-group">
                 <label>Seu nome</label>
                 <input type="text" id="nome" placeholder="Como você se chama?" maxlength="30">
@@ -802,10 +904,13 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         let pessoasSelecionadas = [];
         let notaFelicidade = null;
         
-        // Áudio - CORRIGIDO
+        // Câmera
+        let cameraStream = null;
+        
+        // Áudio
         let mediaRecorder = null;
         let audioChunks = [];
-        let audioBlob = null;
+        let audioBase64 = null;
         let audioConfirmadoFlag = false;
         let tempoInicio = null;
         let timerInterval = null;
@@ -916,9 +1021,74 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         }
 
         // ==========================================
-        // PASSO 1: FOTO E NOME
+        // PASSO 1: FOTO E CÂMERA - CORRIGIDO
         // ==========================================
-        function processarFoto(event) {
+        function mostrarOpcoesFoto() {
+            // Não faz nada, as opções já estão visíveis
+        }
+        
+        async function abrirCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                };
+                
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+                
+                document.getElementById('cameraContainer').classList.add('active');
+                document.getElementById('fotoOpcoes').style.display = 'none';
+                
+            } catch (err) {
+                console.error('Erro ao acessar câmera:', err);
+                mostrarToast('Não foi possível acessar a câmera. Tente escolher da galeria.', 'error');
+            }
+        }
+        
+        function fecharCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraContainer').classList.remove('active');
+            document.getElementById('fotoOpcoes').style.display = 'flex';
+        }
+        
+        function capturarFoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('fotoCanvas');
+            
+            // Definir tamanho do canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Espelhar a imagem (selfie)
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0);
+            
+            // Converter para base64
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Mostrar preview
+            mostrarPreviewFoto(fotoBase64);
+            
+            // Fechar câmera
+            fecharCamera();
+        }
+        
+        function abrirGaleria() {
+            document.getElementById('fotoInput').click();
+        }
+        
+        function processarFotoGaleria(event) {
             const file = event.target.files[0];
             if (!file) return;
             
@@ -926,22 +1096,46 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
+                    const canvas = document.getElementById('fotoCanvas');
                     const max = 800;
                     let w = img.width, h = img.height;
                     if (w > h) { if (w > max) { h *= max/w; w = max; } }
                     else { if (h > max) { w *= max/h; h = max; } }
-                    canvas.width = w; canvas.height = h;
+                    canvas.width = w; 
+                    canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
                     
-                    const container = document.getElementById('fotoContainer');
-                    container.classList.add('has-photo');
-                    container.innerHTML = `<img class="foto-preview" src="${fotoBase64}">`;
+                    mostrarPreviewFoto(fotoBase64);
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+        
+        function mostrarPreviewFoto(src) {
+            const container = document.getElementById('fotoContainer');
+            container.classList.add('has-photo');
+            container.innerHTML = `
+                <img class="foto-preview" src="${src}">
+                <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="removerFoto(event)">
+                    🔄
+                </div>
+            `;
+        }
+        
+        function removerFoto(event) {
+            event.stopPropagation();
+            fotoBase64 = null;
+            const container = document.getElementById('fotoContainer');
+            container.classList.remove('has-photo');
+            container.innerHTML = `
+                <div class="foto-placeholder" id="fotoPlaceholder" onclick="mostrarOpcoesFoto()">
+                    <span>📷</span>
+                    <p>Toque para adicionar foto</p>
+                </div>
+            `;
+            document.getElementById('fotoInput').value = '';
         }
 
         function irParaDesejos() {
@@ -1013,25 +1207,8 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         }
 
         // ==========================================
-        // PASSO 5: ÁUDIO - CORRIGIDO
+        // PASSO 5: ÁUDIO - CORRIGIDO PARA MP3/WAV
         // ==========================================
-        function getSupportedMimeType() {
-            const types = [
-                'audio/mp4',
-                'audio/webm;codecs=opus',
-                'audio/webm',
-                'audio/ogg;codecs=opus',
-                'audio/ogg',
-                'audio/wav'
-            ];
-            for (const type of types) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    return type;
-                }
-            }
-            return 'audio/webm';
-        }
-
         async function toggleGravacao() {
             const btn = document.getElementById('btnGravar');
             
@@ -1046,10 +1223,22 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
                         } 
                     });
                     
-                    const mimeType = getSupportedMimeType();
-                    console.log('Usando formato:', mimeType);
+                    // Tentar formatos em ordem de compatibilidade
+                    let mimeType = 'audio/webm';
+                    if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        mimeType = 'audio/mp4';
+                    } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                        mimeType = 'audio/webm;codecs=opus';
+                    } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                        mimeType = 'audio/ogg;codecs=opus';
+                    }
                     
-                    mediaRecorder = new MediaRecorder(stream, { mimeType });
+                    console.log('Formato de áudio:', mimeType);
+                    
+                    mediaRecorder = new MediaRecorder(stream, { 
+                        mimeType: mimeType,
+                        audioBitsPerSecond: 128000
+                    });
                     audioChunks = [];
                     
                     mediaRecorder.ondataavailable = (e) => {
@@ -1058,29 +1247,35 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
                         }
                     };
                     
-                    mediaRecorder.onstop = () => {
+                    mediaRecorder.onstop = async () => {
                         duracaoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
                         
-                        // Criar blob com o tipo correto
-                        const mType = mediaRecorder.mimeType || 'audio/webm';
-                        audioBlob = new Blob(audioChunks, { type: mType });
+                        // Criar blob
+                        const audioBlob = new Blob(audioChunks, { type: mimeType });
+                        console.log('Áudio gravado:', audioBlob.size, 'bytes');
                         
-                        console.log('Áudio gravado:', audioBlob.size, 'bytes, tipo:', mType);
+                        // Converter para base64 para garantir compatibilidade
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            audioBase64 = reader.result;
+                            console.log('Áudio convertido para base64');
+                            
+                            // Criar URL para preview
+                            const url = URL.createObjectURL(audioBlob);
+                            const audioPlayer = document.getElementById('audioPlayer');
+                            audioPlayer.src = url;
+                            
+                            document.getElementById('audioPreview').style.display = 'block';
+                            document.getElementById('btnGravar').style.display = 'none';
+                            document.getElementById('tempoGravacao').style.display = 'none';
+                        };
+                        reader.readAsDataURL(audioBlob);
                         
-                        // Criar URL e mostrar preview
-                        const url = URL.createObjectURL(audioBlob);
-                        const audioPlayer = document.getElementById('audioPlayer');
-                        audioPlayer.src = url;
-                        
-                        document.getElementById('audioPreview').style.display = 'block';
-                        document.getElementById('btnGravar').style.display = 'none';
-                        document.getElementById('tempoGravacao').style.display = 'none';
-                        
-                        // Parar todas as tracks
+                        // Parar stream
                         stream.getTracks().forEach(t => t.stop());
                     };
                     
-                    mediaRecorder.start(100); // Coleta dados a cada 100ms
+                    mediaRecorder.start(100);
                     btn.classList.add('gravando');
                     btn.innerHTML = '⏹️';
                     
@@ -1119,7 +1314,7 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         }
 
         function regravar() {
-            audioBlob = null;
+            audioBase64 = null;
             audioConfirmadoFlag = false;
             mediaRecorder = null;
             
@@ -1146,7 +1341,7 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         }
 
         function pularAudio() {
-            audioBlob = null;
+            audioBase64 = null;
             audioConfirmadoFlag = false;
             irParaMensagem();
         }
@@ -1192,34 +1387,31 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
                 // Upload foto
                 if (fotoBase64) {
                     const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
-                    const response = await fetch(fotoBase64);
-                    const blob = await response.blob();
-                    await fotoRef.put(blob);
+                    const fotoBlob = await (await fetch(fotoBase64)).blob();
+                    await fotoRef.put(fotoBlob, { contentType: 'image/jpeg' });
                     fotoUrl = await fotoRef.getDownloadURL();
+                    console.log('Foto salva:', fotoUrl);
                 }
 
-                // Upload áudio - CORRIGIDO
-                if (audioBlob && audioConfirmadoFlag) {
-                    // Determinar extensão baseada no tipo
-                    let ext = 'webm';
-                    if (audioBlob.type.includes('mp4')) ext = 'mp4';
-                    else if (audioBlob.type.includes('ogg')) ext = 'ogg';
-                    else if (audioBlob.type.includes('wav')) ext = 'wav';
-                    
-                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio.${ext}`);
-                    
-                    // Upload com metadata
-                    const metadata = {
-                        contentType: audioBlob.type
-                    };
-                    
-                    await audioRef.put(audioBlob, metadata);
-                    audioUrl = await audioRef.getDownloadURL();
-                    console.log('Áudio salvo:', audioUrl);
+                // Upload áudio - SALVAR COMO BASE64 NO DATABASE
+                // Isso garante compatibilidade total
+                if (audioBase64 && audioConfirmadoFlag) {
+                    // Também salvar no Storage como backup
+                    try {
+                        const audioBlob = await (await fetch(audioBase64)).blob();
+                        const ext = audioBase64.includes('audio/mp4') ? 'mp4' : 
+                                   audioBase64.includes('audio/ogg') ? 'ogg' : 'webm';
+                        const audioRef = storage.ref(`capsulas/${capsulaId}/audio.${ext}`);
+                        await audioRef.put(audioBlob, { contentType: audioBlob.type });
+                        audioUrl = await audioRef.getDownloadURL();
+                        console.log('Áudio salvo no Storage:', audioUrl);
+                    } catch (e) {
+                        console.log('Erro no Storage, usando base64:', e);
+                    }
                 }
 
                 // Salvar no banco
-                await database.ref(`capsulas/${capsulaId}`).set({
+                const capsulaData = {
                     eventoId,
                     nome,
                     sobrenome,
@@ -1233,19 +1425,23 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
                         previsao,
                         felicidade: notaFelicidade
                     },
-                    audio: audioUrl,
+                    audioUrl: audioUrl,
+                    audioBase64: audioConfirmadoFlag ? audioBase64 : null,
                     mensagemPessoal: mensagem,
                     dataCriacao: new Date().toISOString(),
                     dataAbertura: eventoData.dataAbertura,
                     liberada: false,
                     aberta: false
-                });
+                };
+                
+                await database.ref(`capsulas/${capsulaId}`).set(capsulaData);
+                console.log('Cápsula salva com sucesso!');
 
                 document.getElementById('loading').classList.remove('active');
                 mostrarSucesso(fotoUrl, nome);
                 
             } catch (err) {
-                console.error(err);
+                console.error('Erro ao salvar:', err);
                 document.getElementById('loading').classList.remove('active');
                 mostrarToast('Erro ao salvar. Tente novamente.', 'error');
                 btn.disabled = false;

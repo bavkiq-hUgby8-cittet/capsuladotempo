@@ -72,14 +72,91 @@
         .tags-container { display: flex; flex-wrap: wrap; gap: 10px; }
         .tag-item { background: rgba(255,215,0,0.18); color: var(--natal-gold); padding: 8px 16px; border-radius: 16px; font-size: 0.95rem; font-weight: 500; border: 1px solid rgba(255,215,0,0.3); }
 
-        /* ÁUDIO - MELHORADO */
-        .audio-player { background: rgba(0,0,0,0.35); border-radius: 16px; padding: 20px; border: 2px solid rgba(255,215,0,0.2); }
-        .audio-player audio { width: 100%; height: 55px; border-radius: 8px; }
-        .audio-info { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-        .audio-icon { font-size: 2.5rem; }
-        .audio-text { color: rgba(255,255,255,0.8); font-size: 1rem; line-height: 1.4; }
-        .audio-error { background: rgba(196,30,58,0.2); border: 2px solid var(--natal-red); border-radius: 12px; padding: 16px; margin-top: 12px; text-align: center; display: none; }
-        .audio-error p { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+        /* ÁUDIO - DESTAQUE ESPECIAL */
+        .secao-audio { 
+            background: linear-gradient(135deg, rgba(196,30,58,0.15), rgba(22,91,51,0.15)); 
+            border: 3px solid var(--natal-gold);
+            position: relative;
+            overflow: hidden;
+        }
+        .secao-audio::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+            animation: audioGlow 3s ease-in-out infinite;
+        }
+        @keyframes audioGlow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .audio-player { 
+            background: rgba(0,0,0,0.4); 
+            border-radius: 16px; 
+            padding: 24px; 
+            position: relative;
+            z-index: 1;
+        }
+        .audio-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            margin-bottom: 20px; 
+        }
+        .audio-icon-big { 
+            font-size: 3.5rem; 
+            animation: micPulse 2s ease-in-out infinite;
+        }
+        @keyframes micPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .audio-info h3 { 
+            color: var(--natal-gold); 
+            font-size: 1.2rem; 
+            margin-bottom: 4px;
+            font-family: 'Pacifico', cursive;
+        }
+        .audio-info p { 
+            color: rgba(255,255,255,0.7); 
+            font-size: 0.95rem; 
+        }
+        .audio-player audio { 
+            width: 100%; 
+            height: 60px; 
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+        }
+        .btn-play-audio {
+            width: 100%;
+            background: linear-gradient(135deg, var(--natal-gold), #ffaa00);
+            color: var(--midnight);
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-play-audio:hover { transform: scale(1.02); }
+        .btn-play-audio.playing { background: var(--natal-green); }
+        
+        .audio-status {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
 
         /* PERGUNTAS */
         .pergunta-item { background: rgba(0,0,0,0.25); border-radius: 14px; padding: 18px; margin-bottom: 14px; border-left: 4px solid var(--natal-gold); }
@@ -248,6 +325,26 @@
                 </div>
             </div>
             
+            <!-- ÁUDIO EM DESTAQUE - PRIMEIRO -->
+            <div class="secao secao-audio" id="secaoAudio" style="display:none">
+                <div class="secao-titulo">🎤 Mensagem de Voz do Passado</div>
+                <div class="audio-player">
+                    <div class="audio-header">
+                        <span class="audio-icon-big">🎙️</span>
+                        <div class="audio-info">
+                            <h3>Ouça você mesmo!</h3>
+                            <p>Uma mensagem gravada especialmente para este momento</p>
+                        </div>
+                    </div>
+                    <audio id="audioPlayer" controls preload="auto"></audio>
+                    <button class="btn-play-audio" id="btnPlayAudio" onclick="toggleAudio()">
+                        <span id="playIcon">▶️</span>
+                        <span id="playText">Ouvir Mensagem</span>
+                    </button>
+                    <div class="audio-status" id="audioStatus"></div>
+                </div>
+            </div>
+            
             <div class="secao" id="secaoDesejos">
                 <div class="secao-titulo">🌟 Prioridades para o ano</div>
                 <div class="tags-container" id="desejosContainer"></div>
@@ -256,22 +353,6 @@
             <div class="secao" id="secaoPessoas" style="display:none">
                 <div class="secao-titulo">👥 Pessoas importantes</div>
                 <div class="tags-container" id="pessoasContainer"></div>
-            </div>
-            
-            <div class="secao" id="secaoAudio" style="display:none">
-                <div class="secao-titulo">🎤 Mensagem de voz</div>
-                <div class="audio-player">
-                    <div class="audio-info">
-                        <span class="audio-icon">🎙️</span>
-                        <span class="audio-text">Ouça a mensagem que você gravou para si mesmo</span>
-                    </div>
-                    <audio id="audioPlayer" controls preload="auto">
-                        Seu navegador não suporta áudio.
-                    </audio>
-                    <div class="audio-error" id="audioError">
-                        <p>⚠️ Não foi possível carregar o áudio. Tente em outro navegador.</p>
-                    </div>
-                </div>
             </div>
             
             <div class="secao" id="secaoPerguntas" style="display:none">
@@ -346,6 +427,8 @@ O que você aprendeu?"></textarea>
         let eventoData = null;
         let isGuardiao = false;
         let countdownInterval = null;
+        let audioElement = null;
+        let isPlaying = false;
 
         // ==========================================
         // UTILS
@@ -433,6 +516,10 @@ O que você aprendeu?"></textarea>
                     mostrarTela('telaErro');
                     return;
                 }
+                
+                console.log('Cápsula carregada:', capsulaData);
+                console.log('Áudio URL:', capsulaData.audioUrl);
+                console.log('Áudio Base64:', capsulaData.audioBase64 ? 'Presente' : 'Ausente');
                 
                 // Carregar evento
                 const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
@@ -562,14 +649,14 @@ O que você aprendeu?"></textarea>
             capsula.classList.remove('explode');
             
             clearInterval(countdownInterval);
-            mostrarConteudo();
+            mostrarConteudo(true); // true = autoplay audio
             criarConfetes();
         }
 
         // ==========================================
         // MOSTRAR CONTEÚDO
         // ==========================================
-        function mostrarConteudo() {
+        function mostrarConteudo(autoplayAudio = false) {
             // Header
             const fotoAberta = document.getElementById('fotoAberta');
             if (capsulaData.foto) {
@@ -582,6 +669,9 @@ O que você aprendeu?"></textarea>
             document.getElementById('dataAberta').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
             document.getElementById('eventoAberta').textContent = eventoData?.nome || '';
             
+            // ÁUDIO - PRIORIDADE MÁXIMA
+            configurarAudio(autoplayAudio);
+            
             // Desejos
             const desejosContainer = document.getElementById('desejosContainer');
             if (capsulaData.desejos && capsulaData.desejos.length > 0) {
@@ -592,30 +682,6 @@ O que você aprendeu?"></textarea>
             if (capsulaData.pessoas && capsulaData.pessoas.length > 0) {
                 document.getElementById('secaoPessoas').style.display = 'block';
                 document.getElementById('pessoasContainer').innerHTML = capsulaData.pessoas.map(p => `<span class="tag-item">${p}</span>`).join('');
-            }
-            
-            // Áudio - CORRIGIDO
-            if (capsulaData.audio) {
-                document.getElementById('secaoAudio').style.display = 'block';
-                const audioPlayer = document.getElementById('audioPlayer');
-                const audioError = document.getElementById('audioError');
-                
-                // Configurar o player
-                audioPlayer.src = capsulaData.audio;
-                
-                // Listener para erro
-                audioPlayer.onerror = function(e) {
-                    console.error('Erro ao carregar áudio:', e);
-                    audioError.style.display = 'block';
-                };
-                
-                // Listener para sucesso
-                audioPlayer.oncanplay = function() {
-                    audioError.style.display = 'none';
-                };
-                
-                // Tentar carregar
-                audioPlayer.load();
             }
             
             // Perguntas
@@ -657,6 +723,116 @@ O que você aprendeu?"></textarea>
             }
             
             mostrarTela('telaAberta');
+        }
+
+        // ==========================================
+        // CONFIGURAR ÁUDIO - CORRIGIDO
+        // ==========================================
+        function configurarAudio(autoplay) {
+            const secaoAudio = document.getElementById('secaoAudio');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            // Verificar se tem áudio (base64 ou URL)
+            const temAudio = capsulaData.audioBase64 || capsulaData.audioUrl;
+            
+            console.log('Configurando áudio:', {
+                temBase64: !!capsulaData.audioBase64,
+                temUrl: !!capsulaData.audioUrl
+            });
+            
+            if (!temAudio) {
+                console.log('Nenhum áudio encontrado');
+                secaoAudio.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar seção de áudio
+            secaoAudio.style.display = 'block';
+            
+            // Tentar carregar - priorizar base64 (mais confiável)
+            if (capsulaData.audioBase64) {
+                console.log('Usando áudio base64');
+                audioPlayer.src = capsulaData.audioBase64;
+                audioStatus.textContent = '🎵 Áudio carregado';
+            } else if (capsulaData.audioUrl) {
+                console.log('Usando áudio URL:', capsulaData.audioUrl);
+                audioPlayer.src = capsulaData.audioUrl;
+                audioStatus.textContent = '🎵 Carregando áudio...';
+            }
+            
+            // Eventos do player
+            audioPlayer.oncanplay = () => {
+                console.log('Áudio pronto para reproduzir');
+                audioStatus.textContent = '🎵 Pronto para reproduzir';
+                
+                // Autoplay se solicitado
+                if (autoplay) {
+                    setTimeout(() => {
+                        playAudio();
+                    }, 1000);
+                }
+            };
+            
+            audioPlayer.onplay = () => {
+                isPlaying = true;
+                document.getElementById('btnPlayAudio').classList.add('playing');
+                document.getElementById('playIcon').textContent = '⏸️';
+                document.getElementById('playText').textContent = 'Pausar';
+                audioStatus.textContent = '🔊 Reproduzindo...';
+            };
+            
+            audioPlayer.onpause = () => {
+                isPlaying = false;
+                document.getElementById('btnPlayAudio').classList.remove('playing');
+                document.getElementById('playIcon').textContent = '▶️';
+                document.getElementById('playText').textContent = 'Ouvir Mensagem';
+                audioStatus.textContent = '🎵 Pausado';
+            };
+            
+            audioPlayer.onended = () => {
+                isPlaying = false;
+                document.getElementById('btnPlayAudio').classList.remove('playing');
+                document.getElementById('playIcon').textContent = '🔄';
+                document.getElementById('playText').textContent = 'Ouvir Novamente';
+                audioStatus.textContent = '✅ Reprodução concluída';
+            };
+            
+            audioPlayer.onerror = (e) => {
+                console.error('Erro no áudio:', e);
+                audioStatus.textContent = '⚠️ Erro ao carregar áudio';
+                
+                // Tentar URL se base64 falhou
+                if (capsulaData.audioBase64 && capsulaData.audioUrl) {
+                    console.log('Tentando URL alternativa...');
+                    audioPlayer.src = capsulaData.audioUrl;
+                }
+            };
+            
+            // Carregar
+            audioPlayer.load();
+        }
+        
+        function toggleAudio() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            if (isPlaying) {
+                audioPlayer.pause();
+            } else {
+                playAudio();
+            }
+        }
+        
+        function playAudio() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            audioPlayer.play().then(() => {
+                console.log('Áudio iniciado');
+            }).catch(err => {
+                console.error('Erro ao reproduzir:', err);
+                audioStatus.textContent = '👆 Toque no botão para ouvir';
+            });
         }
 
         // ==========================================
