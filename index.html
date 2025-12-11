@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Cápsula do Tempo - Painel do Guardião</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #fbbf24;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --dark: #0f0f0f;
+            --card-bg: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-3%, -3%); }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 24px;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Telas */
+        .tela {
+            display: none;
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .tela.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login */
+        .login-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 32px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .login-box p {
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 8px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card .value {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .stat-card.highlight {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.15));
+            border-color: rgba(99,102,241,0.3);
+        }
+        
+        .stat-card.highlight .value {
+            color: var(--primary);
+        }
+
+        /* Cards de Ação */
+        .action-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .action-card h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-card h3 .emoji {
+            font-size: 1.3rem;
+        }
+
+        /* Lista de Cápsulas */
+        .capsulas-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .capsula-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        
+        .capsula-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .capsula-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .capsula-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .capsula-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .capsula-info .nome {
+            font-weight: 600;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .capsula-info .data {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .capsula-status {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .capsula-status.lacrada {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+        
+        .capsula-status.aberta {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        /* Link Box */
+        .link-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .link-box label {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        
+        .link-box .link-content {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .link-box input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Space Grotesk', monospace;
+        }
+        
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .btn-copy:hover {
+            background: #5558e3;
+        }
+
+        /* Botões de Ação */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+            border: none;
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Seção de Criar Evento */
+        .create-section {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .create-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-label {
+            font-weight: 500;
+        }
+        
+        .toggle-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--success);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+
+        /* Navegação */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 6px;
+            background: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        /* Logout */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.95);
+            color: #111;
+            padding: 14px 24px;
+            border-radius: 100px;
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .toast.success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .modal p {
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        /* Responsivo */
+        @media (max-width: 500px) {
+            .container { padding: 16px; }
+            .header { padding: 30px 16px; }
+            .header h1 { font-size: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card .value { font-size: 2rem; }
+            .logout-btn { top: 10px; right: 10px; padding: 8px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <button class="logout-btn" id="logoutBtn" style="display:none" onclick="logout()">Sair</button>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎁</div>
+            <h1>Cápsula do Tempo</h1>
+            <p>Painel do Guardião</p>
+        </div>
+
+        <!-- TELA LOGIN -->
+        <div class="tela active" id="telaLogin">
+            <div class="login-box">
+                <h2>🔐 Área Restrita</h2>
+                <p>Digite a senha do guardião para acessar</p>
+                
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senhaInput" placeholder="Digite a senha..." onkeypress="if(event.key==='Enter')login()">
+                </div>
+                
+                <button class="btn-primary" onclick="login()">Entrar</button>
+            </div>
+        </div>
+
+        <!-- TELA DASHBOARD -->
+        <div class="tela" id="telaDashboard">
+            <!-- Nav Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('eventos')">📅 Eventos</button>
+                <button class="nav-tab" onclick="showTab('capsulas')">💊 Cápsulas</button>
+            </div>
+
+            <!-- Tab Eventos -->
+            <div id="tabEventos">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card highlight">
+                        <div class="value" id="totalEventos">0</div>
+                        <div class="label">Eventos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="totalCapsulas">0</div>
+                        <div class="label">Cápsulas</div>
+                    </div>
+                </div>
+
+                <!-- Criar Evento -->
+                <div class="create-section">
+                    <h3><span class="emoji">✨</span> Criar Novo Evento</h3>
+                    
+                    <div class="form-group">
+                        <label>Nome do Evento</label>
+                        <input type="text" id="nomeEvento" placeholder="Ex: Natal 2024, Ano Novo...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data de Abertura</label>
+                        <input type="date" id="dataEvento">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="criarEvento()">Criar Evento</button>
+                </div>
+
+                <!-- Lista de Eventos -->
+                <div class="action-card">
+                    <h3><span class="emoji">📋</span> Seus Eventos</h3>
+                    <div id="listaEventos" class="capsulas-list">
+                        <div class="empty-state">
+                            <div class="emoji">📭</div>
+                            <p>Nenhum evento criado ainda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Cápsulas -->
+            <div id="tabCapsulas" style="display:none">
+                <div class="action-card">
+                    <h3><span class="emoji">💊</span> Todas as Cápsulas</h3>
+                    
+                    <div class="form-group" style="margin-bottom:16px">
+                        <select id="filtroEvento" onchange="filtrarCapsulas()">
+                            <option value="">Todos os eventos</option>
+                        </select>
+                    </div>
+                    
+                    <div id="listaCapsulas" class="capsulas-list">
+                        <div class="empty-state">
+                            <div class="emoji">📭</div>
+                            <p>Nenhuma cápsula criada ainda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA EVENTO -->
+        <div class="tela" id="telaEvento">
+            <button class="btn-secondary" onclick="voltarDashboard()" style="margin-bottom:24px;width:auto;padding:12px 20px">
+                ← Voltar
+            </button>
+            
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">📅</span> <span id="eventoNome">Evento</span></h3>
+                <p style="color:rgba(255,255,255,0.5);margin-bottom:16px">
+                    Abertura: <strong id="eventoData">--/--/----</strong>
+                </p>
+                
+                <div class="link-box">
+                    <label>Link para participantes</label>
+                    <div class="link-content">
+                        <input type="text" id="linkEvento" readonly>
+                        <button class="btn-copy" onclick="copiarLink()">Copiar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações do Evento -->
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">⚙️</span> Configurações</h3>
+                
+                <div class="toggle-row">
+                    <div>
+                        <div class="toggle-label">Liberar cápsulas</div>
+                        <div class="toggle-desc">Permitir abertura antecipada</div>
+                    </div>
+                    <div class="toggle-switch" id="toggleLiberar" onclick="toggleLiberacao()"></div>
+                </div>
+            </div>
+            
+            <!-- Cápsulas do Evento -->
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">💊</span> Cápsulas (<span id="eventoTotalCapsulas">0</span>)</h3>
+                <div id="eventoCapsulas" class="capsulas-list">
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula ainda</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações Perigosas -->
+            <div class="action-card">
+                <h3><span class="emoji">⚠️</span> Zona de Perigo</h3>
+                <button class="btn-action btn-danger" onclick="confirmarArquivar()">
+                    🗑️ Arquivar Evento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmação -->
+    <div class="modal-overlay" id="modalConfirm">
+        <div class="modal">
+            <h3>⚠️ Tem certeza?</h3>
+            <p id="modalMsg">Esta ação não pode ser desfeita.</p>
+            <div class="modal-buttons">
+                <button class="btn-action btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-action btn-danger" id="modalConfirmBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Config
+        const SENHA_GUARDIAO = 'otacilia';
+        let eventoAtual = null;
+        let eventos = {};
+        let capsulas = {};
+
+        // Utils
+        const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
+        
+        const toast = (msg, tipo = '') => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + tipo;
+            setTimeout(() => t.className = 'toast', 3000);
+        };
+
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('tabEventos').style.display = tab === 'eventos' ? 'block' : 'none';
+            document.getElementById('tabCapsulas').style.display = tab === 'capsulas' ? 'block' : 'none';
+        }
+
+        // Login
+        function login() {
+            const senha = document.getElementById('senhaInput').value;
+            if (senha === SENHA_GUARDIAO) {
+                mostrarTela('telaDashboard');
+                document.getElementById('logoutBtn').style.display = 'block';
+                carregarDados();
+                toast('Bem-vindo, Guardião! 🎉', 'success');
+            } else {
+                toast('Senha incorreta', 'error');
+            }
+        }
+
+        function logout() {
+            mostrarTela('telaLogin');
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('senhaInput').value = '';
+        }
+
+        // Carregar Dados
+        function carregarDados() {
+            // Eventos
+            database.ref('eventos').on('value', (snap) => {
+                eventos = snap.val() || {};
+                renderizarEventos();
+                atualizarFiltro();
+            });
+            
+            // Cápsulas
+            database.ref('capsulas').on('value', (snap) => {
+                capsulas = snap.val() || {};
+                renderizarCapsulas();
+                atualizarStats();
+                
+                if (eventoAtual) {
+                    renderizarCapsulasEvento();
+                }
+            });
+        }
+
+        function atualizarStats() {
+            const eventosAtivos = Object.values(eventos).filter(e => !e.arquivado).length;
+            const totalCaps = Object.keys(capsulas).length;
+            
+            document.getElementById('totalEventos').textContent = eventosAtivos;
+            document.getElementById('totalCapsulas').textContent = totalCaps;
+        }
+
+        function renderizarEventos() {
+            const lista = document.getElementById('listaEventos');
+            const eventosAtivos = Object.entries(eventos).filter(([id, e]) => !e.arquivado);
+            
+            if (eventosAtivos.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhum evento criado ainda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            lista.innerHTML = eventosAtivos.map(([id, evento]) => {
+                const capsulasEvento = Object.values(capsulas).filter(c => c.eventoId === id).length;
+                return `
+                    <div class="capsula-item" onclick="abrirEvento('${id}')" style="cursor:pointer">
+                        <div class="capsula-avatar">📅</div>
+                        <div class="capsula-info">
+                            <div class="nome">${evento.nome}</div>
+                            <div class="data">Abertura: ${formatarData(evento.dataAbertura)} • ${capsulasEvento} cápsulas</div>
+                        </div>
+                        <span style="color:rgba(255,255,255,0.3)">→</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderizarCapsulas() {
+            const lista = document.getElementById('listaCapsulas');
+            const filtro = document.getElementById('filtroEvento').value;
+            
+            let caps = Object.entries(capsulas);
+            if (filtro) {
+                caps = caps.filter(([id, c]) => c.eventoId === filtro);
+            }
+            
+            if (caps.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula encontrada</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            lista.innerHTML = caps.map(([id, cap]) => `
+                <div class="capsula-item">
+                    <div class="capsula-avatar">
+                        ${cap.foto ? `<img src="${cap.foto}">` : '👤'}
+                    </div>
+                    <div class="capsula-info">
+                        <div class="nome">${cap.nome} ${cap.sobrenome || ''}</div>
+                        <div class="data">${formatarData(cap.dataCriacao)}</div>
+                    </div>
+                    <span class="capsula-status ${cap.aberta ? 'aberta' : 'lacrada'}">
+                        ${cap.aberta ? '🔓 Aberta' : '🔒 Lacrada'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function atualizarFiltro() {
+            const select = document.getElementById('filtroEvento');
+            const eventosAtivos = Object.entries(eventos).filter(([id, e]) => !e.arquivado);
+            
+            select.innerHTML = '<option value="">Todos os eventos</option>' +
+                eventosAtivos.map(([id, e]) => `<option value="${id}">${e.nome}</option>`).join('');
+        }
+
+        function filtrarCapsulas() {
+            renderizarCapsulas();
+        }
+
+        // Criar Evento
+        async function criarEvento() {
+            const nome = document.getElementById('nomeEvento').value.trim();
+            const data = document.getElementById('dataEvento').value;
+            
+            if (!nome || !data) {
+                toast('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            try {
+                const id = 'evt_' + Date.now();
+                await database.ref(`eventos/${id}`).set({
+                    nome,
+                    dataAbertura: data,
+                    dataCriacao: new Date().toISOString(),
+                    arquivado: false,
+                    liberado: false
+                });
+                
+                document.getElementById('nomeEvento').value = '';
+                document.getElementById('dataEvento').value = '';
+                
+                toast('Evento criado! 🎉', 'success');
+            } catch (e) {
+                toast('Erro ao criar evento', 'error');
+            }
+        }
+
+        // Abrir Evento
+        function abrirEvento(id) {
+            eventoAtual = id;
+            const evento = eventos[id];
+            
+            document.getElementById('eventoNome').textContent = evento.nome;
+            document.getElementById('eventoData').textContent = formatarData(evento.dataAbertura);
+            
+            const base = window.location.href.replace('index.html', '');
+            document.getElementById('linkEvento').value = `${base}jogador.html?evento=${id}`;
+            
+            document.getElementById('toggleLiberar').classList.toggle('active', evento.liberado || false);
+            
+            renderizarCapsulasEvento();
+            mostrarTela('telaEvento');
+        }
+
+        function renderizarCapsulasEvento() {
+            const lista = document.getElementById('eventoCapsulas');
+            const caps = Object.entries(capsulas).filter(([id, c]) => c.eventoId === eventoAtual);
+            
+            document.getElementById('eventoTotalCapsulas').textContent = caps.length;
+            
+            if (caps.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula ainda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            lista.innerHTML = caps.map(([id, cap]) => `
+                <div class="capsula-item">
+                    <div class="capsula-avatar">
+                        ${cap.foto ? `<img src="${cap.foto}">` : '👤'}
+                    </div>
+                    <div class="capsula-info">
+                        <div class="nome">${cap.nome} ${cap.sobrenome || ''}</div>
+                        <div class="data">${formatarData(cap.dataCriacao)}</div>
+                    </div>
+                    <span class="capsula-status ${cap.aberta ? 'aberta' : 'lacrada'}">
+                        ${cap.aberta ? '🔓' : '🔒'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function voltarDashboard() {
+            eventoAtual = null;
+            mostrarTela('telaDashboard');
+        }
+
+        function copiarLink() {
+            const input = document.getElementById('linkEvento');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            toast('Link copiado! 🔗', 'success');
+        }
+
+        async function toggleLiberacao() {
+            const toggle = document.getElementById('toggleLiberar');
+            const novoEstado = !toggle.classList.contains('active');
+            
+            try {
+                await database.ref(`eventos/${eventoAtual}/liberado`).set(novoEstado);
+                
+                // Atualizar todas as cápsulas deste evento
+                const caps = Object.entries(capsulas).filter(([id, c]) => c.eventoId === eventoAtual);
+                for (const [id, cap] of caps) {
+                    await database.ref(`capsulas/${id}/liberada`).set(novoEstado);
+                }
+                
+                toggle.classList.toggle('active', novoEstado);
+                toast(novoEstado ? 'Cápsulas liberadas! 🔓' : 'Cápsulas bloqueadas 🔒', 'success');
+            } catch (e) {
+                toast('Erro ao atualizar', 'error');
+            }
+        }
+
+        // Modal
+        function confirmarArquivar() {
+            document.getElementById('modalMsg').textContent = 'O evento será arquivado e não aparecerá mais na lista.';
+            document.getElementById('modalConfirmBtn').onclick = arquivarEvento;
+            document.getElementById('modalConfirm').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirm').classList.remove('active');
+        }
+
+        async function arquivarEvento() {
+            try {
+                await database.ref(`eventos/${eventoAtual}/arquivado`).set(true);
+                fecharModal();
+                voltarDashboard();
+                toast('Evento arquivado', 'success');
+            } catch (e) {
+                toast('Erro ao arquivar', 'error');
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set data mínima como hoje
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataEvento').min = hoje;
+        });
+    </script>
+</body>
+</html>

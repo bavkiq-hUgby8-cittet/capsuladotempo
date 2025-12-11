@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Minha Cápsula do Tempo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #fbbf24;
+            --success: #22c55e;
+            --dark: #0f0f0f;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5%, -5%); }
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tela {
+            display: none;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .tela.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tela Lacrada */
+        .tela-lacrada {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .capsula-icon {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 32px;
+            animation: pulse-glow 2s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(99, 102, 241, 0.6); }
+        }
+        
+        .avatar-lacrado {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 3px;
+            margin-bottom: 24px;
+        }
+        
+        .avatar-lacrado-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--dark);
+            overflow: hidden;
+        }
+        
+        .avatar-lacrado-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .titulo-lacrado {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .subtitulo-lacrado {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 32px;
+        }
+        
+        .countdown-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 24px 40px;
+            margin-bottom: 32px;
+        }
+        
+        .countdown-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        
+        .countdown-value {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .countdown-unit {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 4px;
+        }
+        
+        .data-abertura-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+        }
+        
+        .btn-abrir {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+            border: none;
+            padding: 20px 48px;
+            border-radius: 16px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-abrir:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(34, 197, 94, 0.5);
+        }
+        
+        .btn-abrir:disabled {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.4);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Tela Conteúdo */
+        .tela-conteudo {
+            padding: 20px 0;
+        }
+        
+        .header-conteudo {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .header-conteudo .emoji { font-size: 3rem; margin-bottom: 16px; }
+        
+        .header-conteudo h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header-conteudo p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+        
+        .perfil-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .perfil-foto {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 3px;
+            flex-shrink: 0;
+        }
+        
+        .perfil-foto-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--dark);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .perfil-foto-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .perfil-info h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .perfil-info p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12px;
+        }
+        
+        .card-content {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tag-item {
+            background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(236,72,153,0.2));
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .felicidade-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .felicidade-num {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .felicidade-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .felicidade-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .mensagem-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .mensagem-box .card-title { margin-bottom: 16px; }
+        
+        .mensagem-texto {
+            font-size: 1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .audio-player-box {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1));
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .audio-player-box .card-title {
+            color: var(--primary);
+        }
+        
+        .audio-player-box audio {
+            width: 100%;
+            margin-top: 12px;
+        }
+        
+        .btn-share-content {
+            width: 100%;
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-share-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(131, 58, 180, 0.4);
+        }
+
+        /* Modal Share */
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .share-modal.active { display: flex; }
+        
+        .share-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .share-header h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .btn-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .share-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .share-preview-container {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 9/16;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+            background: #111;
+        }
+        
+        .share-preview-container canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .share-status {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .share-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .share-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 16px auto 0;
+            overflow: hidden;
+        }
+        
+        .share-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .share-actions {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .share-btn {
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .share-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .share-btn .icon { font-size: 1.5rem; }
+        .share-btn.primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .share-btn.secondary { background: rgba(255,255,255,0.1); color: white; }
+        .share-btn.full { grid-column: span 2; }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+
+        /* Confetes */
+        .confetes-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1500;
+            overflow: hidden;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.95);
+            color: #111;
+            padding: 14px 24px;
+            border-radius: 100px;
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.4s;
+        }
+        
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: #ef4444; color: white; }
+
+        /* Tela Erro */
+        .tela-erro {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .erro-icon { font-size: 4rem; margin-bottom: 20px; }
+
+        @media (max-width: 400px) {
+            .container { padding: 16px; }
+            .countdown-value { font-size: 2.5rem; }
+            .share-actions { grid-template-columns: 1fr; }
+            .share-btn.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="confetes-container" id="confetes"></div>
+
+    <div class="container">
+        <!-- Tela Lacrada -->
+        <div class="tela tela-lacrada active" id="telaLacrada">
+            <div class="capsula-icon">🔒</div>
+            
+            <div class="avatar-lacrado" id="avatarLacrado" style="display:none">
+                <div class="avatar-lacrado-inner" id="avatarLacradoInner"></div>
+            </div>
+            
+            <h1 class="titulo-lacrado" id="nomeLacrado">Cápsula Lacrada</h1>
+            <p class="subtitulo-lacrado" id="subtituloLacrado">Esta cápsula ainda não pode ser aberta</p>
+            
+            <div class="countdown-box">
+                <div class="countdown-label">Tempo restante</div>
+                <div class="countdown-value" id="countdownValue">--</div>
+                <div class="countdown-unit">dias</div>
+            </div>
+            
+            <div class="data-abertura-box">
+                <span>📅</span>
+                <span>Abertura: <strong id="dataAberturaLacrada">--/--/----</strong></span>
+            </div>
+            
+            <button class="btn-abrir" id="btnAbrir" onclick="abrirCapsula()" disabled>
+                🎁 Abrir Cápsula
+            </button>
+        </div>
+
+        <!-- Tela Conteúdo -->
+        <div class="tela tela-conteudo" id="telaConteudo">
+            <div class="header-conteudo">
+                <div class="emoji">🎉</div>
+                <h1>Cápsula Aberta!</h1>
+                <p id="dataAbertura">Aberta em --/--/----</p>
+            </div>
+            
+            <div class="perfil-section">
+                <div class="perfil-foto">
+                    <div class="perfil-foto-inner" id="perfilFoto">👤</div>
+                </div>
+                <div class="perfil-info">
+                    <h2 id="perfilNome">Nome</h2>
+                    <p id="perfilData">Criada em --/--/----</p>
+                </div>
+            </div>
+            
+            <div class="card" id="cardPrioridades">
+                <div class="card-title">🎯 Prioridades</div>
+                <div class="tags-list" id="listaPrioridades"></div>
+            </div>
+            
+            <div class="card" id="cardPessoas">
+                <div class="card-title">👥 Pessoas importantes</div>
+                <div class="card-content" id="listaPessoas"></div>
+            </div>
+            
+            <div class="card" id="cardPalavra">
+                <div class="card-title">📝 Palavra do momento</div>
+                <div class="card-content" style="font-size:1.5rem;font-weight:700;color:var(--accent)" id="palavraMomento"></div>
+            </div>
+            
+            <div class="card" id="cardFelicidade">
+                <div class="card-title">😊 Nível de felicidade</div>
+                <div class="felicidade-display">
+                    <div class="felicidade-num" id="felicidadeNum">-</div>
+                    <div class="felicidade-bar">
+                        <div class="felicidade-fill" id="felicidadeFill" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" id="cardConquista">
+                <div class="card-title">🎯 O que queria conquistar</div>
+                <div class="card-content" id="conquistaTexto"></div>
+            </div>
+            
+            <div class="card" id="cardMomento">
+                <div class="card-title">✨ Momento marcante</div>
+                <div class="card-content" id="momentoTexto"></div>
+            </div>
+            
+            <div class="audio-player-box" id="audioBox" style="display:none">
+                <div class="card-title">🎤 Mensagem de voz</div>
+                <audio id="audioPlayer" controls></audio>
+            </div>
+            
+            <div class="mensagem-box" id="mensagemBox">
+                <div class="card-title">💌 Carta para o futuro</div>
+                <div class="mensagem-texto" id="mensagemTexto"></div>
+            </div>
+            
+            <button class="btn-share-content" onclick="abrirShare()">
+                <span>✨</span> Criar Stories
+            </button>
+        </div>
+
+        <!-- Tela Erro -->
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 style="margin-bottom:12px">Cápsula não encontrada</h2>
+            <p style="color:rgba(255,255,255,0.6)">Verifique o link e tente novamente</p>
+        </div>
+    </div>
+
+    <!-- Modal Share -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-header">
+            <h3>Criar Stories</h3>
+            <button class="btn-close" onclick="fecharShare()">✕</button>
+        </div>
+        
+        <div class="share-content">
+            <div class="share-preview-container" id="sharePreview">
+                <div class="share-status" id="shareStatus">
+                    <div class="share-spinner"></div>
+                    <p style="color:rgba(255,255,255,0.7)">Criando animação...</p>
+                    <div class="share-progress">
+                        <div class="share-progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="share-actions">
+            <button class="share-btn primary" id="btnSalvarVideo" onclick="salvarVideo()" disabled>
+                <span class="icon">🎬</span>
+                Salvar Vídeo
+            </button>
+            <button class="share-btn secondary" id="btnSalvarImg" onclick="salvarImagem()" disabled>
+                <span class="icon">📸</span>
+                Salvar Imagem
+            </button>
+            <button class="share-btn secondary full" onclick="copiarLink()">
+                <span class="icon">🔗</span>
+                Copiar Link
+            </button>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loading">
+        <div style="font-size:4rem;animation:pulse 1s ease-in-out infinite">🎁</div>
+        <p style="margin-top:20px;color:rgba(255,255,255,0.7)">Abrindo cápsula...</p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        let capsulaId = null, capsulaData = null, eventoData = null;
+        let videoBlob = null, imagemBlob = null;
+
+        const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
+        
+        const toast = (msg, tipo='success') => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (tipo === 'error' ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 3000);
+        };
+
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            capsulaId = params.get('id');
+            
+            if (!capsulaId) { mostrarTela('telaErro'); return; }
+            
+            try {
+                const snap = await database.ref(`capsulas/${capsulaId}`).once('value');
+                capsulaData = snap.val();
+                
+                if (!capsulaData) { mostrarTela('telaErro'); return; }
+                
+                const eventoSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
+                eventoData = eventoSnap.val();
+                
+                configurarTela();
+            } catch (e) {
+                console.error(e);
+                mostrarTela('telaErro');
+            }
+        });
+
+        function configurarTela() {
+            const agora = new Date();
+            const dataAbertura = new Date(capsulaData.dataAbertura);
+            const dias = Math.ceil((dataAbertura - agora) / (1000*60*60*24));
+            const liberada = capsulaData.liberada || dias <= 0;
+            
+            // Foto
+            if (capsulaData.foto) {
+                document.getElementById('avatarLacrado').style.display = 'block';
+                document.getElementById('avatarLacradoInner').innerHTML = `<img src="${capsulaData.foto}">`;
+            }
+            
+            document.getElementById('nomeLacrado').textContent = `Cápsula de ${capsulaData.nome}`;
+            document.getElementById('countdownValue').textContent = Math.max(0, dias);
+            document.getElementById('dataAberturaLacrada').textContent = formatarData(capsulaData.dataAbertura);
+            
+            if (liberada) {
+                document.getElementById('subtituloLacrado').textContent = 'Sua cápsula está pronta para ser aberta!';
+                document.getElementById('btnAbrir').disabled = false;
+                
+                if (capsulaData.aberta) {
+                    mostrarConteudo();
+                }
+            }
+        }
+
+        async function abrirCapsula() {
+            document.getElementById('loading').classList.add('active');
+            
+            try {
+                await database.ref(`capsulas/${capsulaId}`).update({
+                    aberta: true,
+                    dataAberturaReal: new Date().toISOString()
+                });
+                
+                setTimeout(() => {
+                    document.getElementById('loading').classList.remove('active');
+                    mostrarConteudo();
+                    criarConfetes();
+                }, 1500);
+            } catch (e) {
+                document.getElementById('loading').classList.remove('active');
+                toast('Erro ao abrir', 'error');
+            }
+        }
+
+        function mostrarConteudo() {
+            mostrarTela('telaConteudo');
+            
+            document.getElementById('dataAbertura').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
+            
+            if (capsulaData.foto) {
+                document.getElementById('perfilFoto').innerHTML = `<img src="${capsulaData.foto}">`;
+            }
+            
+            document.getElementById('perfilNome').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
+            document.getElementById('perfilData').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
+            
+            // Prioridades
+            if (capsulaData.desejos?.length) {
+                document.getElementById('listaPrioridades').innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
+            } else {
+                document.getElementById('cardPrioridades').style.display = 'none';
+            }
+            
+            // Pessoas
+            if (capsulaData.pessoas?.length) {
+                document.getElementById('listaPessoas').textContent = capsulaData.pessoas.join(', ');
+            } else {
+                document.getElementById('cardPessoas').style.display = 'none';
+            }
+            
+            // Palavra
+            if (capsulaData.perguntas?.palavra) {
+                document.getElementById('palavraMomento').textContent = capsulaData.perguntas.palavra;
+            } else {
+                document.getElementById('cardPalavra').style.display = 'none';
+            }
+            
+            // Felicidade
+            if (capsulaData.perguntas?.felicidade) {
+                document.getElementById('felicidadeNum').textContent = capsulaData.perguntas.felicidade;
+                setTimeout(() => {
+                    document.getElementById('felicidadeFill').style.width = (capsulaData.perguntas.felicidade * 10) + '%';
+                }, 300);
+            } else {
+                document.getElementById('cardFelicidade').style.display = 'none';
+            }
+            
+            // Conquista
+            if (capsulaData.perguntas?.conquista) {
+                document.getElementById('conquistaTexto').textContent = capsulaData.perguntas.conquista;
+            } else {
+                document.getElementById('cardConquista').style.display = 'none';
+            }
+            
+            // Momento
+            if (capsulaData.perguntas?.momento) {
+                document.getElementById('momentoTexto').textContent = capsulaData.perguntas.momento;
+            } else {
+                document.getElementById('cardMomento').style.display = 'none';
+            }
+            
+            // Áudio
+            if (capsulaData.audioUrl || capsulaData.audioBase64) {
+                document.getElementById('audioBox').style.display = 'block';
+                document.getElementById('audioPlayer').src = capsulaData.audioUrl || capsulaData.audioBase64;
+            }
+            
+            // Mensagem
+            if (capsulaData.mensagemPessoal) {
+                document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal;
+            } else {
+                document.getElementById('mensagemBox').style.display = 'none';
+            }
+        }
+
+        function criarConfetes() {
+            const container = document.getElementById('confetes');
+            const cores = ['#6366f1', '#ec4899', '#fbbf24', '#22c55e', '#3b82f6'];
+            
+            for (let i = 0; i < 150; i++) {
+                const el = document.createElement('div');
+                el.style.cssText = `
+                    position: absolute;
+                    width: ${6 + Math.random() * 8}px;
+                    height: ${6 + Math.random() * 8}px;
+                    background: ${cores[Math.floor(Math.random() * cores.length)]};
+                    left: ${Math.random() * 100}%;
+                    top: -20px;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    animation: confetti ${2 + Math.random() * 2}s ease-out forwards;
+                    animation-delay: ${Math.random() * 0.5}s;
+                `;
+                container.appendChild(el);
+            }
+            
+            if (!document.getElementById('confetti-style')) {
+                const style = document.createElement('style');
+                style.id = 'confetti-style';
+                style.textContent = `@keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }`;
+                document.head.appendChild(style);
+            }
+            
+            setTimeout(() => container.innerHTML = '', 4000);
+        }
+
+        // Share
+        function abrirShare() {
+            document.getElementById('shareModal').classList.add('active');
+            document.getElementById('btnSalvarVideo').disabled = true;
+            document.getElementById('btnSalvarImg').disabled = true;
+            document.getElementById('shareStatus').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            setTimeout(() => criarAnimacaoAbertura(), 100);
+        }
+
+        function fecharShare() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        async function criarAnimacaoAbertura() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1080;
+            canvas.height = 1920;
+            
+            const preview = document.getElementById('sharePreview');
+            preview.innerHTML = '';
+            preview.appendChild(canvas);
+            
+            const nome = capsulaData.nome;
+            const prioridades = (capsulaData.desejos || []).slice(0, 3);
+            const palavra = capsulaData.perguntas?.palavra || '';
+            const felicidade = capsulaData.perguntas?.felicidade || 0;
+            
+            let fotoImg = null;
+            if (capsulaData.foto) {
+                try {
+                    fotoImg = await new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                        img.src = capsulaData.foto;
+                    });
+                } catch(e) {}
+            }
+            
+            const stream = canvas.captureStream(30);
+            const chunks = [];
+            let recorder;
+            
+            try {
+                recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+            } catch(e) {
+                recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            }
+            
+            recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+            recorder.onstop = () => {
+                videoBlob = new Blob(chunks, { type: 'video/webm' });
+                document.getElementById('btnSalvarVideo').disabled = false;
+                toast('🎬 Vídeo criado!');
+            };
+            
+            recorder.start();
+            
+            const w = canvas.width, h = canvas.height;
+            let frame = 0;
+            const totalFrames = 210;
+            
+            // Partículas de explosão
+            const explosionParticles = [];
+            for (let i = 0; i < 100; i++) {
+                const angle = (i / 100) * Math.PI * 2;
+                explosionParticles.push({
+                    x: w/2,
+                    y: h/2,
+                    vx: Math.cos(angle) * (10 + Math.random() * 20),
+                    vy: Math.sin(angle) * (10 + Math.random() * 20),
+                    size: 5 + Math.random() * 10,
+                    hue: Math.random() * 60 + 320,
+                    life: 1
+                });
+            }
+            
+            // Confetes
+            const confetes = [];
+            for (let i = 0; i < 80; i++) {
+                confetes.push({
+                    x: Math.random() * w,
+                    y: -50 - Math.random() * 500,
+                    size: 8 + Math.random() * 12,
+                    color: ['#6366f1', '#ec4899', '#fbbf24', '#22c55e'][Math.floor(Math.random() * 4)],
+                    speedY: 5 + Math.random() * 8,
+                    speedX: (Math.random() - 0.5) * 4,
+                    rotation: 0,
+                    rotSpeed: (Math.random() - 0.5) * 0.3
+                });
+            }
+            
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+            
+            function animate() {
+                frame++;
+                const progress = frame / totalFrames;
+                document.getElementById('progressBar').style.width = (progress * 100) + '%';
+                
+                // Background
+                const hue1 = 280 + Math.sin(frame * 0.02) * 30;
+                const hue2 = 340 + Math.cos(frame * 0.015) * 30;
+                
+                const bg = ctx.createLinearGradient(0, 0, w, h);
+                bg.addColorStop(0, `hsl(${hue1}, 60%, 8%)`);
+                bg.addColorStop(0.5, `hsl(${(hue1+hue2)/2}, 50%, 12%)`);
+                bg.addColorStop(1, `hsl(${hue2}, 60%, 8%)`);
+                ctx.fillStyle = bg;
+                ctx.fillRect(0, 0, w, h);
+                
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // ===== CENA 1: EXPLOSÃO (0-60) =====
+                if (frame <= 60) {
+                    const t = frame / 60;
+                    
+                    // Cápsula tremendo e explodindo
+                    if (frame < 30) {
+                        const shake = Math.sin(frame * 0.8) * (5 + frame * 0.5);
+                        const scale = 1 + t * 0.5;
+                        
+                        ctx.save();
+                        ctx.translate(w/2 + shake, h/2);
+                        ctx.scale(scale, scale);
+                        ctx.font = '150px Arial';
+                        ctx.globalAlpha = 1 - t;
+                        ctx.fillText('🎁', 0, 0);
+                        ctx.restore();
+                    }
+                    
+                    // Flash de explosão
+                    if (frame >= 25 && frame <= 40) {
+                        const flashT = (frame - 25) / 15;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * (1 - flashT)})`;
+                        ctx.fillRect(0, 0, w, h);
+                    }
+                    
+                    // Partículas de explosão
+                    if (frame >= 30) {
+                        explosionParticles.forEach(p => {
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.vy += 0.5;
+                            p.life -= 0.02;
+                            p.vx *= 0.98;
+                            
+                            if (p.life > 0) {
+                                ctx.globalAlpha = p.life;
+                                ctx.fillStyle = `hsl(${p.hue}, 80%, 60%)`;
+                                ctx.beginPath();
+                                ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        });
+                        ctx.globalAlpha = 1;
+                    }
+                    
+                    // Texto "ABERTA!"
+                    if (frame > 35) {
+                        const textT = (frame - 35) / 25;
+                        const textScale = easeOutCubic(Math.min(1, textT));
+                        
+                        ctx.save();
+                        ctx.translate(w/2, h/2);
+                        ctx.scale(textScale, textScale);
+                        ctx.font = '900 120px "Sora", sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText('🎉 ABERTA! 🎉', 0, 0);
+                        ctx.restore();
+                    }
+                }
+                
+                // ===== CENA 2: FOTO + NOME (60-120) =====
+                if (frame > 45 && frame <= 120) {
+                    const t = Math.min(1, (frame - 45) / 30);
+                    const fadeOut = frame > 105 ? 1 - (frame - 105) / 15 : 1;
+                    
+                    // Confetes caindo
+                    confetes.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rotation += c.rotSpeed;
+                        if (c.y > h + 50) {
+                            c.y = -50;
+                            c.x = Math.random() * w;
+                        }
+                        
+                        ctx.save();
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.rotation);
+                        ctx.fillStyle = c.color;
+                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                        ctx.restore();
+                    });
+                    
+                    // Foto
+                    if (fotoImg) {
+                        const fotoY = h * 0.35;
+                        const fotoSize = 380 * easeOutCubic(t);
+                        
+                        ctx.save();
+                        ctx.globalAlpha = easeOutCubic(t) * fadeOut;
+                        
+                        const borderGrad = ctx.createLinearGradient(w/2 - 220, fotoY - 220, w/2 + 220, fotoY + 220);
+                        borderGrad.addColorStop(0, '#22c55e');
+                        borderGrad.addColorStop(0.5, '#fbbf24');
+                        borderGrad.addColorStop(1, '#ec4899');
+                        
+                        ctx.fillStyle = borderGrad;
+                        ctx.beginPath();
+                        ctx.arc(w/2, fotoY, fotoSize/2 + 15, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.arc(w/2, fotoY, fotoSize/2, 0, Math.PI * 2);
+                        ctx.clip();
+                        
+                        const ratio = fotoImg.width / fotoImg.height;
+                        let dw = fotoSize, dh = fotoSize;
+                        if (ratio > 1) dw = fotoSize * ratio;
+                        else dh = fotoSize / ratio;
+                        ctx.drawImage(fotoImg, w/2 - dw/2, fotoY - dh/2, dw, dh);
+                        ctx.restore();
+                    }
+                    
+                    // Nome
+                    if (frame > 60) {
+                        const nameT = (frame - 60) / 25;
+                        ctx.save();
+                        ctx.globalAlpha = easeOutCubic(Math.min(1, nameT)) * fadeOut;
+                        ctx.font = '800 90px "Sora", sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText(nome.toUpperCase(), w/2, h * 0.62);
+                        
+                        ctx.font = '400 40px "Outfit", sans-serif';
+                        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                        ctx.fillText('abriu sua cápsula', w/2, h * 0.68);
+                        ctx.restore();
+                    }
+                }
+                
+                // ===== CENA 3: CONQUISTAS + PALAVRA (120-170) =====
+                if (frame > 105 && frame <= 170) {
+                    const t = Math.min(1, (frame - 105) / 30);
+                    const fadeOut = frame > 155 ? 1 - (frame - 155) / 15 : 1;
+                    
+                    // Confetes continuam
+                    confetes.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rotation += c.rotSpeed;
+                        if (c.y > h + 50) { c.y = -50; c.x = Math.random() * w; }
+                        ctx.save();
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.rotation);
+                        ctx.fillStyle = c.color;
+                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                        ctx.restore();
+                    });
+                    
+                    ctx.save();
+                    ctx.globalAlpha = easeOutCubic(t) * fadeOut;
+                    
+                    ctx.font = '600 40px "Outfit", sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fillText('MINHAS PRIORIDADES ERAM', w/2, h * 0.2);
+                    
+                    prioridades.forEach((tag, i) => {
+                        const delay = i * 8;
+                        if (frame > 115 + delay) {
+                            const tagT = Math.min(1, (frame - 115 - delay) / 15);
+                            const tagY = h * 0.35 + i * 130;
+                            
+                            ctx.globalAlpha = easeOutCubic(tagT) * fadeOut;
+                            
+                            const tagGrad = ctx.createLinearGradient(w/2 - 280, tagY, w/2 + 280, tagY);
+                            tagGrad.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+                            tagGrad.addColorStop(1, 'rgba(251, 191, 36, 0.3)');
+                            
+                            ctx.fillStyle = tagGrad;
+                            roundRect(ctx, w/2 - 280, tagY - 50, 560, 100, 50);
+                            ctx.fill();
+                            
+                            ctx.font = '700 56px "Sora", sans-serif';
+                            ctx.fillStyle = '#fff';
+                            ctx.fillText(tag, w/2, tagY + 5);
+                        }
+                    });
+                    
+                    // Palavra + Felicidade
+                    if (frame > 140) {
+                        const wordT = (frame - 140) / 20;
+                        ctx.globalAlpha = easeOutCubic(Math.min(1, wordT)) * fadeOut;
+                        
+                        if (palavra) {
+                            ctx.font = '500 32px "Outfit", sans-serif';
+                            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                            ctx.fillText('Palavra do momento', w/2, h * 0.73);
+                            
+                            ctx.font = '800 80px "Sora", sans-serif';
+                            ctx.fillStyle = '#fbbf24';
+                            ctx.fillText(palavra.toUpperCase(), w/2, h * 0.8);
+                        }
+                        
+                        if (felicidade) {
+                            ctx.font = '500 28px "Outfit", sans-serif';
+                            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                            ctx.fillText('Felicidade', w/2, h * 0.88);
+                            
+                            ctx.font = '900 100px "Sora", sans-serif';
+                            ctx.fillStyle = '#22c55e';
+                            ctx.fillText(`${felicidade}/10`, w/2, h * 0.95);
+                        }
+                    }
+                    
+                    ctx.restore();
+                }
+                
+                // ===== CENA 4: FINAL (170-210) =====
+                if (frame > 155) {
+                    const t = Math.min(1, (frame - 155) / 30);
+                    
+                    // Confetes
+                    confetes.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rotation += c.rotSpeed;
+                        if (c.y > h + 50) { c.y = -50; c.x = Math.random() * w; }
+                        ctx.save();
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.rotation);
+                        ctx.fillStyle = c.color;
+                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                        ctx.restore();
+                    });
+                    
+                    ctx.save();
+                    ctx.globalAlpha = easeOutCubic(t);
+                    
+                    // Emoji comemorativo
+                    ctx.font = '180px Arial';
+                    ctx.fillText('🎊', w/2, h * 0.3);
+                    
+                    ctx.font = '900 72px "Sora", sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText('CÁPSULA', w/2, h * 0.48);
+                    ctx.fillText('ABERTA!', w/2, h * 0.55);
+                    
+                    ctx.font = '500 36px "Outfit", sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.fillText(nome, w/2, h * 0.65);
+                    
+                    // Glow final
+                    const glowSize = 300 + Math.sin(frame * 0.1) * 50;
+                    const glow = ctx.createRadialGradient(w/2, h * 0.5, 0, w/2, h * 0.5, glowSize);
+                    glow.addColorStop(0, 'rgba(34, 197, 94, 0.2)');
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.fillRect(0, 0, w, h);
+                    
+                    ctx.font = '400 28px "Outfit", sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.fillText('Cápsula do Tempo • 2024', w/2, h - 80);
+                    
+                    ctx.restore();
+                }
+                
+                if (frame < totalFrames) {
+                    requestAnimationFrame(animate);
+                } else {
+                    recorder.stop();
+                    canvas.toBlob((blob) => {
+                        imagemBlob = blob;
+                        document.getElementById('btnSalvarImg').disabled = false;
+                        document.getElementById('shareStatus').style.display = 'none';
+                    }, 'image/png');
+                }
+            }
+            
+            animate();
+        }
+        
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function salvarVideo() {
+            if (!videoBlob) { toast('Aguarde...', 'error'); return; }
+            const url = URL.createObjectURL(videoBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `capsula-aberta-${Date.now()}.webm`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast('🎬 Vídeo salvo!');
+        }
+
+        function salvarImagem() {
+            if (!imagemBlob) { toast('Aguarde...', 'error'); return; }
+            const url = URL.createObjectURL(imagemBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `capsula-aberta-${Date.now()}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast('📸 Imagem salva!');
+        }
+
+        function copiarLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => toast('🔗 Link copiado!'));
+        }
+    </script>
+</body>
+</html>
