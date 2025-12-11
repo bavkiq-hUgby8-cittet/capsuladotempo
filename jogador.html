@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎁 Criar Cápsula do Tempo</title>
     
-<<<<<<< HEAD
     <!-- Fontes Profissionais -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-=======
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
->>>>>>> parent of 3238cba (Add files via upload)
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -868,7 +864,6 @@
             box-shadow: 0 10px 40px rgba(131, 58, 180, 0.4);
         }
 
-<<<<<<< HEAD
         /* Modal Share - Estilo Spotify */
         .share-modal {
             position: fixed;
@@ -1016,22 +1011,6 @@
         .share-btn.full {
             grid-column: span 2;
         }
-=======
-        /* MODAL COMPARTILHAR */
-        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; overflow-y: auto; }
-        .share-modal.active { display: flex; }
-        .share-modal-content { max-width: 400px; width: 100%; text-align: center; padding-top: 20px; }
-        .share-modal h3 { color: var(--natal-gold); font-size: 1.5rem; margin-bottom: 20px; font-family: 'Pacifico', cursive; }
-        .share-preview { width: 100%; max-height: 50vh; overflow: hidden; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: #111; }
-        .share-preview img { width: 100%; height: auto; display: block; }
-        .share-preview canvas { width: 100%; height: auto; display: block; border-radius: 16px; }
-        .share-btns { display: flex; flex-direction: column; gap: 12px; }
-        .share-btns button { padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 1.1rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .btn-baixar-img { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; }
-        .btn-copiar-link { background: var(--natal-green); color: white; border: none; }
-        .btn-fechar-share { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
-        .share-loading { color: var(--natal-gold); font-size: 1.1rem; padding: 40px; }
->>>>>>> parent of 3238cba (Add files via upload)
 
         /* Tela Erro */
         .tela-erro {
@@ -1087,16 +1066,10 @@
             .container { padding: 16px; }
             .titulo-principal { font-size: 1.75rem; }
             .header-tela h2 { font-size: 1.5rem; }
-<<<<<<< HEAD
             .pessoas-grid { gap: 8px; }
             .pessoa-card { padding: 16px; }
             .share-actions { grid-template-columns: 1fr; }
             .share-btn.full { grid-column: span 1; }
-=======
-            .pessoas-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .escala-num { width: 42px; height: 42px; font-size: 1rem; }
-            .foto-opcoes { flex-direction: column; }
->>>>>>> parent of 3238cba (Add files via upload)
         }
     </style>
 </head>
@@ -1136,7 +1109,6 @@
             </div>
             
             <div class="foto-section">
-<<<<<<< HEAD
                 <div class="foto-container">
                     <div class="foto-inner" id="fotoContainer">
                         <div class="foto-placeholder" onclick="abrirGaleria()">
@@ -1146,12 +1118,6 @@
                             </svg>
                             <span style="font-size:0.85rem">Adicionar foto</span>
                         </div>
-=======
-                <div class="foto-container" id="fotoContainer">
-                    <div class="foto-placeholder" id="fotoPlaceholder">
-                        <span>📷</span>
-                        <p>Toque para adicionar foto</p>
->>>>>>> parent of 3238cba (Add files via upload)
                     </div>
                 </div>
                 
@@ -1461,17 +1427,12 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
             </div>
             
             <div class="sucesso-btns">
-<<<<<<< HEAD
                 <button class="btn-share" onclick="abrirShare()">
                     <span>✨</span> Criar Stories
                 </button>
                 <button class="btn-secondary" style="justify-content:center" onclick="verCapsula()">
                     👁️ Ver Cápsula
                 </button>
-=======
-                <button class="btn-compartilhar" onclick="abrirCompartilhar()">📸 Compartilhar nas Redes</button>
-                <button class="btn-ver" onclick="verCapsula()">👁️ Ver Minha Cápsula</button>
->>>>>>> parent of 3238cba (Add files via upload)
             </div>
         </div>
 
@@ -1485,7 +1446,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
 
     <!-- MODAL SHARE -->
     <div class="share-modal" id="shareModal">
-<<<<<<< HEAD
         <div class="share-header">
             <h3>Criar Stories</h3>
             <button class="btn-close" onclick="fecharShare()">✕</button>
@@ -1516,18 +1476,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
                 <span class="icon">🔗</span>
                 Copiar Link
             </button>
-=======
-        <div class="share-modal-content">
-            <h3>📸 Compartilhe sua Cápsula!</h3>
-            <div class="share-preview" id="sharePreview">
-                <div class="share-loading">⏳ Gerando imagem...</div>
-            </div>
-            <div class="share-btns">
-                <button class="btn-baixar-img" id="btnBaixar" onclick="baixarImagem()">📥 Salvar Imagem no Celular</button>
-                <button class="btn-copiar-link" onclick="copiarLink()">🔗 Copiar Link da Cápsula</button>
-                <button class="btn-fechar-share" onclick="fecharCompartilhar()">✕ Fechar</button>
-            </div>
->>>>>>> parent of 3238cba (Add files via upload)
         </div>
     </div>
 
@@ -1555,25 +1503,10 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
         const database = firebase.database();
         const storage = firebase.storage();
 
-<<<<<<< HEAD
         // State
         let eventoId = null, eventoData = null, capsulaId = null;
         let fotoBase64 = null, linkCapsula = null;
         let desejosSelecionados = [], pessoasSelecionadas = [];
-=======
-        // ==========================================
-        // VARIÁVEIS GLOBAIS
-        // ==========================================
-        let eventoId = null;
-        let eventoData = null;
-        let capsulaId = null;
-        let fotoBase64 = null;
-        let linkCapsula = null;
-        let imagemGeradaBlob = null;
-        
-        let desejosSelecionados = [];
-        let pessoasSelecionadas = [];
->>>>>>> parent of 3238cba (Add files via upload)
         let notaFelicidade = null;
         let cameraStream = null;
         let mediaRecorder = null, audioChunks = [], audioBase64 = null;
@@ -1686,7 +1619,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
         function removerFoto(e) {
             e.stopPropagation();
             fotoBase64 = null;
-<<<<<<< HEAD
             document.getElementById('fotoContainer').innerHTML = `
                 <div class="foto-placeholder" onclick="abrirGaleria()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px">
@@ -1697,11 +1629,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
                     <span style="font-size:0.85rem">Adicionar foto</span>
                 </div>
             `;
-=======
-            const container = document.getElementById('fotoContainer');
-            container.classList.remove('has-photo');
-            container.innerHTML = `<div class="foto-placeholder"><span>📷</span><p>Toque para adicionar foto</p></div>`;
->>>>>>> parent of 3238cba (Add files via upload)
             document.getElementById('fotoInput').value = '';
         }
 
@@ -1890,7 +1817,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
             mostrarTela('telaSucesso');
         }
 
-<<<<<<< HEAD
         function criarConfetes() {
             const container = document.getElementById('confetes');
             const cores = ['#6366f1', '#ec4899', '#fbbf24', '#22c55e', '#3b82f6', '#f43f5e'];
@@ -1941,32 +1867,11 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
         // ANIMAÇÃO ESTILO SPOTIFY WRAPPED
         // ========================================
         async function criarAnimacaoSpotify() {
-=======
-        // ==========================================
-        // COMPARTILHAR - GERAR IMAGEM
-        // ==========================================
-        async function abrirCompartilhar() {
-            const modal = document.getElementById('shareModal');
-            const preview = document.getElementById('sharePreview');
-            modal.classList.add('active');
-            preview.innerHTML = '<div class="share-loading">⏳ Gerando imagem...</div>';
-            
-            try {
-                await gerarImagemCompartilhar();
-            } catch (err) {
-                console.error('Erro ao gerar imagem:', err);
-                preview.innerHTML = '<div class="share-loading">❌ Erro ao gerar imagem</div>';
-            }
-        }
-
-        async function gerarImagemCompartilhar() {
->>>>>>> parent of 3238cba (Add files via upload)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 1080;
             canvas.height = 1920;
             
-<<<<<<< HEAD
             const preview = document.getElementById('sharePreview');
             preview.innerHTML = '';
             preview.appendChild(canvas);
@@ -2297,214 +2202,6 @@ Escreva tudo..." maxlength="5000" rows="8" oninput="atualizarContador()"></texta
             }
             
             animate();
-=======
-            // Tamanho 9:16 para Stories
-            const w = 1080;
-            const h = 1920;
-            canvas.width = w;
-            canvas.height = h;
-            
-            // Background gradiente natalino
-            const bg = ctx.createLinearGradient(0, 0, 0, h);
-            bg.addColorStop(0, '#0a0e14');
-            bg.addColorStop(0.3, '#1a2e1a');
-            bg.addColorStop(0.6, '#2a1a1a');
-            bg.addColorStop(1, '#0a0e14');
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, w, h);
-            
-            // Estrelas decorativas
-            for (let i = 0; i < 150; i++) {
-                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.8})`;
-                ctx.beginPath();
-                ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 1, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Círculo decorativo dourado
-            ctx.beginPath();
-            ctx.arc(w/2, 200, 500, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,215,0,0.08)';
-            ctx.fill();
-            
-            // Emoji de presente no topo
-            ctx.font = '120px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('🎁', w/2, 180);
-            
-            // Título
-            ctx.font = 'bold 72px Arial, sans-serif';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText('CÁPSULA DO TEMPO', w/2, 320);
-            
-            // Subtítulo evento
-            ctx.font = '40px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fillText(eventoData?.nome || 'Natal 2024', w/2, 390);
-            
-            // Foto do usuário
-            const fotoY = 480;
-            const fotoSize = 320;
-            
-            // Borda dourada da foto
-            ctx.beginPath();
-            ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2 + 15, 0, Math.PI * 2);
-            const borderGrad = ctx.createLinearGradient(w/2 - 200, fotoY, w/2 + 200, fotoY + fotoSize);
-            borderGrad.addColorStop(0, '#ffd700');
-            borderGrad.addColorStop(0.5, '#fff8dc');
-            borderGrad.addColorStop(1, '#ffd700');
-            ctx.fillStyle = borderGrad;
-            ctx.fill();
-            
-            // Foto circular
-            if (fotoBase64) {
-                try {
-                    const img = await loadImage(fotoBase64);
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                    ctx.clip();
-                    
-                    // Centralizar e cobrir
-                    const imgRatio = img.width / img.height;
-                    let drawW, drawH, drawX, drawY;
-                    if (imgRatio > 1) {
-                        drawH = fotoSize;
-                        drawW = fotoSize * imgRatio;
-                        drawX = w/2 - drawW/2;
-                        drawY = fotoY;
-                    } else {
-                        drawW = fotoSize;
-                        drawH = fotoSize / imgRatio;
-                        drawX = w/2 - fotoSize/2;
-                        drawY = fotoY - (drawH - fotoSize) / 2;
-                    }
-                    ctx.drawImage(img, drawX, drawY, drawW, drawH);
-                    ctx.restore();
-                } catch (e) {
-                    // Círculo placeholder
-                    ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                    ctx.fillStyle = '#333';
-                    ctx.fill();
-                    ctx.font = '100px Arial';
-                    ctx.fillText('👤', w/2, fotoY + fotoSize/2 + 35);
-                }
-            } else {
-                ctx.beginPath();
-                ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                ctx.fillStyle = '#333';
-                ctx.fill();
-                ctx.font = '100px Arial';
-                ctx.fillText('👤', w/2, fotoY + fotoSize/2 + 35);
-            }
-            
-            // Nome
-            const nome = document.getElementById('nome').value.trim();
-            ctx.font = 'bold 64px Arial, sans-serif';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(nome, w/2, fotoY + fotoSize + 80);
-            
-            // Cadeado
-            ctx.font = '140px Arial';
-            ctx.fillText('🔒', w/2, fotoY + fotoSize + 240);
-            
-            // Status
-            ctx.font = 'bold 48px Arial, sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText('CÁPSULA LACRADA!', w/2, fotoY + fotoSize + 340);
-            
-            // Data de abertura
-            ctx.font = '36px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fillText(`📅 Abre em: ${formatarData(eventoData?.dataAbertura)}`, w/2, fotoY + fotoSize + 410);
-            
-            // Dias restantes
-            const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000*60*60*24));
-            ctx.font = 'bold 72px Arial, sans-serif';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(`${dias} DIAS`, w/2, fotoY + fotoSize + 510);
-            
-            // Prioridades
-            if (desejosSelecionados.length > 0) {
-                ctx.font = '30px Arial, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('Minhas prioridades:', w/2, fotoY + fotoSize + 590);
-                
-                ctx.font = 'bold 36px Arial, sans-serif';
-                ctx.fillStyle = '#ffd700';
-                const tags = desejosSelecionados.slice(0, 4).join(' • ');
-                ctx.fillText(tags, w/2, fotoY + fotoSize + 640);
-            }
-            
-            // Felicidade
-            if (notaFelicidade) {
-                ctx.font = '30px Arial, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText(`Felicidade hoje: ${notaFelicidade}/10 ⭐`, w/2, fotoY + fotoSize + 720);
-            }
-            
-            // Rodapé decorativo
-            ctx.beginPath();
-            ctx.arc(w/2, h + 150, 400, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(196,30,58,0.1)';
-            ctx.fill();
-            
-            // Créditos
-            ctx.font = '28px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillText('🎄 Cápsula do Tempo 🎄', w/2, h - 80);
-            
-            // Converter para blob e mostrar
-            canvas.toBlob((blob) => {
-                imagemGeradaBlob = blob;
-                const url = URL.createObjectURL(blob);
-                const preview = document.getElementById('sharePreview');
-                preview.innerHTML = `<img src="${url}" alt="Compartilhar">`;
-            }, 'image/png', 1.0);
-        }
-
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
-        }
-
-        function baixarImagem() {
-            if (!imagemGeradaBlob) {
-                mostrarToast('Aguarde a imagem carregar', 'error');
-                return;
-            }
-            
-            const url = URL.createObjectURL(imagemGeradaBlob);
-            const link = document.createElement('a');
-            link.download = `capsula-${Date.now()}.png`;
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            mostrarToast('📥 Imagem salva!');
-        }
-        
-        function copiarLink() {
-            if (!linkCapsula) return;
-            navigator.clipboard.writeText(linkCapsula).then(() => {
-                mostrarToast('🔗 Link copiado!');
-            }).catch(() => {
-                const i = document.createElement('textarea');
-                i.value = linkCapsula;
-                document.body.appendChild(i);
-                i.select();
-                document.execCommand('copy');
-                document.body.removeChild(i);
-                mostrarToast('🔗 Link copiado!');
-            });
->>>>>>> parent of 3238cba (Add files via upload)
         }
         
         function roundRect(ctx, x, y, w, h, r) {
