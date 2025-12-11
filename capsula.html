@@ -6,750 +6,1114 @@
     <title>🎁 Minha Cápsula do Tempo</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #ec4899;
-            --accent: #fbbf24;
-            --success: #22c55e;
-            --dark: #0f0f0f;
+            --primary: #2D5A4C;
+            --primary-light: #3D7A66;
+            --primary-dark: #1D3A2C;
+            --accent: #E8B86D;
+            --accent-light: #F5D49A;
+            --accent-dark: #C9963D;
+            --bg-dark: #0F1419;
+            --bg-card: #1A2332;
+            --bg-elevated: #243447;
+            --text: #F4F4F5;
+            --text-muted: #9CA3AF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --radius: 20px;
+            --radius-sm: 12px;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--dark);
+            background: var(--bg-dark);
             min-height: 100vh;
-            color: white;
+            color: var(--text);
             overflow-x: hidden;
         }
+        
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
 
-        .bg-animation {
+        /* BACKGROUND ANIMADO */
+        .bg-pattern {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(45,90,76,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(232,184,109,0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(45,90,76,0.08) 0%, transparent 70%);
+            pointer-events: none;
             z-index: 0;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
         }
         
-        .bg-animation::before {
+        .floating-shapes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 25s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            width: 500px; height: 500px;
+            background: var(--primary);
+            top: -150px; left: -150px;
+        }
+        
+        .shape-2 {
+            width: 350px; height: 350px;
+            background: var(--accent);
+            bottom: -100px; right: -100px;
+            animation-delay: -8s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(40px, -30px) scale(1.05); }
+            50% { transform: translate(-30px, 40px) scale(0.95); }
+            75% { transform: translate(30px, 20px) scale(1.02); }
+        }
+
+        /* PARTÍCULAS */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: particleFloat 15s linear infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* TELAS */
+        .tela {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            animation: fadeIn 0.6s ease;
+        }
+        
+        .tela.active { display: flex; }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* TELA LACRADA */
+        .tela-lacrada {
+            align-items: center;
+            text-align: center;
+            padding: 30px 20px;
+            justify-content: center;
+        }
+        
+        .foto-lacrada {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid var(--accent);
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            box-shadow: 
+                0 0 0 8px rgba(232,184,109,0.15),
+                0 20px 50px rgba(0,0,0,0.4);
+        }
+        
+        .foto-lacrada img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .nome-lacrada {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        
+        .evento-lacrada {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        /* CÁPSULA 3D */
+        .capsula-3d {
+            position: relative;
+            width: 160px;
+            height: 200px;
+            margin: 20px auto 30px;
+        }
+        
+        .capsula-corpo {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 50%, #A67B2A 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 
+                inset -25px -25px 50px rgba(0,0,0,0.3),
+                0 25px 50px rgba(0,0,0,0.4),
+                0 0 80px rgba(232,184,109,0.2);
+            animation: floatCapsula 4s ease-in-out infinite;
+        }
+        
+        @keyframes floatCapsula { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-15px); } 
+        }
+        
+        .capsula-tampa {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border-radius: 50% 50% 0 0;
+        }
+        
+        .capsula-lacre {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            z-index: 2;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        
+        .capsula-brilho {
+            position: absolute;
+            top: 20%;
+            left: 25%;
+            width: 25px;
+            height: 25px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            filter: blur(6px);
+        }
+
+        /* STATUS BADGE */
+        .status-badge {
+            padding: 14px 32px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            margin: 20px 0;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-lacrada {
+            background: var(--bg-card);
+            color: var(--text-muted);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-liberada {
+            background: rgba(232,184,109,0.15);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            animation: pulseStatus 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseStatus { 
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232,184,109,0.4); } 
+            50% { transform: scale(1.02); box-shadow: 0 0 20px 5px rgba(232,184,109,0.2); } 
+        }
+
+        /* COUNTDOWN */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        
+        .countdown-item { text-align: center; }
+        
+        .countdown-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--bg-card);
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            min-width: 65px;
+            border: 2px solid rgba(232,184,109,0.2);
+        }
+        
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* BOTÕES */
+        .btn-abrir {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-dark);
+            border: none;
+            padding: 18px 48px;
+            border-radius: var(--radius);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 8px 30px rgba(232,184,109,0.35);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn-abrir:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(232,184,109,0.45);
+        }
+        
+        .btn-abrir:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .msg-aguarde {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        /* TELA ABERTA */
+        .tela-aberta { padding: 20px 0; }
+        
+        .header-aberta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid rgba(255,255,255,0.08);
+        }
+        
+        .foto-mini {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--accent);
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        
+        .foto-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .info-header h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        .info-header p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* SEÇÕES */
+        .secao {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .secao-titulo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        
+        .secao-conteudo {
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* TAGS */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tag-item {
+            background: rgba(232,184,109,0.12);
+            color: var(--accent);
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(232,184,109,0.2);
+        }
+
+        /* SEÇÃO ÁUDIO */
+        .secao-audio {
+            background: linear-gradient(135deg, rgba(45,90,76,0.2), rgba(232,184,109,0.1));
+            border: 2px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .secao-audio::before {
             content: '';
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
-            animation: bgMove 20s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(232,184,109,0.1) 0%, transparent 70%);
+            animation: audioGlow 4s ease-in-out infinite;
         }
         
-        @keyframes bgMove {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-5%, -5%); }
+        @keyframes audioGlow { 
+            0%, 100% { transform: scale(1); opacity: 0.5; } 
+            50% { transform: scale(1.2); opacity: 1; } 
         }
-
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
+        
+        .audio-player {
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-sm);
+            padding: 24px;
             position: relative;
             z-index: 1;
         }
-
-        .tela {
-            display: none;
-            flex-direction: column;
-            min-height: calc(100vh - 40px);
-            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
         
-        .tela.active { display: flex; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Tela Lacrada */
-        .tela-lacrada {
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .capsula-icon {
-            width: 140px;
-            height: 140px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 40px;
+        .audio-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            margin-bottom: 32px;
-            animation: pulse-glow 2s ease-in-out infinite;
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(99, 102, 241, 0.6); }
-        }
-        
-        .avatar-lacrado {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 3px;
-            margin-bottom: 24px;
-        }
-        
-        .avatar-lacrado-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--dark);
-            overflow: hidden;
-        }
-        
-        .avatar-lacrado-inner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .titulo-lacrado {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .subtitulo-lacrado {
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 32px;
-        }
-        
-        .countdown-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 24px 40px;
-            margin-bottom: 32px;
-        }
-        
-        .countdown-label {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 8px;
-        }
-        
-        .countdown-value {
-            font-family: 'Space Grotesk', monospace;
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        .countdown-unit {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 4px;
-        }
-        
-        .data-abertura-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 32px;
-        }
-        
-        .btn-abrir {
-            background: linear-gradient(135deg, var(--success), #16a34a);
-            color: white;
-            border: none;
-            padding: 20px 48px;
-            border-radius: 16px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            font-family: 'Outfit', sans-serif;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
-        }
-        
-        .btn-abrir:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 50px rgba(34, 197, 94, 0.5);
-        }
-        
-        .btn-abrir:disabled {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.4);
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* Tela Conteúdo */
-        .tela-conteudo {
-            padding: 20px 0;
-        }
-        
-        .header-conteudo {
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-        
-        .header-conteudo .emoji { font-size: 3rem; margin-bottom: 16px; }
-        
-        .header-conteudo h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        
-        .header-conteudo p {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.9rem;
-        }
-        
-        .perfil-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 24px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
+            gap: 16px;
             margin-bottom: 20px;
         }
         
-        .perfil-foto {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 3px;
-            flex-shrink: 0;
+        .audio-icon-big {
+            font-size: 3rem;
+            animation: micPulse 2s ease-in-out infinite;
         }
         
-        .perfil-foto-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--dark);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
+        @keyframes micPulse { 
+            0%, 100% { transform: scale(1); } 
+            50% { transform: scale(1.1); } 
         }
         
-        .perfil-foto-inner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .perfil-info h2 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 700;
+        .audio-info h3 {
+            color: var(--accent);
+            font-size: 1.15rem;
             margin-bottom: 4px;
         }
         
-        .perfil-info p {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.85rem;
+        .audio-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
         
-        .card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+        .audio-player audio {
+            width: 100%;
+            height: 50px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.1);
         }
         
-        .card-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 12px;
-        }
-        
-        .card-content {
+        .btn-play-audio {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-dark);
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-sm);
             font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .tags-list {
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
         }
         
-        .tag-item {
-            background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(236,72,153,0.2));
-            padding: 8px 16px;
-            border-radius: 100px;
+        .btn-play-audio:hover { transform: scale(1.02); }
+        .btn-play-audio.playing { background: var(--primary); color: white; }
+
+        /* PERGUNTAS */
+        .pergunta-item {
+            background: rgba(0,0,0,0.2);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            margin-bottom: 14px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .pergunta-label {
             font-size: 0.85rem;
-            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .pergunta-resposta {
+            color: var(--text);
+            font-size: 1.05rem;
+            line-height: 1.5;
         }
         
         .felicidade-display {
             display: flex;
             align-items: center;
             gap: 16px;
+            margin-top: 8px;
         }
         
-        .felicidade-num {
-            font-family: 'Space Grotesk', monospace;
-            font-size: 3rem;
-            font-weight: 700;
+        .felicidade-nota {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
             color: var(--accent);
+            font-weight: 700;
         }
         
-        .felicidade-bar {
+        .felicidade-barra {
             flex: 1;
-            height: 8px;
+            height: 12px;
             background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
         }
         
         .felicidade-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-            border-radius: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 6px;
             transition: width 1s ease;
         }
-        
-        .mensagem-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-        
-        .mensagem-box .card-title { margin-bottom: 16px; }
-        
+
+        /* MENSAGEM */
         .mensagem-texto {
-            font-size: 1rem;
-            line-height: 1.8;
             white-space: pre-wrap;
-            color: rgba(255,255,255,0.9);
+            font-size: 1.05rem;
+            line-height: 1.8;
         }
         
-        .audio-player-box {
-            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1));
-            border: 1px solid rgba(99,102,241,0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        
-        .audio-player-box .card-title {
-            color: var(--primary);
-        }
-        
-        .audio-player-box audio {
-            width: 100%;
+        .mensagem-chars {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
             margin-top: 12px;
         }
-        
-        .btn-share-content {
+
+        /* REFLEXÃO */
+        .reflexao-form textarea {
             width: 100%;
-            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
-            color: white;
-            border: none;
             padding: 18px;
-            border-radius: 14px;
-            font-size: 1.05rem;
-            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            font-size: 1rem;
             font-family: 'Outfit', sans-serif;
+            resize: none;
+            min-height: 120px;
+            line-height: 1.6;
+            transition: border-color 0.3s;
+        }
+        
+        .reflexao-form textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .reflexao-form textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn-salvar {
+            background: var(--primary);
+            color: var(--text);
+            border: none;
+            padding: 14px 28px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
             cursor: pointer;
+            margin-top: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
             transition: all 0.3s;
+        }
+        
+        .btn-salvar:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .reflexao-salva {
+            background: rgba(45,90,76,0.15);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .reflexao-salva-titulo {
+            color: var(--primary-light);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .reflexao-salva-texto {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* BOTÃO COMPARTILHAR */
+        .btn-compartilhar {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            color: var(--text);
+            padding: 18px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
             margin-top: 20px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            transition: all 0.3s;
         }
         
-        .btn-share-content:hover {
+        .btn-compartilhar:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(131, 58, 180, 0.4);
+            box-shadow: 0 10px 30px rgba(45,90,76,0.3);
         }
 
-        /* Modal Share */
+        /* MODAL COMPARTILHAR */
         .share-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
             z-index: 2000;
             display: none;
             flex-direction: column;
-        }
-        
-        .share-modal.active { display: flex; }
-        
-        .share-header {
-            padding: 16px 20px;
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .share-header h3 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        
-        .btn-close {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        
-        .share-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 20px;
             overflow-y: auto;
         }
         
-        .share-preview-container {
+        .share-modal.active { display: flex; }
+        
+        .share-modal-content {
+            max-width: 420px;
             width: 100%;
-            max-width: 300px;
-            aspect-ratio: 9/16;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            margin-bottom: 24px;
-            background: #111;
+            text-align: center;
         }
         
-        .share-preview-container canvas {
+        .share-modal h3 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        
+        .share-preview {
+            width: 100%;
+            aspect-ratio: 9/16;
+            max-height: 55vh;
+            overflow: hidden;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(232,184,109,0.2);
+            background: var(--bg-dark);
+            position: relative;
+        }
+        
+        .share-preview canvas,
+        .share-preview video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            border-radius: var(--radius);
         }
         
         .share-status {
-            text-align: center;
+            color: var(--accent);
+            font-size: 1rem;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
         
-        .share-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: var(--primary);
+        .share-status .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(232,184,109,0.2);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .share-progress {
-            width: 200px;
-            height: 4px;
+            width: 100%;
+            height: 6px;
             background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            margin: 16px auto 0;
+            border-radius: 3px;
             overflow: hidden;
         }
         
         .share-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background: linear-gradient(90deg, var(--accent), var(--primary), var(--accent));
             width: 0%;
             transition: width 0.3s;
         }
         
-        .share-actions {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .share-btns {
+            display: flex;
+            flex-direction: column;
             gap: 12px;
         }
         
-        .share-btn {
+        .share-btns button {
             padding: 16px;
-            border-radius: 14px;
-            border: none;
-            font-family: 'Outfit', sans-serif;
+            border-radius: var(--radius-sm);
             font-weight: 600;
-            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: all 0.3s;
+            border: none;
         }
         
-        .share-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .share-btn .icon { font-size: 1.5rem; }
-        .share-btn.primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
-        .share-btn.secondary { background: rgba(255,255,255,0.1); color: white; }
-        .share-btn.full { grid-column: span 2; }
+        .share-btns button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-baixar-video {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--text);
+        }
+        
+        .btn-baixar-img {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-dark);
+        }
+        
+        .btn-copiar-link {
+            background: var(--bg-elevated);
+            color: var(--text);
+        }
+        
+        .btn-fechar-share {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2) !important;
+            color: var(--text);
+            margin-top: 8px;
+        }
 
-        /* Loading */
-        .loading-overlay {
+        /* ANIMAÇÃO DE ABERTURA */
+        .abertura-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
+            inset: 0;
+            background: rgba(0,0,0,0.97);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s;
+            transition: all 0.5s;
         }
         
-        .loading-overlay.active { opacity: 1; visibility: visible; }
-
-        /* Confetes */
-        .confetes-container {
+        .abertura-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .abertura-capsula {
+            font-size: 8rem;
+        }
+        
+        .abertura-capsula.shake {
+            animation: shakeOpen 0.5s ease;
+        }
+        
+        @keyframes shakeOpen { 
+            0%, 100% { transform: rotate(0); } 
+            25% { transform: rotate(-15deg); } 
+            75% { transform: rotate(15deg); } 
+        }
+        
+        .abertura-capsula.explode {
+            animation: explodeOpen 0.8s ease forwards;
+        }
+        
+        @keyframes explodeOpen { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(1.5); } 
+            100% { transform: scale(3); opacity: 0; } 
+        }
+        
+        .flash {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
+            background: white;
+            opacity: 0;
+            z-index: 1001;
             pointer-events: none;
-            z-index: 1500;
-            overflow: hidden;
+        }
+        
+        .flash.active {
+            animation: flashAnim 0.8s ease;
+        }
+        
+        @keyframes flashAnim { 
+            0% { opacity: 0; } 
+            50% { opacity: 1; } 
+            100% { opacity: 0; } 
         }
 
-        /* Toast */
+        /* CONFETES */
+        .confetes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1500;
+        }
+        
+        .confete {
+            position: absolute;
+            animation: confeteFall 3s ease-out forwards;
+        }
+        
+        @keyframes confeteFall { 
+            0% { transform: translateY(-100vh) rotate(0deg); } 
+            100% { transform: translateY(110vh) rotate(720deg); } 
+        }
+
+        /* TOAST */
         .toast {
             position: fixed;
-            bottom: 100px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: rgba(255,255,255,0.95);
-            color: #111;
-            padding: 14px 24px;
-            border-radius: 100px;
+            background: var(--primary);
+            color: var(--text);
+            padding: 16px 28px;
+            border-radius: var(--radius-sm);
             font-weight: 600;
             z-index: 3000;
             opacity: 0;
             transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: #ef4444; color: white; }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
 
-        /* Tela Erro */
+        /* TELA ERRO */
         .tela-erro {
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
         }
         
-        .erro-icon { font-size: 4rem; margin-bottom: 20px; }
+        .erro-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .erro-titulo {
+            color: var(--accent);
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+        
+        .erro-msg {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
 
-        @media (max-width: 400px) {
+        /* FAMÍLIA INFO */
+        .familia-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(45,90,76,0.2);
+            color: var(--primary-light);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
             .container { padding: 16px; }
-            .countdown-value { font-size: 2.5rem; }
-            .share-actions { grid-template-columns: 1fr; }
-            .share-btn.full { grid-column: span 1; }
+            .countdown { gap: 10px; }
+            .countdown-value { font-size: 1.6rem; padding: 12px 14px; min-width: 55px; }
+            .nome-lacrada { font-size: 1.5rem; }
+            .btn-abrir { padding: 16px 36px; font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-animation"></div>
-    <div class="confetes-container" id="confetes"></div>
+    <div class="bg-pattern"></div>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+    <div class="confetes" id="confetes"></div>
+    <div class="flash" id="flash"></div>
 
     <div class="container">
-        <!-- Tela Lacrada -->
-        <div class="tela tela-lacrada active" id="telaLacrada">
-            <div class="capsula-icon">🔒</div>
-            
-            <div class="avatar-lacrado" id="avatarLacrado" style="display:none">
-                <div class="avatar-lacrado-inner" id="avatarLacradoInner"></div>
+        <!-- TELA LACRADA -->
+        <div class="tela tela-lacrada" id="telaLacrada">
+            <div class="familia-badge" id="familiaBadge" style="display:none">
+                <span>👨‍👩‍👧‍👦</span>
+                <span id="familiaNome">Família</span>
             </div>
             
-            <h1 class="titulo-lacrado" id="nomeLacrado">Cápsula Lacrada</h1>
-            <p class="subtitulo-lacrado" id="subtituloLacrado">Esta cápsula ainda não pode ser aberta</p>
+            <div class="foto-lacrada" id="fotoLacrada">📷</div>
+            <h2 class="nome-lacrada" id="nomeLacrada">Carregando...</h2>
+            <p class="evento-lacrada" id="eventoLacrada">Evento</p>
             
-            <div class="countdown-box">
-                <div class="countdown-label">Tempo restante</div>
-                <div class="countdown-value" id="countdownValue">--</div>
-                <div class="countdown-unit">dias</div>
+            <div class="capsula-3d">
+                <div class="capsula-corpo">
+                    <div class="capsula-tampa"></div>
+                    <div class="capsula-lacre" id="capsulaLacre">🔒</div>
+                    <div class="capsula-brilho"></div>
+                </div>
             </div>
             
-            <div class="data-abertura-box">
-                <span>📅</span>
-                <span>Abertura: <strong id="dataAberturaLacrada">--/--/----</strong></span>
+            <div class="status-badge status-lacrada" id="statusBadge">🔒 Lacrada</div>
+            
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="dias">--</div>
+                    <div class="countdown-label">DIAS</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="horas">--</div>
+                    <div class="countdown-label">HORAS</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="minutos">--</div>
+                    <div class="countdown-label">MIN</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="segundos">--</div>
+                    <div class="countdown-label">SEG</div>
+                </div>
             </div>
             
-            <button class="btn-abrir" id="btnAbrir" onclick="abrirCapsula()" disabled>
-                🎁 Abrir Cápsula
+            <button class="btn-abrir" id="btnAbrir" onclick="iniciarAbertura()" disabled>
+                🎁 ABRIR CÁPSULA
             </button>
+            <p class="msg-aguarde" id="msgAguarde">⏳ Aguardando o guardião liberar sua cápsula...</p>
         </div>
 
-        <!-- Tela Conteúdo -->
-        <div class="tela tela-conteudo" id="telaConteudo">
-            <div class="header-conteudo">
-                <div class="emoji">🎉</div>
-                <h1>Cápsula Aberta!</h1>
-                <p id="dataAbertura">Aberta em --/--/----</p>
-            </div>
-            
-            <div class="perfil-section">
-                <div class="perfil-foto">
-                    <div class="perfil-foto-inner" id="perfilFoto">👤</div>
-                </div>
-                <div class="perfil-info">
-                    <h2 id="perfilNome">Nome</h2>
-                    <p id="perfilData">Criada em --/--/----</p>
+        <!-- TELA ABERTA -->
+        <div class="tela tela-aberta" id="telaAberta">
+            <div class="header-aberta">
+                <div class="foto-mini" id="fotoAberta"></div>
+                <div class="info-header">
+                    <h2 id="nomeAberta">Nome</h2>
+                    <p id="dataAberta">Criada em --/--/----</p>
+                    <p id="eventoAberta">Evento</p>
                 </div>
             </div>
             
-            <div class="card" id="cardPrioridades">
-                <div class="card-title">🎯 Prioridades</div>
-                <div class="tags-list" id="listaPrioridades"></div>
-            </div>
-            
-            <div class="card" id="cardPessoas">
-                <div class="card-title">👥 Pessoas importantes</div>
-                <div class="card-content" id="listaPessoas"></div>
-            </div>
-            
-            <div class="card" id="cardPalavra">
-                <div class="card-title">📝 Palavra do momento</div>
-                <div class="card-content" style="font-size:1.5rem;font-weight:700;color:var(--accent)" id="palavraMomento"></div>
-            </div>
-            
-            <div class="card" id="cardFelicidade">
-                <div class="card-title">😊 Nível de felicidade</div>
-                <div class="felicidade-display">
-                    <div class="felicidade-num" id="felicidadeNum">-</div>
-                    <div class="felicidade-bar">
-                        <div class="felicidade-fill" id="felicidadeFill" style="width:0%"></div>
+            <div class="secao secao-audio" id="secaoAudio" style="display:none">
+                <div class="secao-titulo">🎤 Mensagem de Voz</div>
+                <div class="audio-player">
+                    <div class="audio-header">
+                        <span class="audio-icon-big">🎙️</span>
+                        <div class="audio-info">
+                            <h3>Ouça você mesmo!</h3>
+                            <p>Mensagem do passado</p>
+                        </div>
                     </div>
+                    <audio id="audioPlayer" controls preload="auto"></audio>
+                    <button class="btn-play-audio" id="btnPlayAudio" onclick="toggleAudio()">
+                        <span id="playIcon">▶️</span>
+                        <span id="playText">Ouvir Mensagem</span>
+                    </button>
+                    <div class="audio-status" id="audioStatus"></div>
                 </div>
             </div>
             
-            <div class="card" id="cardConquista">
-                <div class="card-title">🎯 O que queria conquistar</div>
-                <div class="card-content" id="conquistaTexto"></div>
+            <div class="secao" id="secaoDesejos">
+                <div class="secao-titulo">🌟 Prioridades</div>
+                <div class="tags-container" id="desejosContainer"></div>
             </div>
             
-            <div class="card" id="cardMomento">
-                <div class="card-title">✨ Momento marcante</div>
-                <div class="card-content" id="momentoTexto"></div>
+            <div class="secao" id="secaoPessoas" style="display:none">
+                <div class="secao-titulo">👥 Pessoas importantes</div>
+                <div class="tags-container" id="pessoasContainer"></div>
             </div>
             
-            <div class="audio-player-box" id="audioBox" style="display:none">
-                <div class="card-title">🎤 Mensagem de voz</div>
-                <audio id="audioPlayer" controls></audio>
+            <div class="secao" id="secaoPerguntas" style="display:none">
+                <div class="secao-titulo">💭 Reflexões</div>
+                <div id="perguntasContainer"></div>
             </div>
             
-            <div class="mensagem-box" id="mensagemBox">
-                <div class="card-title">💌 Carta para o futuro</div>
-                <div class="mensagem-texto" id="mensagemTexto"></div>
+            <div class="secao">
+                <div class="secao-titulo">💌 Mensagem para o futuro</div>
+                <div class="secao-conteudo">
+                    <div class="mensagem-texto" id="mensagemTexto"></div>
+                    <div class="mensagem-chars" id="mensagemChars"></div>
+                </div>
             </div>
             
-            <button class="btn-share-content" onclick="abrirShare()">
-                <span>✨</span> Criar Stories
+            <div class="secao" id="secaoReflexao">
+                <div class="secao-titulo">✍️ Sua reflexão agora</div>
+                <div class="reflexao-form" id="reflexaoForm">
+                    <textarea id="reflexaoInput" placeholder="O que você sente ao ler isso? Como mudou sua perspectiva?"></textarea>
+                    <button class="btn-salvar" onclick="salvarReflexao()">💾 Salvar reflexão</button>
+                </div>
+                <div class="reflexao-salva" id="reflexaoSalva" style="display:none">
+                    <div class="reflexao-salva-titulo">📝 Sua reflexão:</div>
+                    <div class="reflexao-salva-texto" id="reflexaoTexto"></div>
+                </div>
+            </div>
+            
+            <button class="btn-compartilhar" onclick="abrirCompartilhar()">
+                🎬 Criar Vídeo para Stories
             </button>
         </div>
 
-        <!-- Tela Erro -->
+        <!-- TELA ERRO -->
         <div class="tela tela-erro" id="telaErro">
             <div class="erro-icon">😕</div>
-            <h2 style="margin-bottom:12px">Cápsula não encontrada</h2>
-            <p style="color:rgba(255,255,255,0.6)">Verifique o link e tente novamente</p>
+            <h2 class="erro-titulo">Cápsula não encontrada</h2>
+            <p class="erro-msg">Verifique o link e tente novamente</p>
         </div>
     </div>
 
-    <!-- Modal Share -->
+    <!-- MODAL COMPARTILHAR -->
     <div class="share-modal" id="shareModal">
-        <div class="share-header">
-            <h3>Criar Stories</h3>
-            <button class="btn-close" onclick="fecharShare()">✕</button>
-        </div>
-        
-        <div class="share-content">
-            <div class="share-preview-container" id="sharePreview">
+        <div class="share-modal-content">
+            <h3>🎬 Momento épico!</h3>
+            <div class="share-preview" id="sharePreview">
                 <div class="share-status" id="shareStatus">
-                    <div class="share-spinner"></div>
-                    <p style="color:rgba(255,255,255,0.7)">Criando animação...</p>
+                    <div class="spinner"></div>
+                    <span>Criando animação de abertura...</span>
                     <div class="share-progress">
                         <div class="share-progress-bar" id="progressBar"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="share-actions">
-            <button class="share-btn primary" id="btnSalvarVideo" onclick="salvarVideo()" disabled>
-                <span class="icon">🎬</span>
-                Salvar Vídeo
-            </button>
-            <button class="share-btn secondary" id="btnSalvarImg" onclick="salvarImagem()" disabled>
-                <span class="icon">📸</span>
-                Salvar Imagem
-            </button>
-            <button class="share-btn secondary full" onclick="copiarLink()">
-                <span class="icon">🔗</span>
-                Copiar Link
-            </button>
+            <div class="share-btns">
+                <button class="btn-baixar-video" id="btnBaixarVideo" onclick="baixarVideo()" disabled>
+                    🎬 Baixar Vídeo (.webm)
+                </button>
+                <button class="btn-baixar-img" id="btnBaixarImg" onclick="baixarImagem()" disabled>
+                    📸 Baixar Imagem (.png)
+                </button>
+                <button class="btn-copiar-link" onclick="copiarLink()">🔗 Copiar Link</button>
+                <button class="btn-fechar-share" onclick="fecharCompartilhar()">✕ Fechar</button>
+            </div>
         </div>
     </div>
 
-    <div class="loading-overlay" id="loading">
-        <div style="font-size:4rem;animation:pulse 1s ease-in-out infinite">🎁</div>
-        <p style="margin-top:20px;color:rgba(255,255,255,0.7)">Abrindo cápsula...</p>
+    <!-- ANIMAÇÃO ABERTURA -->
+    <div class="abertura-overlay" id="aberturaOverlay">
+        <div class="abertura-capsula" id="aberturaCapsula">🎁</div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
             authDomain: "capsuladotempo-f86bf.firebaseapp.com",
@@ -762,619 +1126,733 @@
         
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const storage = firebase.storage();
 
-        let capsulaId = null, capsulaData = null, eventoData = null;
-        let videoBlob = null, imagemBlob = null;
+        // ESTADO
+        let capsulaId = null;
+        let capsulaData = null;
+        let eventoData = null;
+        let familiaData = null;
+        let isGuardiao = false;
+        let countdownInterval = null;
+        let isPlaying = false;
+        let videoBlob = null;
+        let imagemBlob = null;
+        let fotoImg = null;
 
+        // HELPERS
         const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
         
-        const toast = (msg, tipo='success') => {
+        const mostrarToast = (msg) => {
             const t = document.getElementById('toast');
             t.textContent = msg;
-            t.className = 'toast show' + (tipo === 'error' ? ' error' : '');
+            t.className = 'toast show';
             setTimeout(() => t.className = 'toast', 3000);
         };
 
+        // PARTÍCULAS
+        function criarParticulas() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.width = (2 + Math.random() * 4) + 'px';
+                p.style.height = p.style.width;
+                p.style.animationDuration = (10 + Math.random() * 10) + 's';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                container.appendChild(p);
+            }
+        }
+
+        // CONFETES
+        function criarConfetes() {
+            const c = document.getElementById('confetes');
+            c.innerHTML = '';
+            const cores = ['#2D5A4C', '#3D7A66', '#E8B86D', '#F5D49A', '#fff', '#10B981'];
+            for (let i = 0; i < 150; i++) {
+                const cf = document.createElement('div');
+                cf.className = 'confete';
+                cf.style.left = Math.random() * 100 + 'vw';
+                cf.style.background = cores[Math.floor(Math.random() * cores.length)];
+                cf.style.animationDelay = Math.random() * 2 + 's';
+                const sz = 6 + Math.random() * 10;
+                cf.style.width = sz + 'px';
+                cf.style.height = sz + 'px';
+                cf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                c.appendChild(cf);
+            }
+        }
+
+        // TELAS
         function mostrarTela(id) {
             document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
+        // INIT
         document.addEventListener('DOMContentLoaded', async () => {
+            criarParticulas();
+            
             const params = new URLSearchParams(window.location.search);
             capsulaId = params.get('id');
+            isGuardiao = params.get('guardiao') === 'true';
             
-            if (!capsulaId) { mostrarTela('telaErro'); return; }
+            if (!capsulaId) {
+                mostrarTela('telaErro');
+                return;
+            }
             
             try {
-                const snap = await database.ref(`capsulas/${capsulaId}`).once('value');
-                capsulaData = snap.val();
+                // Buscar cápsula
+                const capSnap = await database.ref(`capsulas/${capsulaId}`).once('value');
+                capsulaData = capSnap.val();
                 
-                if (!capsulaData) { mostrarTela('telaErro'); return; }
+                if (!capsulaData) {
+                    mostrarTela('telaErro');
+                    return;
+                }
                 
-                const eventoSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
-                eventoData = eventoSnap.val();
+                // Buscar evento
+                const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
+                eventoData = evtSnap.val();
                 
-                configurarTela();
-            } catch (e) {
-                console.error(e);
+                // Buscar família (v2.0)
+                if (eventoData?.familiaId) {
+                    const famSnap = await database.ref(`familias/${eventoData.familiaId}`).once('value');
+                    familiaData = famSnap.val();
+                    
+                    if (familiaData) {
+                        document.getElementById('familiaBadge').style.display = 'inline-flex';
+                        document.getElementById('familiaNome').textContent = familiaData.nome;
+                    }
+                }
+                
+                // Pré-carregar foto
+                if (capsulaData.foto) {
+                    fotoImg = new Image();
+                    fotoImg.crossOrigin = 'anonymous';
+                    fotoImg.src = capsulaData.foto;
+                }
+                
+                if (capsulaData.aberta) {
+                    mostrarConteudo();
+                    return;
+                }
+                
+                renderizarLacrada();
+                
+            } catch (err) {
+                console.error('Erro ao carregar cápsula:', err);
                 mostrarTela('telaErro');
             }
         });
 
-        function configurarTela() {
-            const agora = new Date();
-            const dataAbertura = new Date(capsulaData.dataAbertura);
-            const dias = Math.ceil((dataAbertura - agora) / (1000*60*60*24));
-            const liberada = capsulaData.liberada || dias <= 0;
-            
-            // Foto
+        // RENDERIZAR LACRADA
+        function renderizarLacrada() {
             if (capsulaData.foto) {
-                document.getElementById('avatarLacrado').style.display = 'block';
-                document.getElementById('avatarLacradoInner').innerHTML = `<img src="${capsulaData.foto}">`;
+                document.getElementById('fotoLacrada').innerHTML = `<img src="${capsulaData.foto}">`;
             }
             
-            document.getElementById('nomeLacrado').textContent = `Cápsula de ${capsulaData.nome}`;
-            document.getElementById('countdownValue').textContent = Math.max(0, dias);
-            document.getElementById('dataAberturaLacrada').textContent = formatarData(capsulaData.dataAbertura);
+            document.getElementById('nomeLacrada').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`.trim();
+            document.getElementById('eventoLacrada').textContent = eventoData?.nome || 'Cápsula do Tempo';
             
-            if (liberada) {
-                document.getElementById('subtituloLacrado').textContent = 'Sua cápsula está pronta para ser aberta!';
+            if (capsulaData.liberada || isGuardiao) {
+                document.getElementById('statusBadge').className = 'status-badge status-liberada';
+                document.getElementById('statusBadge').textContent = '🔓 Liberada!';
+                document.getElementById('capsulaLacre').textContent = '🔓';
                 document.getElementById('btnAbrir').disabled = false;
-                
-                if (capsulaData.aberta) {
-                    mostrarConteudo();
-                }
+                document.getElementById('msgAguarde').style.display = 'none';
             }
-        }
-
-        async function abrirCapsula() {
-            document.getElementById('loading').classList.add('active');
             
-            try {
-                await database.ref(`capsulas/${capsulaId}`).update({
-                    aberta: true,
-                    dataAberturaReal: new Date().toISOString()
-                });
-                
-                setTimeout(() => {
-                    document.getElementById('loading').classList.remove('active');
-                    mostrarConteudo();
-                    criarConfetes();
-                }, 1500);
-            } catch (e) {
-                document.getElementById('loading').classList.remove('active');
-                toast('Erro ao abrir', 'error');
-            }
+            mostrarTela('telaLacrada');
+            atualizarCountdown();
+            countdownInterval = setInterval(atualizarCountdown, 1000);
         }
 
+        // COUNTDOWN
+        function atualizarCountdown() {
+            const diff = new Date(capsulaData.dataAbertura) - new Date();
+            
+            if (diff <= 0) {
+                document.getElementById('dias').textContent = '0';
+                document.getElementById('horas').textContent = '00';
+                document.getElementById('minutos').textContent = '00';
+                document.getElementById('segundos').textContent = '00';
+                return;
+            }
+            
+            document.getElementById('dias').textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('horas').textContent = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            document.getElementById('minutos').textContent = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            document.getElementById('segundos').textContent = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        }
+
+        // ABERTURA
+        async function iniciarAbertura() {
+            const overlay = document.getElementById('aberturaOverlay');
+            const capsula = document.getElementById('aberturaCapsula');
+            const flash = document.getElementById('flash');
+            
+            overlay.classList.add('active');
+            
+            // Shake 3x
+            for (let i = 0; i < 3; i++) {
+                capsula.classList.add('shake');
+                await new Promise(r => setTimeout(r, 600));
+                capsula.classList.remove('shake');
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            // Explosão
+            capsula.classList.add('explode');
+            flash.classList.add('active');
+            criarConfetes();
+            
+            await new Promise(r => setTimeout(r, 800));
+            
+            // Marcar como aberta
+            await database.ref(`capsulas/${capsulaId}`).update({
+                aberta: true,
+                dataAberturaReal: new Date().toISOString()
+            });
+            
+            overlay.classList.remove('active');
+            flash.classList.remove('active');
+            capsula.classList.remove('explode');
+            
+            mostrarConteudo();
+        }
+
+        // MOSTRAR CONTEÚDO
         function mostrarConteudo() {
-            mostrarTela('telaConteudo');
+            clearInterval(countdownInterval);
             
-            document.getElementById('dataAbertura').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
-            
+            // Header
             if (capsulaData.foto) {
-                document.getElementById('perfilFoto').innerHTML = `<img src="${capsulaData.foto}">`;
+                document.getElementById('fotoAberta').innerHTML = `<img src="${capsulaData.foto}">`;
             }
             
-            document.getElementById('perfilNome').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
-            document.getElementById('perfilData').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
+            document.getElementById('nomeAberta').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`.trim();
+            document.getElementById('dataAberta').textContent = `Criada em ${formatarData(capsulaData.dataCriacao)}`;
+            document.getElementById('eventoAberta').textContent = eventoData?.nome || 'Cápsula do Tempo';
             
-            // Prioridades
+            // Desejos/Prioridades
+            const desejosContainer = document.getElementById('desejosContainer');
             if (capsulaData.desejos?.length) {
-                document.getElementById('listaPrioridades').innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
+                desejosContainer.innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
             } else {
-                document.getElementById('cardPrioridades').style.display = 'none';
+                document.getElementById('secaoDesejos').style.display = 'none';
             }
             
             // Pessoas
             if (capsulaData.pessoas?.length) {
-                document.getElementById('listaPessoas').textContent = capsulaData.pessoas.join(', ');
-            } else {
-                document.getElementById('cardPessoas').style.display = 'none';
+                document.getElementById('secaoPessoas').style.display = 'block';
+                document.getElementById('pessoasContainer').innerHTML = capsulaData.pessoas.map(p => `<span class="tag-item">${p}</span>`).join('');
             }
             
-            // Palavra
-            if (capsulaData.perguntas?.palavra) {
-                document.getElementById('palavraMomento').textContent = capsulaData.perguntas.palavra;
-            } else {
-                document.getElementById('cardPalavra').style.display = 'none';
-            }
-            
-            // Felicidade
-            if (capsulaData.perguntas?.felicidade) {
-                document.getElementById('felicidadeNum').textContent = capsulaData.perguntas.felicidade;
-                setTimeout(() => {
-                    document.getElementById('felicidadeFill').style.width = (capsulaData.perguntas.felicidade * 10) + '%';
-                }, 300);
-            } else {
-                document.getElementById('cardFelicidade').style.display = 'none';
-            }
-            
-            // Conquista
-            if (capsulaData.perguntas?.conquista) {
-                document.getElementById('conquistaTexto').textContent = capsulaData.perguntas.conquista;
-            } else {
-                document.getElementById('cardConquista').style.display = 'none';
-            }
-            
-            // Momento
-            if (capsulaData.perguntas?.momento) {
-                document.getElementById('momentoTexto').textContent = capsulaData.perguntas.momento;
-            } else {
-                document.getElementById('cardMomento').style.display = 'none';
+            // Perguntas
+            if (capsulaData.perguntas) {
+                document.getElementById('secaoPerguntas').style.display = 'block';
+                const pContainer = document.getElementById('perguntasContainer');
+                let html = '';
+                
+                const perguntas = capsulaData.perguntas;
+                
+                if (perguntas.conquista) {
+                    html += `<div class="pergunta-item">
+                        <div class="pergunta-label">🏆 O que achava que ia conquistar:</div>
+                        <div class="pergunta-resposta">${perguntas.conquista}</div>
+                    </div>`;
+                }
+                
+                if (perguntas.momento) {
+                    html += `<div class="pergunta-item">
+                        <div class="pergunta-label">✨ Momento mais marcante:</div>
+                        <div class="pergunta-resposta">${perguntas.momento}</div>
+                    </div>`;
+                }
+                
+                if (perguntas.palavra) {
+                    html += `<div class="pergunta-item">
+                        <div class="pergunta-label">💬 Palavra que definia o momento:</div>
+                        <div class="pergunta-resposta">"${perguntas.palavra}"</div>
+                    </div>`;
+                }
+                
+                if (perguntas.felicidade) {
+                    html += `<div class="pergunta-item">
+                        <div class="pergunta-label">😊 Nível de felicidade:</div>
+                        <div class="felicidade-display">
+                            <span class="felicidade-nota">${perguntas.felicidade}/10</span>
+                            <div class="felicidade-barra">
+                                <div class="felicidade-fill" style="width: ${perguntas.felicidade * 10}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                
+                if (perguntas.previsao) {
+                    html += `<div class="pergunta-item">
+                        <div class="pergunta-label">🔮 Previsão para o futuro:</div>
+                        <div class="pergunta-resposta">${perguntas.previsao}</div>
+                    </div>`;
+                }
+                
+                pContainer.innerHTML = html;
             }
             
             // Áudio
-            if (capsulaData.audioUrl || capsulaData.audioBase64) {
-                document.getElementById('audioBox').style.display = 'block';
-                document.getElementById('audioPlayer').src = capsulaData.audioUrl || capsulaData.audioBase64;
+            if (capsulaData.audio) {
+                document.getElementById('secaoAudio').style.display = 'block';
+                document.getElementById('audioPlayer').src = capsulaData.audio;
             }
             
             // Mensagem
+            document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal || 'Nenhuma mensagem escrita.';
             if (capsulaData.mensagemPessoal) {
-                document.getElementById('mensagemTexto').textContent = capsulaData.mensagemPessoal;
+                document.getElementById('mensagemChars').textContent = `${capsulaData.mensagemPessoal.length} caracteres`;
+            }
+            
+            // Reflexão já salva
+            if (capsulaData.reflexao) {
+                document.getElementById('reflexaoForm').style.display = 'none';
+                document.getElementById('reflexaoSalva').style.display = 'block';
+                document.getElementById('reflexaoTexto').textContent = capsulaData.reflexao;
+            }
+            
+            mostrarTela('telaAberta');
+        }
+
+        // ÁUDIO
+        function toggleAudio() {
+            const audio = document.getElementById('audioPlayer');
+            const btn = document.getElementById('btnPlayAudio');
+            const icon = document.getElementById('playIcon');
+            const text = document.getElementById('playText');
+            
+            if (isPlaying) {
+                audio.pause();
+                icon.textContent = '▶️';
+                text.textContent = 'Ouvir Mensagem';
+                btn.classList.remove('playing');
             } else {
-                document.getElementById('mensagemBox').style.display = 'none';
+                audio.play();
+                icon.textContent = '⏸️';
+                text.textContent = 'Pausar';
+                btn.classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+            
+            audio.onended = () => {
+                isPlaying = false;
+                icon.textContent = '▶️';
+                text.textContent = 'Ouvir Novamente';
+                btn.classList.remove('playing');
+            };
+        }
+
+        // REFLEXÃO
+        async function salvarReflexao() {
+            const texto = document.getElementById('reflexaoInput').value.trim();
+            if (!texto) {
+                mostrarToast('Escreva algo primeiro');
+                return;
+            }
+            
+            try {
+                await database.ref(`capsulas/${capsulaId}`).update({
+                    reflexao: texto,
+                    dataReflexao: new Date().toISOString()
+                });
+                
+                document.getElementById('reflexaoForm').style.display = 'none';
+                document.getElementById('reflexaoSalva').style.display = 'block';
+                document.getElementById('reflexaoTexto').textContent = texto;
+                
+                mostrarToast('✅ Reflexão salva!');
+            } catch (err) {
+                console.error(err);
+                mostrarToast('Erro ao salvar');
             }
         }
 
-        function criarConfetes() {
-            const container = document.getElementById('confetes');
-            const cores = ['#6366f1', '#ec4899', '#fbbf24', '#22c55e', '#3b82f6'];
-            
-            for (let i = 0; i < 150; i++) {
-                const el = document.createElement('div');
-                el.style.cssText = `
-                    position: absolute;
-                    width: ${6 + Math.random() * 8}px;
-                    height: ${6 + Math.random() * 8}px;
-                    background: ${cores[Math.floor(Math.random() * cores.length)]};
-                    left: ${Math.random() * 100}%;
-                    top: -20px;
-                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-                    animation: confetti ${2 + Math.random() * 2}s ease-out forwards;
-                    animation-delay: ${Math.random() * 0.5}s;
-                `;
-                container.appendChild(el);
-            }
-            
-            if (!document.getElementById('confetti-style')) {
-                const style = document.createElement('style');
-                style.id = 'confetti-style';
-                style.textContent = `@keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }`;
-                document.head.appendChild(style);
-            }
-            
-            setTimeout(() => container.innerHTML = '', 4000);
-        }
-
-        // Share
-        function abrirShare() {
+        // COMPARTILHAR
+        function abrirCompartilhar() {
             document.getElementById('shareModal').classList.add('active');
-            document.getElementById('btnSalvarVideo').disabled = true;
-            document.getElementById('btnSalvarImg').disabled = true;
-            document.getElementById('shareStatus').style.display = 'block';
-            document.getElementById('progressBar').style.width = '0%';
-            
-            setTimeout(() => criarAnimacaoAbertura(), 100);
+            criarAnimacaoCompartilhar();
         }
-
-        function fecharShare() {
+        
+        function fecharCompartilhar() {
             document.getElementById('shareModal').classList.remove('active');
         }
-
-        async function criarAnimacaoAbertura() {
+        
+        async function criarAnimacaoCompartilhar() {
+            const preview = document.getElementById('sharePreview');
+            const status = document.getElementById('shareStatus');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Canvas para animação
             const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
             canvas.width = 1080;
             canvas.height = 1920;
-            
-            const preview = document.getElementById('sharePreview');
             preview.innerHTML = '';
             preview.appendChild(canvas);
             
-            const nome = capsulaData.nome;
-            const prioridades = (capsulaData.desejos || []).slice(0, 3);
+            const ctx = canvas.getContext('2d');
+            
+            // Dados
+            const nome = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`.trim();
+            const dataCriacao = formatarData(capsulaData.dataCriacao);
+            const dataAbertura = formatarData(new Date());
             const palavra = capsulaData.perguntas?.palavra || '';
-            const felicidade = capsulaData.perguntas?.felicidade || 0;
+            const felicidade = capsulaData.perguntas?.felicidade || null;
             
-            let fotoImg = null;
-            if (capsulaData.foto) {
-                try {
-                    fotoImg = await new Promise((resolve, reject) => {
-                        const img = new Image();
-                        img.crossOrigin = 'anonymous';
-                        img.onload = () => resolve(img);
-                        img.onerror = reject;
-                        img.src = capsulaData.foto;
-                    });
-                } catch(e) {}
-            }
-            
-            const stream = canvas.captureStream(30);
-            const chunks = [];
-            let recorder;
-            
-            try {
-                recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
-            } catch(e) {
-                recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-            }
-            
-            recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-            recorder.onstop = () => {
-                videoBlob = new Blob(chunks, { type: 'video/webm' });
-                document.getElementById('btnSalvarVideo').disabled = false;
-                toast('🎬 Vídeo criado!');
+            // Cores
+            const colors = {
+                bg: '#0F1419',
+                primary: '#2D5A4C',
+                accent: '#E8B86D',
+                text: '#F4F4F5'
             };
             
-            recorder.start();
-            
-            const w = canvas.width, h = canvas.height;
-            let frame = 0;
-            const totalFrames = 210;
-            
-            // Partículas de explosão
-            const explosionParticles = [];
-            for (let i = 0; i < 100; i++) {
-                const angle = (i / 100) * Math.PI * 2;
-                explosionParticles.push({
-                    x: w/2,
-                    y: h/2,
-                    vx: Math.cos(angle) * (10 + Math.random() * 20),
-                    vy: Math.sin(angle) * (10 + Math.random() * 20),
-                    size: 5 + Math.random() * 10,
-                    hue: Math.random() * 60 + 320,
+            // Partículas de fundo
+            const particulas = [];
+            for (let i = 0; i < 50; i++) {
+                particulas.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    size: 3 + Math.random() * 5,
+                    color: Math.random() > 0.5 ? colors.primary : colors.accent,
                     life: 1
                 });
             }
             
-            // Confetes
-            const confetes = [];
-            for (let i = 0; i < 80; i++) {
-                confetes.push({
-                    x: Math.random() * w,
-                    y: -50 - Math.random() * 500,
-                    size: 8 + Math.random() * 12,
-                    color: ['#6366f1', '#ec4899', '#fbbf24', '#22c55e'][Math.floor(Math.random() * 4)],
-                    speedY: 5 + Math.random() * 8,
-                    speedX: (Math.random() - 0.5) * 4,
-                    rotation: 0,
-                    rotSpeed: (Math.random() - 0.5) * 0.3
+            // Estrelas
+            const estrelas = [];
+            for (let i = 0; i < 40; i++) {
+                estrelas.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: 1 + Math.random() * 2,
+                    twinkle: Math.random() * Math.PI * 2
                 });
             }
             
-            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+            // Fogos
+            const fogos = [];
+            for (let i = 0; i < 8; i++) {
+                fogos.push({
+                    x: 150 + Math.random() * (canvas.width - 300),
+                    y: 200 + Math.random() * 600,
+                    radius: 0,
+                    maxRadius: 120 + Math.random() * 80,
+                    color: [colors.primary, colors.accent, '#10B981', '#F5D49A'][Math.floor(Math.random() * 4)],
+                    delay: i * 8,
+                    alpha: 0
+                });
+            }
             
-            function animate() {
-                frame++;
-                const progress = frame / totalFrames;
-                document.getElementById('progressBar').style.width = (progress * 100) + '%';
-                
+            let frame = 0;
+            const totalFrames = 180;
+            
+            const renderFrame = () => {
                 // Background
-                const hue1 = 280 + Math.sin(frame * 0.02) * 30;
-                const hue2 = 340 + Math.cos(frame * 0.015) * 30;
+                ctx.fillStyle = colors.bg;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                const bg = ctx.createLinearGradient(0, 0, w, h);
-                bg.addColorStop(0, `hsl(${hue1}, 60%, 8%)`);
-                bg.addColorStop(0.5, `hsl(${(hue1+hue2)/2}, 50%, 12%)`);
-                bg.addColorStop(1, `hsl(${hue2}, 60%, 8%)`);
-                ctx.fillStyle = bg;
-                ctx.fillRect(0, 0, w, h);
+                // Gradient overlay
+                const bgGrad = ctx.createRadialGradient(
+                    canvas.width / 2, canvas.height / 2, 0,
+                    canvas.width / 2, canvas.height / 2, canvas.width
+                );
+                bgGrad.addColorStop(0, 'rgba(45,90,76,0.15)');
+                bgGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                // Estrelas
+                estrelas.forEach(s => {
+                    s.twinkle += 0.05;
+                    const alpha = 0.3 + Math.sin(s.twinkle) * 0.5;
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
                 
-                // ===== CENA 1: EXPLOSÃO (0-60) =====
-                if (frame <= 60) {
-                    const t = frame / 60;
+                // Fase 1: Cápsula
+                if (frame < 60) {
+                    const shake = Math.sin(frame * 0.8) * (10 - frame * 0.15);
+                    const scale = frame < 40 ? 1 : 1 + (frame - 40) * 0.05;
+                    const alpha = frame < 50 ? 1 : 1 - (frame - 50) * 0.1;
                     
-                    // Cápsula tremendo e explodindo
-                    if (frame < 30) {
-                        const shake = Math.sin(frame * 0.8) * (5 + frame * 0.5);
-                        const scale = 1 + t * 0.5;
-                        
-                        ctx.save();
-                        ctx.translate(w/2 + shake, h/2);
-                        ctx.scale(scale, scale);
-                        ctx.font = '150px Arial';
-                        ctx.globalAlpha = 1 - t;
-                        ctx.fillText('🎁', 0, 0);
-                        ctx.restore();
-                    }
+                    ctx.save();
+                    ctx.translate(canvas.width / 2 + shake, 600);
+                    ctx.scale(scale, scale);
+                    ctx.globalAlpha = alpha;
+                    ctx.font = '200px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🎁', 0, 0);
+                    ctx.restore();
                     
-                    // Flash de explosão
-                    if (frame >= 25 && frame <= 40) {
-                        const flashT = (frame - 25) / 15;
-                        ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * (1 - flashT)})`;
-                        ctx.fillRect(0, 0, w, h);
-                    }
-                    
-                    // Partículas de explosão
-                    if (frame >= 30) {
-                        explosionParticles.forEach(p => {
-                            p.x += p.vx;
-                            p.y += p.vy;
-                            p.vy += 0.5;
-                            p.life -= 0.02;
-                            p.vx *= 0.98;
-                            
-                            if (p.life > 0) {
-                                ctx.globalAlpha = p.life;
-                                ctx.fillStyle = `hsl(${p.hue}, 80%, 60%)`;
-                                ctx.beginPath();
-                                ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                                ctx.fill();
-                            }
-                        });
-                        ctx.globalAlpha = 1;
-                    }
-                    
-                    // Texto "ABERTA!"
-                    if (frame > 35) {
-                        const textT = (frame - 35) / 25;
-                        const textScale = easeOutCubic(Math.min(1, textT));
-                        
-                        ctx.save();
-                        ctx.translate(w/2, h/2);
-                        ctx.scale(textScale, textScale);
-                        ctx.font = '900 120px "Sora", sans-serif';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText('🎉 ABERTA! 🎉', 0, 0);
-                        ctx.restore();
+                    if (frame > 45 && frame < 60) {
+                        const flashAlpha = (frame - 45) / 15 * 0.8;
+                        ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
                     }
                 }
                 
-                // ===== CENA 2: FOTO + NOME (60-120) =====
-                if (frame > 45 && frame <= 120) {
-                    const t = Math.min(1, (frame - 45) / 30);
-                    const fadeOut = frame > 105 ? 1 - (frame - 105) / 15 : 1;
-                    
-                    // Confetes caindo
-                    confetes.forEach(c => {
-                        c.y += c.speedY;
-                        c.x += c.speedX;
-                        c.rotation += c.rotSpeed;
-                        if (c.y > h + 50) {
-                            c.y = -50;
-                            c.x = Math.random() * w;
-                        }
+                // Fase 2: Partículas
+                if (frame > 30) {
+                    particulas.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.3;
+                        p.life -= 0.01;
                         
-                        ctx.save();
-                        ctx.translate(c.x, c.y);
-                        ctx.rotate(c.rotation);
-                        ctx.fillStyle = c.color;
-                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
-                        ctx.restore();
+                        if (p.life > 0) {
+                            ctx.globalAlpha = p.life;
+                            ctx.fillStyle = p.color;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                        }
                     });
+                }
+                
+                // Fase 3: Fogos
+                if (frame > 60) {
+                    fogos.forEach(f => {
+                        if (frame > 60 + f.delay) {
+                            f.radius += 6;
+                            f.alpha = f.radius < f.maxRadius * 0.5 
+                                ? f.radius / (f.maxRadius * 0.5) 
+                                : 1 - (f.radius - f.maxRadius * 0.5) / (f.maxRadius * 0.5);
+                            
+                            if (f.alpha > 0) {
+                                ctx.strokeStyle = f.color;
+                                ctx.lineWidth = 3;
+                                ctx.globalAlpha = f.alpha * 0.8;
+                                ctx.beginPath();
+                                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                                ctx.stroke();
+                                
+                                for (let j = 0; j < 10; j++) {
+                                    const angle = (j / 10) * Math.PI * 2 + frame * 0.05;
+                                    const px = f.x + Math.cos(angle) * f.radius;
+                                    const py = f.y + Math.sin(angle) * f.radius;
+                                    ctx.fillStyle = f.color;
+                                    ctx.beginPath();
+                                    ctx.arc(px, py, 5, 0, Math.PI * 2);
+                                    ctx.fill();
+                                }
+                                ctx.globalAlpha = 1;
+                            }
+                        }
+                    });
+                }
+                
+                // Título
+                if (frame > 50) {
+                    const titleAlpha = Math.min(1, (frame - 50) / 30);
+                    const titleScale = 0.5 + titleAlpha * 0.5;
+                    
+                    ctx.save();
+                    ctx.translate(canvas.width / 2, 180);
+                    ctx.scale(titleScale, titleScale);
+                    ctx.globalAlpha = titleAlpha;
+                    ctx.shadowColor = colors.accent;
+                    ctx.shadowBlur = 40;
+                    ctx.font = 'bold 64px Arial';
+                    ctx.fillStyle = colors.accent;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🎉 CÁPSULA ABERTA! 🎉', 0, 0);
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                    
+                    ctx.globalAlpha = titleAlpha;
+                    ctx.font = '32px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(eventoData?.nome || 'Cápsula do Tempo', canvas.width / 2, 260);
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Foto
+                if (frame > 80 && fotoImg && fotoImg.complete) {
+                    const fotoY = 500;
+                    const fotoSize = 280;
+                    const fotoAlpha = Math.min(1, (frame - 80) / 30);
+                    const fotoScale = 0.3 + fotoAlpha * 0.7;
+                    
+                    ctx.save();
+                    ctx.translate(canvas.width / 2, fotoY);
+                    ctx.scale(fotoScale, fotoScale);
+                    ctx.globalAlpha = fotoAlpha;
+                    
+                    // Borda
+                    ctx.beginPath();
+                    ctx.arc(0, 0, fotoSize / 2 + 15, 0, Math.PI * 2);
+                    ctx.fillStyle = colors.accent;
+                    ctx.fill();
                     
                     // Foto
-                    if (fotoImg) {
-                        const fotoY = h * 0.35;
-                        const fotoSize = 380 * easeOutCubic(t);
-                        
-                        ctx.save();
-                        ctx.globalAlpha = easeOutCubic(t) * fadeOut;
-                        
-                        const borderGrad = ctx.createLinearGradient(w/2 - 220, fotoY - 220, w/2 + 220, fotoY + 220);
-                        borderGrad.addColorStop(0, '#22c55e');
-                        borderGrad.addColorStop(0.5, '#fbbf24');
-                        borderGrad.addColorStop(1, '#ec4899');
-                        
-                        ctx.fillStyle = borderGrad;
-                        ctx.beginPath();
-                        ctx.arc(w/2, fotoY, fotoSize/2 + 15, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        ctx.beginPath();
-                        ctx.arc(w/2, fotoY, fotoSize/2, 0, Math.PI * 2);
-                        ctx.clip();
-                        
-                        const ratio = fotoImg.width / fotoImg.height;
-                        let dw = fotoSize, dh = fotoSize;
-                        if (ratio > 1) dw = fotoSize * ratio;
-                        else dh = fotoSize / ratio;
-                        ctx.drawImage(fotoImg, w/2 - dw/2, fotoY - dh/2, dw, dh);
-                        ctx.restore();
-                    }
+                    ctx.beginPath();
+                    ctx.arc(0, 0, fotoSize / 2, 0, Math.PI * 2);
+                    ctx.clip();
                     
-                    // Nome
-                    if (frame > 60) {
-                        const nameT = (frame - 60) / 25;
-                        ctx.save();
-                        ctx.globalAlpha = easeOutCubic(Math.min(1, nameT)) * fadeOut;
-                        ctx.font = '800 90px "Sora", sans-serif';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText(nome.toUpperCase(), w/2, h * 0.62);
-                        
-                        ctx.font = '400 40px "Outfit", sans-serif';
-                        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                        ctx.fillText('abriu sua cápsula', w/2, h * 0.68);
-                        ctx.restore();
-                    }
-                }
-                
-                // ===== CENA 3: CONQUISTAS + PALAVRA (120-170) =====
-                if (frame > 105 && frame <= 170) {
-                    const t = Math.min(1, (frame - 105) / 30);
-                    const fadeOut = frame > 155 ? 1 - (frame - 155) / 15 : 1;
-                    
-                    // Confetes continuam
-                    confetes.forEach(c => {
-                        c.y += c.speedY;
-                        c.x += c.speedX;
-                        c.rotation += c.rotSpeed;
-                        if (c.y > h + 50) { c.y = -50; c.x = Math.random() * w; }
-                        ctx.save();
-                        ctx.translate(c.x, c.y);
-                        ctx.rotate(c.rotation);
-                        ctx.fillStyle = c.color;
-                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
-                        ctx.restore();
-                    });
-                    
-                    ctx.save();
-                    ctx.globalAlpha = easeOutCubic(t) * fadeOut;
-                    
-                    ctx.font = '600 40px "Outfit", sans-serif';
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fillText('MINHAS PRIORIDADES ERAM', w/2, h * 0.2);
-                    
-                    prioridades.forEach((tag, i) => {
-                        const delay = i * 8;
-                        if (frame > 115 + delay) {
-                            const tagT = Math.min(1, (frame - 115 - delay) / 15);
-                            const tagY = h * 0.35 + i * 130;
-                            
-                            ctx.globalAlpha = easeOutCubic(tagT) * fadeOut;
-                            
-                            const tagGrad = ctx.createLinearGradient(w/2 - 280, tagY, w/2 + 280, tagY);
-                            tagGrad.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
-                            tagGrad.addColorStop(1, 'rgba(251, 191, 36, 0.3)');
-                            
-                            ctx.fillStyle = tagGrad;
-                            roundRect(ctx, w/2 - 280, tagY - 50, 560, 100, 50);
-                            ctx.fill();
-                            
-                            ctx.font = '700 56px "Sora", sans-serif';
-                            ctx.fillStyle = '#fff';
-                            ctx.fillText(tag, w/2, tagY + 5);
-                        }
-                    });
-                    
-                    // Palavra + Felicidade
-                    if (frame > 140) {
-                        const wordT = (frame - 140) / 20;
-                        ctx.globalAlpha = easeOutCubic(Math.min(1, wordT)) * fadeOut;
-                        
-                        if (palavra) {
-                            ctx.font = '500 32px "Outfit", sans-serif';
-                            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                            ctx.fillText('Palavra do momento', w/2, h * 0.73);
-                            
-                            ctx.font = '800 80px "Sora", sans-serif';
-                            ctx.fillStyle = '#fbbf24';
-                            ctx.fillText(palavra.toUpperCase(), w/2, h * 0.8);
-                        }
-                        
-                        if (felicidade) {
-                            ctx.font = '500 28px "Outfit", sans-serif';
-                            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                            ctx.fillText('Felicidade', w/2, h * 0.88);
-                            
-                            ctx.font = '900 100px "Sora", sans-serif';
-                            ctx.fillStyle = '#22c55e';
-                            ctx.fillText(`${felicidade}/10`, w/2, h * 0.95);
-                        }
-                    }
+                    const imgRatio = fotoImg.width / fotoImg.height;
+                    let drawW = fotoSize, drawH = fotoSize;
+                    if (imgRatio > 1) drawW = fotoSize * imgRatio;
+                    else drawH = fotoSize / imgRatio;
+                    ctx.drawImage(fotoImg, -drawW / 2, -drawH / 2, drawW, drawH);
                     
                     ctx.restore();
                 }
                 
-                // ===== CENA 4: FINAL (170-210) =====
-                if (frame > 155) {
-                    const t = Math.min(1, (frame - 155) / 30);
-                    
-                    // Confetes
-                    confetes.forEach(c => {
-                        c.y += c.speedY;
-                        c.x += c.speedX;
-                        c.rotation += c.rotSpeed;
-                        if (c.y > h + 50) { c.y = -50; c.x = Math.random() * w; }
-                        ctx.save();
-                        ctx.translate(c.x, c.y);
-                        ctx.rotate(c.rotation);
-                        ctx.fillStyle = c.color;
-                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
-                        ctx.restore();
-                    });
-                    
-                    ctx.save();
-                    ctx.globalAlpha = easeOutCubic(t);
-                    
-                    // Emoji comemorativo
-                    ctx.font = '180px Arial';
-                    ctx.fillText('🎊', w/2, h * 0.3);
-                    
-                    ctx.font = '900 72px "Sora", sans-serif';
-                    ctx.fillStyle = '#fff';
-                    ctx.fillText('CÁPSULA', w/2, h * 0.48);
-                    ctx.fillText('ABERTA!', w/2, h * 0.55);
-                    
-                    ctx.font = '500 36px "Outfit", sans-serif';
+                // Nome
+                if (frame > 100) {
+                    const nameChars = Math.min(nome.length, Math.floor((frame - 100) / 2));
+                    ctx.font = 'bold 56px Arial';
+                    ctx.fillStyle = colors.accent;
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = colors.accent;
+                    ctx.shadowBlur = 20;
+                    ctx.fillText(nome.substring(0, nameChars), canvas.width / 2, 720);
+                    ctx.shadowBlur = 0;
+                }
+                
+                // Datas
+                if (frame > 120) {
+                    ctx.font = '26px Arial';
                     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                    ctx.fillText(nome, w/2, h * 0.65);
+                    ctx.fillText(`Criada: ${dataCriacao}  →  Aberta: ${dataAbertura}`, canvas.width / 2, 790);
+                }
+                
+                // Palavra
+                if (frame > 140 && palavra) {
+                    ctx.font = '24px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fillText('Palavra que me definia:', canvas.width / 2, 880);
                     
-                    // Glow final
-                    const glowSize = 300 + Math.sin(frame * 0.1) * 50;
-                    const glow = ctx.createRadialGradient(w/2, h * 0.5, 0, w/2, h * 0.5, glowSize);
-                    glow.addColorStop(0, 'rgba(34, 197, 94, 0.2)');
-                    glow.addColorStop(1, 'transparent');
-                    ctx.fillStyle = glow;
-                    ctx.fillRect(0, 0, w, h);
-                    
-                    ctx.font = '400 28px "Outfit", sans-serif';
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.fillText('Cápsula do Tempo • 2024', w/2, h - 80);
-                    
+                    const wordScale = 1 + Math.sin(frame * 0.1) * 0.05;
+                    ctx.save();
+                    ctx.translate(canvas.width / 2, 940);
+                    ctx.scale(wordScale, wordScale);
+                    ctx.font = 'bold 44px Arial';
+                    ctx.fillStyle = colors.accent;
+                    ctx.fillText(`"${palavra}"`, 0, 0);
                     ctx.restore();
                 }
                 
-                if (frame < totalFrames) {
-                    requestAnimationFrame(animate);
-                } else {
+                // Felicidade
+                if (frame > 160 && felicidade) {
+                    ctx.font = '24px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fillText('Felicidade naquela época:', canvas.width / 2, 1040);
+                    
+                    const barWidth = 450;
+                    const barX = (canvas.width - barWidth) / 2;
+                    const barY = 1080;
+                    const fillProgress = Math.min(1, (frame - 160) / 30);
+                    
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.fillRect(barX, barY, barWidth, 28);
+                    
+                    const fillGrad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+                    fillGrad.addColorStop(0, colors.accent);
+                    fillGrad.addColorStop(1, '#F5D49A');
+                    ctx.fillStyle = fillGrad;
+                    ctx.fillRect(barX, barY, (barWidth * felicidade / 10) * fillProgress, 28);
+                    
+                    ctx.font = 'bold 48px Arial';
+                    ctx.fillStyle = colors.accent;
+                    ctx.fillText(`${felicidade}/10`, canvas.width / 2, 1180);
+                }
+                
+                // Marca d'água
+                if (frame > 150) {
+                    ctx.font = '20px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.fillText('Cápsula do Tempo 2.0', canvas.width / 2, 1850);
+                }
+                
+                progressBar.style.width = (frame / totalFrames * 100) + '%';
+            };
+            
+            // Renderizar frames
+            const frames = [];
+            
+            for (frame = 0; frame < totalFrames; frame++) {
+                renderFrame();
+                frames.push(canvas.toDataURL('image/webp', 0.8));
+                await new Promise(r => setTimeout(r, 10));
+            }
+            
+            // Salvar última imagem
+            imagemBlob = await new Promise(resolve => {
+                canvas.toBlob(resolve, 'image/png');
+            });
+            
+            // Criar vídeo se suportado
+            if (typeof MediaRecorder !== 'undefined' && canvas.captureStream) {
+                try {
+                    const stream = canvas.captureStream(30);
+                    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                    const chunks = [];
+                    
+                    recorder.ondataavailable = e => chunks.push(e.data);
+                    recorder.onstop = () => {
+                        videoBlob = new Blob(chunks, { type: 'video/webm' });
+                        document.getElementById('btnBaixarVideo').disabled = false;
+                    };
+                    
+                    recorder.start();
+                    
+                    for (frame = 0; frame < totalFrames; frame++) {
+                        renderFrame();
+                        await new Promise(r => setTimeout(r, 33));
+                    }
+                    
                     recorder.stop();
-                    canvas.toBlob((blob) => {
-                        imagemBlob = blob;
-                        document.getElementById('btnSalvarImg').disabled = false;
-                        document.getElementById('shareStatus').style.display = 'none';
-                    }, 'image/png');
+                } catch (e) {
+                    console.log('Video recording not supported');
                 }
             }
             
-            animate();
-        }
-        
-        function roundRect(ctx, x, y, w, h, r) {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + w - r, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-            ctx.lineTo(x + w, y + h - r);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-            ctx.lineTo(x + r, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-            ctx.lineTo(x, y + r);
-            ctx.quadraticCurveTo(x, y, x + r, y);
-            ctx.closePath();
+            document.getElementById('btnBaixarImg').disabled = false;
+            status.innerHTML = '<span style="color: var(--success)">✅ Pronto para compartilhar!</span>';
         }
 
-        function salvarVideo() {
-            if (!videoBlob) { toast('Aguarde...', 'error'); return; }
+        // DOWNLOAD
+        function baixarVideo() {
+            if (!videoBlob) return;
             const url = URL.createObjectURL(videoBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `capsula-aberta-${Date.now()}.webm`;
+            a.download = `capsula-${capsulaData.nome}-video.webm`;
             a.click();
             URL.revokeObjectURL(url);
-            toast('🎬 Vídeo salvo!');
+            mostrarToast('📥 Vídeo baixado!');
         }
-
-        function salvarImagem() {
-            if (!imagemBlob) { toast('Aguarde...', 'error'); return; }
+        
+        function baixarImagem() {
+            if (!imagemBlob) return;
             const url = URL.createObjectURL(imagemBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `capsula-aberta-${Date.now()}.png`;
+            a.download = `capsula-${capsulaData.nome}.png`;
             a.click();
             URL.revokeObjectURL(url);
-            toast('📸 Imagem salva!');
+            mostrarToast('📥 Imagem baixada!');
         }
-
+        
         function copiarLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => toast('🔗 Link copiado!'));
+            navigator.clipboard.writeText(window.location.href);
+            mostrarToast('🔗 Link copiado!');
         }
     </script>
 </body>
