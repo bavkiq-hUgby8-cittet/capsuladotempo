@@ -7,6 +7,9 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
+    <!-- GIF.js para criar GIFs animados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
@@ -169,20 +172,32 @@
         .btn-compartilhar { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); border: none; color: white; }
         .btn-ver { background: var(--natal-gold); border: none; color: var(--midnight); }
 
-        /* MODAL COMPARTILHAR */
-        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; overflow-y: auto; }
+        /* MODAL COMPARTILHAR - ULTRA PROFISSIONAL */
+        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; padding: 15px; overflow-y: auto; }
         .share-modal.active { display: flex; }
-        .share-modal-content { max-width: 400px; width: 100%; text-align: center; padding-top: 20px; }
-        .share-modal h3 { color: var(--natal-gold); font-size: 1.5rem; margin-bottom: 20px; font-family: 'Pacifico', cursive; }
-        .share-preview { width: 100%; max-height: 50vh; overflow: hidden; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: #111; }
-        .share-preview img { width: 100%; height: auto; display: block; }
-        .share-preview canvas { width: 100%; height: auto; display: block; border-radius: 16px; }
-        .share-btns { display: flex; flex-direction: column; gap: 12px; }
-        .share-btns button { padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 1.1rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .btn-baixar-img { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; }
-        .btn-copiar-link { background: var(--natal-green); color: white; border: none; }
-        .btn-fechar-share { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
-        .share-loading { color: var(--natal-gold); font-size: 1.1rem; padding: 40px; }
+        .share-modal-content { max-width: 420px; width: 100%; text-align: center; }
+        .share-modal h3 { color: var(--natal-gold); font-size: 1.5rem; margin: 15px 0; font-family: 'Pacifico', cursive; }
+        .share-preview { width: 100%; max-width: 280px; margin: 0 auto 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 50px rgba(255,215,0,0.4); background: #000; }
+        .share-preview img { width: 100%; display: block; }
+        .share-preview canvas { width: 100%; display: block; }
+        
+        .share-status { background: rgba(255,215,0,0.1); border: 2px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .share-status .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,215,0,0.3); border-top-color: var(--natal-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .share-status p { color: var(--natal-gold); font-weight: 600; }
+        .share-progress { width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .share-progress-bar { height: 100%; background: linear-gradient(90deg, var(--natal-gold), #ff6b6b, var(--natal-gold)); width: 0%; transition: width 0.3s; background-size: 200% 100%; animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        .share-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .share-btns button { padding: 14px 10px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s; border: none; }
+        .share-btns button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .share-btns button span.icon { font-size: 1.5rem; }
+        .btn-img { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); }
+        .btn-gif { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; }
+        .btn-link { background: var(--natal-green); color: white; }
+        .btn-fechar { background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3) !important; }
+        .share-btns .full-width { grid-column: span 2; }
 
         .tela-erro { align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
         .erro-icon { font-size: 5rem; margin-bottom: 20px; }
@@ -202,6 +217,8 @@
             .pessoas-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .escala-num { width: 42px; height: 42px; font-size: 1rem; }
             .foto-opcoes { flex-direction: column; }
+            .share-btns { grid-template-columns: 1fr; }
+            .share-btns .full-width { grid-column: span 1; }
         }
     </style>
 </head>
@@ -238,7 +255,7 @@
             
             <div class="foto-section">
                 <div class="foto-container" id="fotoContainer">
-                    <div class="foto-placeholder" id="fotoPlaceholder">
+                    <div class="foto-placeholder" id="fotoPlaceholder" onclick="abrirGaleria()">
                         <span>📷</span>
                         <p>Toque para adicionar foto</p>
                     </div>
@@ -542,7 +559,7 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
             <div class="sucesso-data">📅 <span id="sucessoData">--/--/----</span></div>
             <div class="sucesso-dias" id="sucessoDias">-- dias restantes</div>
             <div class="sucesso-btns">
-                <button class="btn-compartilhar" onclick="abrirCompartilhar()">📸 Compartilhar nas Redes</button>
+                <button class="btn-compartilhar" onclick="abrirCompartilhar()">📸 Criar Imagem p/ Stories</button>
                 <button class="btn-ver" onclick="verCapsula()">👁️ Ver Minha Cápsula</button>
             </div>
         </div>
@@ -558,14 +575,36 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
     <!-- MODAL COMPARTILHAR -->
     <div class="share-modal" id="shareModal">
         <div class="share-modal-content">
-            <h3>📸 Compartilhe sua Cápsula!</h3>
+            <h3>✨ Sua Arte para Stories</h3>
+            
             <div class="share-preview" id="sharePreview">
-                <div class="share-loading">⏳ Gerando imagem...</div>
+                <!-- Canvas ou imagem aqui -->
             </div>
+            
+            <div class="share-status" id="shareStatus">
+                <div class="spinner"></div>
+                <p>Criando sua arte...</p>
+                <div class="share-progress">
+                    <div class="share-progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            
             <div class="share-btns">
-                <button class="btn-baixar-img" id="btnBaixar" onclick="baixarImagem()">📥 Salvar Imagem no Celular</button>
-                <button class="btn-copiar-link" onclick="copiarLink()">🔗 Copiar Link da Cápsula</button>
-                <button class="btn-fechar-share" onclick="fecharCompartilhar()">✕ Fechar</button>
+                <button class="btn-img" id="btnSalvarImg" onclick="salvarImagem()" disabled>
+                    <span class="icon">📸</span>
+                    Salvar Imagem
+                </button>
+                <button class="btn-gif" id="btnSalvarGif" onclick="criarGifAnimado()" disabled>
+                    <span class="icon">🎬</span>
+                    Criar GIF Animado
+                </button>
+                <button class="btn-link full-width" onclick="copiarLink()">
+                    <span class="icon">🔗</span>
+                    Copiar Link da Cápsula
+                </button>
+                <button class="btn-fechar full-width" onclick="fecharCompartilhar()">
+                    ✕ Fechar
+                </button>
             </div>
         </div>
     </div>
@@ -604,7 +643,8 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         let capsulaId = null;
         let fotoBase64 = null;
         let linkCapsula = null;
-        let imagemGeradaBlob = null;
+        let imagemCanvas = null;
+        let imagemBlob = null;
         
         let desejosSelecionados = [];
         let pessoasSelecionadas = [];
@@ -794,7 +834,7 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
             fotoBase64 = null;
             const container = document.getElementById('fotoContainer');
             container.classList.remove('has-photo');
-            container.innerHTML = `<div class="foto-placeholder"><span>📷</span><p>Toque para adicionar foto</p></div>`;
+            container.innerHTML = `<div class="foto-placeholder" onclick="abrirGaleria()"><span>📷</span><p>Toque para adicionar foto</p></div>`;
             document.getElementById('fotoInput').value = '';
         }
 
@@ -1005,192 +1045,343 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
         }
 
         // ==========================================
-        // COMPARTILHAR - GERAR IMAGEM
+        // COMPARTILHAR - GERAÇÃO DE IMAGEM
         // ==========================================
         async function abrirCompartilhar() {
             const modal = document.getElementById('shareModal');
-            const preview = document.getElementById('sharePreview');
             modal.classList.add('active');
-            preview.innerHTML = '<div class="share-loading">⏳ Gerando imagem...</div>';
             
-            try {
-                await gerarImagemCompartilhar();
-            } catch (err) {
-                console.error('Erro ao gerar imagem:', err);
-                preview.innerHTML = '<div class="share-loading">❌ Erro ao gerar imagem</div>';
-            }
+            // Reset
+            document.getElementById('btnSalvarImg').disabled = true;
+            document.getElementById('btnSalvarGif').disabled = true;
+            document.getElementById('shareStatus').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // Criar imagem
+            await gerarImagemStories();
         }
 
-        async function gerarImagemCompartilhar() {
+        async function gerarImagemStories() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // Tamanho 9:16 para Stories
+            // Tamanho Stories (9:16)
             const w = 1080;
             const h = 1920;
             canvas.width = w;
             canvas.height = h;
             
-            // Background gradiente natalino
-            const bg = ctx.createLinearGradient(0, 0, 0, h);
-            bg.addColorStop(0, '#0a0e14');
-            bg.addColorStop(0.3, '#1a2e1a');
-            bg.addColorStop(0.6, '#2a1a1a');
-            bg.addColorStop(1, '#0a0e14');
-            ctx.fillStyle = bg;
+            // Dados
+            const nome = document.getElementById('nome').value.trim();
+            const dataAbertura = formatarData(eventoData?.dataAbertura);
+            const dias = Math.max(0, Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000*60*60*24)));
+            const prioridades = desejosSelecionados.slice(0, 4);
+            
+            // Atualizar progresso
+            const updateProgress = (p) => {
+                document.getElementById('progressBar').style.width = p + '%';
+            };
+            
+            updateProgress(10);
+            
+            // ========== BACKGROUND ==========
+            const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+            bgGrad.addColorStop(0, '#0f0c29');
+            bgGrad.addColorStop(0.5, '#302b63');
+            bgGrad.addColorStop(1, '#24243e');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, w, h);
             
-            // Estrelas decorativas
-            for (let i = 0; i < 150; i++) {
-                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.8})`;
-                ctx.beginPath();
-                ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 1, 0, Math.PI * 2);
-                ctx.fill();
+            // Overlay com textura
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.03)';
+            for (let i = 0; i < w; i += 4) {
+                for (let j = 0; j < h; j += 4) {
+                    if (Math.random() > 0.5) ctx.fillRect(i, j, 2, 2);
+                }
             }
             
-            // Círculo decorativo dourado
-            ctx.beginPath();
-            ctx.arc(w/2, 200, 500, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,215,0,0.08)';
-            ctx.fill();
+            updateProgress(20);
             
-            // Emoji de presente no topo
-            ctx.font = '120px Arial';
+            // ========== ESTRELAS ==========
+            for (let i = 0; i < 150; i++) {
+                const x = Math.random() * w;
+                const y = Math.random() * h;
+                const size = Math.random() * 3 + 1;
+                const alpha = Math.random() * 0.8 + 0.2;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Brilho
+                if (Math.random() > 0.7) {
+                    ctx.fillStyle = `rgba(255, 215, 0, ${alpha * 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            updateProgress(30);
+            
+            // ========== CONFETES ==========
+            const cores = ['#ffd700', '#c41e3a', '#165b33', '#ff6b6b', '#4ecdc4', '#fff', '#ff69b4', '#00ffff'];
+            for (let i = 0; i < 100; i++) {
+                ctx.fillStyle = cores[Math.floor(Math.random() * cores.length)];
+                ctx.save();
+                ctx.translate(Math.random() * w, Math.random() * h);
+                ctx.rotate(Math.random() * Math.PI * 2);
+                
+                if (Math.random() > 0.5) {
+                    ctx.fillRect(-5, -10, 10, 20);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 6 + Math.random() * 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+            
+            updateProgress(40);
+            
+            // ========== GLOW CENTRAL ==========
+            const glowGrad = ctx.createRadialGradient(w/2, 500, 0, w/2, 500, 400);
+            glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
+            glowGrad.addColorStop(0.5, 'rgba(255, 215, 0, 0.1)');
+            glowGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = glowGrad;
+            ctx.fillRect(0, 0, w, h);
+            
+            // ========== TÍTULO ==========
             ctx.textAlign = 'center';
-            ctx.fillText('🎁', w/2, 180);
+            ctx.textBaseline = 'middle';
             
-            // Título
-            ctx.font = 'bold 72px Arial, sans-serif';
+            // Sombra do título
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 40;
+            ctx.font = 'bold 80px Arial, sans-serif';
             ctx.fillStyle = '#ffd700';
-            ctx.fillText('CÁPSULA DO TEMPO', w/2, 320);
+            ctx.fillText('🎁 CÁPSULA DO TEMPO 🎁', w/2, 150);
+            ctx.shadowBlur = 0;
             
-            // Subtítulo evento
+            // Subtítulo
             ctx.font = '40px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fillText(eventoData?.nome || 'Natal 2024', w/2, 390);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText(eventoData?.nome || 'Natal 2024', w/2, 230);
             
-            // Foto do usuário
-            const fotoY = 480;
-            const fotoSize = 320;
+            updateProgress(50);
             
-            // Borda dourada da foto
+            // ========== CÁPSULA 3D ==========
+            const capX = w / 2;
+            const capY = 520;
+            
+            // Glow da cápsula
+            const capsGlow = ctx.createRadialGradient(capX, capY, 0, capX, capY, 280);
+            capsGlow.addColorStop(0, 'rgba(255, 215, 0, 0.5)');
+            capsGlow.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
+            capsGlow.addColorStop(1, 'transparent');
+            ctx.fillStyle = capsGlow;
             ctx.beginPath();
-            ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2 + 15, 0, Math.PI * 2);
-            const borderGrad = ctx.createLinearGradient(w/2 - 200, fotoY, w/2 + 200, fotoY + fotoSize);
-            borderGrad.addColorStop(0, '#ffd700');
-            borderGrad.addColorStop(0.5, '#fff8dc');
-            borderGrad.addColorStop(1, '#ffd700');
-            ctx.fillStyle = borderGrad;
+            ctx.arc(capX, capY, 280, 0, Math.PI * 2);
             ctx.fill();
             
-            // Foto circular
+            // Corpo da cápsula - gradiente 3D
+            const bodyGrad = ctx.createLinearGradient(capX - 150, capY - 200, capX + 150, capY + 200);
+            bodyGrad.addColorStop(0, '#ffd700');
+            bodyGrad.addColorStop(0.2, '#ffec80');
+            bodyGrad.addColorStop(0.4, '#ffd700');
+            bodyGrad.addColorStop(0.6, '#cc9900');
+            bodyGrad.addColorStop(0.8, '#996600');
+            bodyGrad.addColorStop(1, '#664400');
+            
+            ctx.fillStyle = bodyGrad;
+            ctx.beginPath();
+            ctx.ellipse(capX, capY, 150, 200, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Borda dourada
+            ctx.strokeStyle = '#ffcc00';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+            
+            // Reflexo de luz
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.ellipse(capX - 60, capY - 100, 40, 70, -0.4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Tampa
+            const tampaGrad = ctx.createLinearGradient(capX - 100, capY - 200, capX + 100, capY - 150);
+            tampaGrad.addColorStop(0, '#ffcc00');
+            tampaGrad.addColorStop(0.5, '#ffd700');
+            tampaGrad.addColorStop(1, '#cc9900');
+            ctx.fillStyle = tampaGrad;
+            ctx.beginPath();
+            ctx.ellipse(capX, capY - 180, 100, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#996600';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Cadeado
+            ctx.font = '120px Arial';
+            ctx.fillText('🔒', capX, capY + 20);
+            
+            updateProgress(60);
+            
+            // ========== FOTO ==========
             if (fotoBase64) {
                 try {
                     const img = await loadImage(fotoBase64);
+                    const fotoY = 900;
+                    const fotoSize = 300;
+                    
+                    // Borda arco-íris
+                    const borderGrad = ctx.createLinearGradient(capX - 180, fotoY - 180, capX + 180, fotoY + 180);
+                    borderGrad.addColorStop(0, '#ff0000');
+                    borderGrad.addColorStop(0.17, '#ff8800');
+                    borderGrad.addColorStop(0.33, '#ffff00');
+                    borderGrad.addColorStop(0.5, '#00ff00');
+                    borderGrad.addColorStop(0.67, '#0088ff');
+                    borderGrad.addColorStop(0.83, '#8800ff');
+                    borderGrad.addColorStop(1, '#ff0088');
+                    
+                    ctx.fillStyle = borderGrad;
+                    ctx.beginPath();
+                    ctx.arc(capX, fotoY, fotoSize/2 + 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Clip e foto
                     ctx.save();
                     ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
+                    ctx.arc(capX, fotoY, fotoSize/2, 0, Math.PI * 2);
                     ctx.clip();
                     
-                    // Centralizar e cobrir
-                    const imgRatio = img.width / img.height;
-                    let drawW, drawH, drawX, drawY;
-                    if (imgRatio > 1) {
-                        drawH = fotoSize;
-                        drawW = fotoSize * imgRatio;
-                        drawX = w/2 - drawW/2;
-                        drawY = fotoY;
+                    const ratio = img.width / img.height;
+                    let dw, dh;
+                    if (ratio > 1) {
+                        dh = fotoSize;
+                        dw = fotoSize * ratio;
                     } else {
-                        drawW = fotoSize;
-                        drawH = fotoSize / imgRatio;
-                        drawX = w/2 - fotoSize/2;
-                        drawY = fotoY - (drawH - fotoSize) / 2;
+                        dw = fotoSize;
+                        dh = fotoSize / ratio;
                     }
-                    ctx.drawImage(img, drawX, drawY, drawW, drawH);
+                    ctx.drawImage(img, capX - dw/2, fotoY - dh/2, dw, dh);
                     ctx.restore();
+                    
                 } catch (e) {
-                    // Círculo placeholder
-                    ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                    ctx.fillStyle = '#333';
-                    ctx.fill();
-                    ctx.font = '100px Arial';
-                    ctx.fillText('👤', w/2, fotoY + fotoSize/2 + 35);
+                    console.log('Erro foto:', e);
                 }
-            } else {
-                ctx.beginPath();
-                ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                ctx.fillStyle = '#333';
-                ctx.fill();
-                ctx.font = '100px Arial';
-                ctx.fillText('👤', w/2, fotoY + fotoSize/2 + 35);
             }
             
-            // Nome
-            const nome = document.getElementById('nome').value.trim();
-            ctx.font = 'bold 64px Arial, sans-serif';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(nome, w/2, fotoY + fotoSize + 80);
+            updateProgress(70);
             
-            // Cadeado
-            ctx.font = '140px Arial';
-            ctx.fillText('🔒', w/2, fotoY + fotoSize + 240);
+            // ========== NOME ==========
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 30;
+            ctx.font = 'bold 72px Arial, sans-serif';
+            ctx.fillStyle = '#ffd700';
+            ctx.fillText(nome, w/2, 1130);
+            ctx.shadowBlur = 0;
             
             // Status
             ctx.font = 'bold 48px Arial, sans-serif';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText('CÁPSULA LACRADA!', w/2, fotoY + fotoSize + 340);
+            ctx.fillText('✨ CÁPSULA LACRADA! ✨', w/2, 1210);
             
-            // Data de abertura
-            ctx.font = '36px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fillText(`📅 Abre em: ${formatarData(eventoData?.dataAbertura)}`, w/2, fotoY + fotoSize + 410);
+            // Data
+            ctx.font = '38px Arial, sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillText(`📅 Abre em: ${dataAbertura}`, w/2, 1300);
             
-            // Dias restantes
-            const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000*60*60*24));
-            ctx.font = 'bold 72px Arial, sans-serif';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(`${dias} DIAS`, w/2, fotoY + fotoSize + 510);
+            updateProgress(80);
             
-            // Prioridades
-            if (desejosSelecionados.length > 0) {
-                ctx.font = '30px Arial, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('Minhas prioridades:', w/2, fotoY + fotoSize + 590);
-                
-                ctx.font = 'bold 36px Arial, sans-serif';
-                ctx.fillStyle = '#ffd700';
-                const tags = desejosSelecionados.slice(0, 4).join(' • ');
-                ctx.fillText(tags, w/2, fotoY + fotoSize + 640);
-            }
-            
-            // Felicidade
-            if (notaFelicidade) {
-                ctx.font = '30px Arial, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText(`Felicidade hoje: ${notaFelicidade}/10 ⭐`, w/2, fotoY + fotoSize + 720);
-            }
-            
-            // Rodapé decorativo
-            ctx.beginPath();
-            ctx.arc(w/2, h + 150, 400, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(196,30,58,0.1)';
+            // ========== DIAS RESTANTES ==========
+            // Box de destaque
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+            roundRect(ctx, w/2 - 200, 1350, 400, 120, 20);
             ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+            ctx.lineWidth = 3;
+            roundRect(ctx, w/2 - 200, 1350, 400, 120, 20);
+            ctx.stroke();
             
-            // Créditos
+            ctx.shadowColor = '#ff6b6b';
+            ctx.shadowBlur = 30;
+            ctx.font = 'bold 100px Arial, sans-serif';
+            ctx.fillStyle = '#ffd700';
+            ctx.fillText(`${dias}`, w/2 - 50, 1425);
+            ctx.font = 'bold 50px Arial, sans-serif';
+            ctx.fillText('DIAS', w/2 + 90, 1425);
+            ctx.shadowBlur = 0;
+            
+            // ========== PRIORIDADES ==========
+            if (prioridades.length > 0) {
+                ctx.font = '30px Arial, sans-serif';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.fillText('Minhas prioridades:', w/2, 1530);
+                
+                ctx.font = 'bold 34px Arial, sans-serif';
+                ctx.fillStyle = '#ffd700';
+                ctx.fillText(prioridades.join(' • '), w/2, 1580);
+            }
+            
+            // ========== FELICIDADE ==========
+            if (notaFelicidade) {
+                ctx.font = '32px Arial, sans-serif';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillText(`Felicidade hoje: ${notaFelicidade}/10 ⭐`, w/2, 1670);
+            }
+            
+            updateProgress(90);
+            
+            // ========== RODAPÉ ==========
             ctx.font = '28px Arial, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillText('🎄 Cápsula do Tempo 🎄', w/2, h - 80);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillText('🎄 Cápsula do Tempo 🎄', w/2, h - 100);
+            ctx.font = '22px Arial, sans-serif';
+            ctx.fillText('Compartilhe nos Stories!', w/2, h - 60);
             
-            // Converter para blob e mostrar
+            // Salvar canvas
+            imagemCanvas = canvas;
+            
+            // Converter para blob
             canvas.toBlob((blob) => {
-                imagemGeradaBlob = blob;
-                const url = URL.createObjectURL(blob);
+                imagemBlob = blob;
+                
+                // Mostrar preview
                 const preview = document.getElementById('sharePreview');
-                preview.innerHTML = `<img src="${url}" alt="Compartilhar">`;
+                preview.innerHTML = '';
+                preview.appendChild(canvas);
+                
+                // Habilitar botões
+                document.getElementById('btnSalvarImg').disabled = false;
+                document.getElementById('btnSalvarGif').disabled = false;
+                document.getElementById('shareStatus').style.display = 'none';
+                
+                updateProgress(100);
+                mostrarToast('✨ Imagem criada com sucesso!');
+                
             }, 'image/png', 1.0);
         }
-
+        
+        // Função auxiliar para retângulo arredondado
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        // Carregar imagem
         function loadImage(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -1201,25 +1392,307 @@ Escreva tudo que quiser lembrar quando abrir esta cápsula..." maxlength="5000" 
             });
         }
 
-        function baixarImagem() {
-            if (!imagemGeradaBlob) {
-                mostrarToast('Aguarde a imagem carregar', 'error');
+        // ==========================================
+        // SALVAR IMAGEM
+        // ==========================================
+        function salvarImagem() {
+            if (!imagemBlob) {
+                mostrarToast('Aguarde a imagem ser gerada', 'error');
                 return;
             }
             
-            const url = URL.createObjectURL(imagemGeradaBlob);
+            const url = URL.createObjectURL(imagemBlob);
             const link = document.createElement('a');
-            link.download = `capsula-${Date.now()}.png`;
             link.href = url;
+            link.download = `capsula-${nome}-${Date.now()}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            mostrarToast('📥 Imagem salva!');
+            
+            mostrarToast('📸 Imagem salva! Compartilhe nos Stories!');
         }
-        
+
+        // ==========================================
+        // CRIAR GIF ANIMADO
+        // ==========================================
+        async function criarGifAnimado() {
+            if (!imagemCanvas) {
+                mostrarToast('Aguarde a imagem ser gerada', 'error');
+                return;
+            }
+            
+            document.getElementById('btnSalvarGif').disabled = true;
+            document.getElementById('btnSalvarGif').innerHTML = '<span class="icon">⏳</span>Criando GIF...';
+            
+            mostrarToast('🎬 Criando GIF animado... Aguarde!');
+            
+            try {
+                // Criar GIF com gif.js
+                const gif = new GIF({
+                    workers: 2,
+                    quality: 10,
+                    width: 540,
+                    height: 960,
+                    workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+                });
+                
+                const w = 540, h = 960;
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = w;
+                tempCanvas.height = h;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Dados
+                const nome = document.getElementById('nome').value.trim();
+                const dataAbertura = formatarData(eventoData?.dataAbertura);
+                const dias = Math.max(0, Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000*60*60*24)));
+                
+                // Gerar 30 frames (3 segundos a 10fps)
+                const totalFrames = 30;
+                
+                // Pré-carregar foto
+                let fotoImg = null;
+                if (fotoBase64) {
+                    try {
+                        fotoImg = await loadImage(fotoBase64);
+                    } catch(e) {}
+                }
+                
+                for (let frame = 0; frame < totalFrames; frame++) {
+                    const progress = frame / totalFrames;
+                    
+                    // Limpar
+                    const bgGrad = tempCtx.createLinearGradient(0, 0, w, h);
+                    bgGrad.addColorStop(0, '#0f0c29');
+                    bgGrad.addColorStop(0.5, '#302b63');
+                    bgGrad.addColorStop(1, '#24243e');
+                    tempCtx.fillStyle = bgGrad;
+                    tempCtx.fillRect(0, 0, w, h);
+                    
+                    // Estrelas com twinkle
+                    for (let i = 0; i < 80; i++) {
+                        const x = (i * 7) % w;
+                        const y = (i * 13) % h;
+                        const size = 1 + Math.sin(frame * 0.3 + i) * 0.5;
+                        const alpha = 0.5 + Math.sin(frame * 0.2 + i * 0.5) * 0.5;
+                        tempCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+                        tempCtx.beginPath();
+                        tempCtx.arc(x, y, size, 0, Math.PI * 2);
+                        tempCtx.fill();
+                    }
+                    
+                    // Confetes caindo
+                    const cores = ['#ffd700', '#c41e3a', '#165b33', '#ff6b6b', '#4ecdc4', '#fff'];
+                    for (let i = 0; i < 40; i++) {
+                        const baseY = (i * 30 + frame * 15) % (h + 100) - 50;
+                        const x = (i * 17 + Math.sin(frame * 0.1 + i) * 20) % w;
+                        const rot = frame * 0.2 + i;
+                        
+                        tempCtx.save();
+                        tempCtx.translate(x, baseY);
+                        tempCtx.rotate(rot);
+                        tempCtx.fillStyle = cores[i % cores.length];
+                        tempCtx.fillRect(-4, -8, 8, 16);
+                        tempCtx.restore();
+                    }
+                    
+                    // Glow central pulsante
+                    const glowSize = 150 + Math.sin(frame * 0.3) * 30;
+                    const glowGrad = tempCtx.createRadialGradient(w/2, 250, 0, w/2, 250, glowSize);
+                    glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+                    glowGrad.addColorStop(1, 'transparent');
+                    tempCtx.fillStyle = glowGrad;
+                    tempCtx.fillRect(0, 0, w, h);
+                    
+                    // Título
+                    tempCtx.textAlign = 'center';
+                    tempCtx.font = 'bold 36px Arial';
+                    tempCtx.fillStyle = '#ffd700';
+                    tempCtx.shadowColor = '#ffd700';
+                    tempCtx.shadowBlur = 15;
+                    tempCtx.fillText('🎁 CÁPSULA DO TEMPO 🎁', w/2, 70);
+                    tempCtx.shadowBlur = 0;
+                    
+                    // Subtítulo
+                    tempCtx.font = '18px Arial';
+                    tempCtx.fillStyle = 'rgba(255,255,255,0.9)';
+                    tempCtx.fillText(eventoData?.nome || 'Natal 2024', w/2, 105);
+                    
+                    // Cápsula animada
+                    const capY = 260 + Math.sin(frame * 0.2) * 8;
+                    const capScale = 1 + Math.sin(frame * 0.15) * 0.05;
+                    const shake = frame < 10 ? Math.sin(frame * 0.8) * 3 : 0;
+                    
+                    tempCtx.save();
+                    tempCtx.translate(w/2 + shake, capY);
+                    tempCtx.scale(capScale, capScale);
+                    
+                    // Glow
+                    const capsGlow = tempCtx.createRadialGradient(0, 0, 0, 0, 0, 130);
+                    capsGlow.addColorStop(0, 'rgba(255, 215, 0, 0.4)');
+                    capsGlow.addColorStop(1, 'transparent');
+                    tempCtx.fillStyle = capsGlow;
+                    tempCtx.beginPath();
+                    tempCtx.arc(0, 0, 130, 0, Math.PI * 2);
+                    tempCtx.fill();
+                    
+                    // Corpo
+                    const bodyGrad = tempCtx.createLinearGradient(-75, -100, 75, 100);
+                    bodyGrad.addColorStop(0, '#ffd700');
+                    bodyGrad.addColorStop(0.3, '#ffec80');
+                    bodyGrad.addColorStop(0.7, '#cc9900');
+                    bodyGrad.addColorStop(1, '#996600');
+                    tempCtx.fillStyle = bodyGrad;
+                    tempCtx.beginPath();
+                    tempCtx.ellipse(0, 0, 75, 100, 0, 0, Math.PI * 2);
+                    tempCtx.fill();
+                    
+                    // Reflexo
+                    tempCtx.fillStyle = 'rgba(255,255,255,0.4)';
+                    tempCtx.beginPath();
+                    tempCtx.ellipse(-30, -50, 20, 35, -0.3, 0, Math.PI * 2);
+                    tempCtx.fill();
+                    
+                    // Tampa
+                    tempCtx.fillStyle = '#ffcc00';
+                    tempCtx.beginPath();
+                    tempCtx.ellipse(0, -90, 50, 20, 0, 0, Math.PI * 2);
+                    tempCtx.fill();
+                    
+                    // Cadeado (aparece gradualmente)
+                    if (frame > 5) {
+                        const lockAlpha = Math.min(1, (frame - 5) / 10);
+                        tempCtx.globalAlpha = lockAlpha;
+                        tempCtx.font = '50px Arial';
+                        tempCtx.fillText('🔒', 0, 15);
+                        tempCtx.globalAlpha = 1;
+                    }
+                    
+                    tempCtx.restore();
+                    
+                    // Foto (aparece depois)
+                    if (frame > 8 && fotoImg) {
+                        const fotoAlpha = Math.min(1, (frame - 8) / 8);
+                        const fotoY = 460;
+                        const fotoSize = 140;
+                        
+                        tempCtx.globalAlpha = fotoAlpha;
+                        
+                        // Borda
+                        const borderGrad = tempCtx.createLinearGradient(w/2 - 80, fotoY - 80, w/2 + 80, fotoY + 80);
+                        borderGrad.addColorStop(0, '#ffd700');
+                        borderGrad.addColorStop(0.5, '#ff6b6b');
+                        borderGrad.addColorStop(1, '#ffd700');
+                        tempCtx.fillStyle = borderGrad;
+                        tempCtx.beginPath();
+                        tempCtx.arc(w/2, fotoY, fotoSize/2 + 8, 0, Math.PI * 2);
+                        tempCtx.fill();
+                        
+                        tempCtx.save();
+                        tempCtx.beginPath();
+                        tempCtx.arc(w/2, fotoY, fotoSize/2, 0, Math.PI * 2);
+                        tempCtx.clip();
+                        const ratio = fotoImg.width / fotoImg.height;
+                        let dw = fotoSize, dh = fotoSize;
+                        if (ratio > 1) dw = fotoSize * ratio;
+                        else dh = fotoSize / ratio;
+                        tempCtx.drawImage(fotoImg, w/2 - dw/2, fotoY - dh/2, dw, dh);
+                        tempCtx.restore();
+                        
+                        tempCtx.globalAlpha = 1;
+                    }
+                    
+                    // Nome (typewriter)
+                    if (frame > 12) {
+                        const chars = Math.min(nome.length, Math.floor((frame - 12) / 1.5));
+                        tempCtx.font = 'bold 32px Arial';
+                        tempCtx.fillStyle = '#ffd700';
+                        tempCtx.shadowColor = '#ffd700';
+                        tempCtx.shadowBlur = 10;
+                        tempCtx.fillText(nome.substring(0, chars), w/2, 570);
+                        tempCtx.shadowBlur = 0;
+                    }
+                    
+                    // Status
+                    if (frame > 16) {
+                        tempCtx.font = 'bold 22px Arial';
+                        tempCtx.fillStyle = '#fff';
+                        tempCtx.fillText('✨ CÁPSULA LACRADA! ✨', w/2, 615);
+                    }
+                    
+                    // Data
+                    if (frame > 18) {
+                        tempCtx.font = '18px Arial';
+                        tempCtx.fillStyle = 'rgba(255,255,255,0.9)';
+                        tempCtx.fillText(`📅 Abre em: ${dataAbertura}`, w/2, 660);
+                    }
+                    
+                    // Dias (pulsante)
+                    if (frame > 20) {
+                        const diasScale = 1 + Math.sin(frame * 0.3) * 0.1;
+                        tempCtx.save();
+                        tempCtx.translate(w/2, 720);
+                        tempCtx.scale(diasScale, diasScale);
+                        tempCtx.font = 'bold 50px Arial';
+                        tempCtx.fillStyle = '#ffd700';
+                        tempCtx.shadowColor = '#ff6b6b';
+                        tempCtx.shadowBlur = 20;
+                        tempCtx.fillText(`${dias} DIAS`, 0, 0);
+                        tempCtx.shadowBlur = 0;
+                        tempCtx.restore();
+                    }
+                    
+                    // Prioridades
+                    if (frame > 24 && desejosSelecionados.length > 0) {
+                        tempCtx.font = '14px Arial';
+                        tempCtx.fillStyle = 'rgba(255,255,255,0.7)';
+                        tempCtx.fillText('Prioridades: ' + desejosSelecionados.slice(0,3).join(' • '), w/2, 800);
+                    }
+                    
+                    // Rodapé
+                    tempCtx.font = '14px Arial';
+                    tempCtx.fillStyle = 'rgba(255,255,255,0.5)';
+                    tempCtx.fillText('🎄 Cápsula do Tempo 🎄', w/2, h - 40);
+                    
+                    // Adicionar frame ao GIF
+                    gif.addFrame(tempCtx, { copy: true, delay: 100 });
+                }
+                
+                // Renderizar GIF
+                gif.on('finished', function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `capsula-animada-${Date.now()}.gif`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    document.getElementById('btnSalvarGif').disabled = false;
+                    document.getElementById('btnSalvarGif').innerHTML = '<span class="icon">🎬</span>Criar GIF Animado';
+                    mostrarToast('🎬 GIF animado salvo! Perfeito para Stories!');
+                });
+                
+                gif.render();
+                
+            } catch (err) {
+                console.error('Erro ao criar GIF:', err);
+                document.getElementById('btnSalvarGif').disabled = false;
+                document.getElementById('btnSalvarGif').innerHTML = '<span class="icon">🎬</span>Criar GIF Animado';
+                mostrarToast('Erro ao criar GIF. Tente novamente.', 'error');
+            }
+        }
+
+        // ==========================================
+        // OUTRAS FUNÇÕES
+        // ==========================================
         function copiarLink() {
-            if (!linkCapsula) return;
+            if (!linkCapsula) {
+                mostrarToast('Link não disponível', 'error');
+                return;
+            }
             navigator.clipboard.writeText(linkCapsula).then(() => {
                 mostrarToast('🔗 Link copiado!');
             }).catch(() => {

@@ -107,19 +107,26 @@
 
         .btn-compartilhar { width: 100%; background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); border: none; color: white; padding: 18px; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 20px; font-family: 'Poppins', sans-serif; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        /* MODAL COMPARTILHAR */
-        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; overflow-y: auto; }
+        /* MODAL COMPARTILHAR - PROFISSIONAL */
+        .share-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15px; overflow-y: auto; }
         .share-modal.active { display: flex; }
-        .share-modal-content { max-width: 400px; width: 100%; text-align: center; padding-top: 20px; }
-        .share-modal h3 { color: var(--natal-gold); font-size: 1.5rem; margin-bottom: 20px; font-family: 'Pacifico', cursive; }
-        .share-preview { width: 100%; max-height: 50vh; overflow: hidden; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: #111; }
-        .share-preview img { width: 100%; height: auto; display: block; }
-        .share-btns { display: flex; flex-direction: column; gap: 12px; }
-        .share-btns button { padding: 16px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+        .share-modal-content { max-width: 420px; width: 100%; text-align: center; }
+        .share-modal h3 { color: var(--natal-gold); font-size: 1.6rem; margin: 15px 0; font-family: 'Pacifico', cursive; }
+        .share-preview { width: 100%; aspect-ratio: 9/16; max-height: 55vh; overflow: hidden; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 15px 50px rgba(255,215,0,0.3); background: #000; position: relative; }
+        .share-preview canvas { width: 100%; height: 100%; object-fit: contain; border-radius: 20px; }
+        .share-preview video { width: 100%; height: 100%; object-fit: contain; border-radius: 20px; }
+        .share-status { color: var(--natal-gold); font-size: 1rem; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .share-status .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,215,0,0.3); border-top-color: var(--natal-gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .share-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+        .share-progress-bar { height: 100%; background: linear-gradient(90deg, var(--natal-gold), #ff6b6b, var(--natal-gold)); width: 0%; transition: width 0.3s; }
+        .share-btns { display: flex; flex-direction: column; gap: 10px; }
+        .share-btns button { padding: 16px; border-radius: 16px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; transition: all 0.3s; }
+        .share-btns button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-baixar-video { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; border: none; }
         .btn-baixar-img { background: linear-gradient(135deg, var(--natal-gold), #ffaa00); color: var(--midnight); border: none; }
         .btn-copiar-link { background: var(--natal-green); color: white; border: none; }
-        .btn-fechar-share { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; }
-        .share-loading { color: var(--natal-gold); font-size: 1.1rem; padding: 40px; }
+        .btn-fechar-share { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: white; margin-top: 5px; }
 
         .abertura-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.5s; }
         .abertura-overlay.active { opacity: 1; visibility: visible; }
@@ -247,7 +254,7 @@
                 </div>
             </div>
             
-            <button class="btn-compartilhar" onclick="abrirCompartilhar()">📸 Compartilhar nas Redes</button>
+            <button class="btn-compartilhar" onclick="abrirCompartilhar()">🎬 Criar Vídeo para Stories</button>
         </div>
 
         <!-- TELA ERRO -->
@@ -261,12 +268,23 @@
     <!-- MODAL COMPARTILHAR -->
     <div class="share-modal" id="shareModal">
         <div class="share-modal-content">
-            <h3>📸 Compartilhe!</h3>
+            <h3>🎬 Momento épico!</h3>
             <div class="share-preview" id="sharePreview">
-                <div class="share-loading">⏳ Gerando imagem...</div>
+                <div class="share-status" id="shareStatus">
+                    <div class="spinner"></div>
+                    <span>Criando animação de abertura...</span>
+                    <div class="share-progress">
+                        <div class="share-progress-bar" id="progressBar"></div>
+                    </div>
+                </div>
             </div>
             <div class="share-btns">
-                <button class="btn-baixar-img" onclick="baixarImagem()">📥 Salvar Imagem</button>
+                <button class="btn-baixar-video" id="btnBaixarVideo" onclick="baixarVideo()" disabled>
+                    🎬 Baixar Vídeo (.webm)
+                </button>
+                <button class="btn-baixar-img" id="btnBaixarImg" onclick="baixarImagem()" disabled>
+                    📸 Baixar Imagem (.png)
+                </button>
                 <button class="btn-copiar-link" onclick="copiarLink()">🔗 Copiar Link</button>
                 <button class="btn-fechar-share" onclick="fecharCompartilhar()">✕ Fechar</button>
             </div>
@@ -300,7 +318,9 @@
         let isGuardiao = false;
         let countdownInterval = null;
         let isPlaying = false;
-        let imagemGeradaBlob = null;
+        let videoBlob = null;
+        let imagemBlob = null;
+        let fotoImg = null;
 
         const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
         const mostrarToast = (msg) => {
@@ -376,6 +396,13 @@
                 
                 const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
                 eventoData = evtSnap.val();
+                
+                // Pré-carregar foto
+                if (capsulaData.foto) {
+                    fotoImg = new Image();
+                    fotoImg.crossOrigin = 'anonymous';
+                    fotoImg.src = capsulaData.foto;
+                }
                 
                 if (capsulaData.aberta) { mostrarConteudo(); return; }
                 renderizarLacrada();
@@ -564,182 +591,562 @@
             mostrarToast('✓ Salvo!');
         }
 
-        // COMPARTILHAR
+        // ==========================================
+        // COMPARTILHAR - ANIMAÇÃO DE ABERTURA ÉPICA
+        // ==========================================
         async function abrirCompartilhar() {
             const modal = document.getElementById('shareModal');
-            const preview = document.getElementById('sharePreview');
             modal.classList.add('active');
-            preview.innerHTML = '<div class="share-loading">⏳ Gerando imagem...</div>';
+            
+            document.getElementById('btnBaixarVideo').disabled = true;
+            document.getElementById('btnBaixarImg').disabled = true;
+            document.getElementById('sharePreview').innerHTML = `
+                <div class="share-status" id="shareStatus">
+                    <div class="spinner"></div>
+                    <span>Criando animação épica de abertura...</span>
+                    <div class="share-progress">
+                        <div class="share-progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
             
             try {
-                await gerarImagemAberta();
+                await criarAnimacaoAbrir();
             } catch (err) {
-                console.error(err);
-                preview.innerHTML = '<div class="share-loading">❌ Erro</div>';
+                console.error('Erro na animação:', err);
+                await criarImagemEstatica();
             }
         }
 
-        async function gerarImagemAberta() {
+        async function criarAnimacaoAbrir() {
+            const preview = document.getElementById('sharePreview');
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const w = 1080, h = 1920;
-            canvas.width = w;
-            canvas.height = h;
+            
+            canvas.width = 1080;
+            canvas.height = 1920;
+            
+            preview.innerHTML = '';
+            preview.appendChild(canvas);
+            
+            // Dados
+            const nome = capsulaData.nome;
+            const palavra = capsulaData.perguntas?.palavra || '';
+            const felicidade = capsulaData.perguntas?.felicidade || 0;
+            const prioridades = (capsulaData.desejos || []).slice(0, 4).join(' • ');
+            const dataCriacao = formatarData(capsulaData.dataCriacao);
+            const dataAbertura = formatarData(new Date());
+            
+            // Elementos da animação
+            const confetes = [];
+            const particulas = [];
+            const fogos = [];
+            const estrelas = [];
+            
+            // Criar estrelas
+            for (let i = 0; i < 120; i++) {
+                estrelas.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    twinkle: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 0.1 + 0.05
+                });
+            }
+            
+            // Criar confetes
+            for (let i = 0; i < 100; i++) {
+                confetes.push({
+                    x: Math.random() * canvas.width,
+                    y: -100 - Math.random() * 800,
+                    size: Math.random() * 18 + 8,
+                    color: ['#ffd700', '#c41e3a', '#165b33', '#ff6b6b', '#4ecdc4', '#fff', '#ff69b4', '#00ffff'][Math.floor(Math.random() * 8)],
+                    speedY: Math.random() * 10 + 5,
+                    speedX: Math.random() * 6 - 3,
+                    rotation: Math.random() * 360,
+                    rotSpeed: Math.random() * 15 - 7.5
+                });
+            }
+            
+            // Criar partículas de explosão
+            for (let i = 0; i < 80; i++) {
+                const angle = (i / 80) * Math.PI * 2;
+                const speed = Math.random() * 25 + 10;
+                particulas.push({
+                    x: canvas.width / 2,
+                    y: 600,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    color: ['#ffd700', '#ff6b6b', '#4ecdc4', '#fff'][Math.floor(Math.random() * 4)],
+                    size: Math.random() * 8 + 4
+                });
+            }
+            
+            // Criar fogos de artifício
+            for (let i = 0; i < 5; i++) {
+                fogos.push({
+                    x: 200 + Math.random() * 680,
+                    y: 300 + Math.random() * 400,
+                    radius: 0,
+                    maxRadius: 150 + Math.random() * 100,
+                    color: ['#ffd700', '#ff6b6b', '#4ecdc4', '#ff69b4'][Math.floor(Math.random() * 4)],
+                    delay: i * 20,
+                    alpha: 0
+                });
+            }
+            
+            // Animação
+            let frame = 0;
+            const totalFrames = 210; // 3.5 segundos
+            const chunks = [];
+            
+            const stream = canvas.captureStream(30);
+            const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+            
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunks.push(e.data);
+            };
+            
+            recorder.onstop = () => {
+                videoBlob = new Blob(chunks, { type: 'video/webm' });
+                
+                canvas.toBlob((blob) => {
+                    imagemBlob = blob;
+                    document.getElementById('btnBaixarImg').disabled = false;
+                }, 'image/png');
+                
+                const videoUrl = URL.createObjectURL(videoBlob);
+                preview.innerHTML = `<video src="${videoUrl}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;border-radius:20px"></video>`;
+                
+                document.getElementById('btnBaixarVideo').disabled = false;
+                mostrarToast('🎬 Vídeo criado!');
+            };
+            
+            recorder.start();
+            
+            function animate() {
+                frame++;
+                const progress = frame / totalFrames;
+                document.getElementById('progressBar').style.width = (progress * 100) + '%';
+                
+                // Background épico
+                ctx.fillStyle = '#0a0e14';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Gradiente radial que pulsa
+                const pulseSize = 800 + Math.sin(frame * 0.1) * 100;
+                const bgGrad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, pulseSize);
+                bgGrad.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+                bgGrad.addColorStop(0.3, 'rgba(196, 30, 58, 0.1)');
+                bgGrad.addColorStop(0.6, 'rgba(22, 91, 51, 0.08)');
+                bgGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Estrelas com twinkle
+                estrelas.forEach(s => {
+                    s.twinkle += s.speed;
+                    const alpha = 0.3 + Math.sin(s.twinkle) * 0.7;
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Fase 1: Explosão inicial (frames 0-60)
+                if (frame < 60) {
+                    // Cápsula tremendo e explodindo
+                    const shake = Math.sin(frame * 0.8) * (10 - frame * 0.15);
+                    const scale = frame < 40 ? 1 : 1 + (frame - 40) * 0.05;
+                    const alpha = frame < 50 ? 1 : 1 - (frame - 50) * 0.1;
+                    
+                    ctx.save();
+                    ctx.translate(canvas.width/2 + shake, 600);
+                    ctx.scale(scale, scale);
+                    ctx.globalAlpha = alpha;
+                    ctx.font = '200px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🎁', 0, 0);
+                    ctx.restore();
+                    
+                    // Flash de explosão
+                    if (frame > 45 && frame < 60) {
+                        const flashAlpha = (frame - 45) / 15 * 0.8;
+                        ctx.fillStyle = `rgba(255,255,255,${flashAlpha})`;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                }
+                
+                // Fase 2: Partículas de explosão (frames 30-100)
+                if (frame > 30) {
+                    particulas.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.5; // Gravidade
+                        p.life -= 0.015;
+                        p.vx *= 0.98;
+                        
+                        if (p.life > 0) {
+                            ctx.globalAlpha = p.life;
+                            ctx.fillStyle = p.color;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                        }
+                    });
+                }
+                
+                // Fase 3: Fogos de artifício (frames 60-150)
+                if (frame > 60) {
+                    fogos.forEach((f, i) => {
+                        if (frame > 60 + f.delay) {
+                            f.radius += 8;
+                            f.alpha = f.radius < f.maxRadius * 0.5 ? f.radius / (f.maxRadius * 0.5) : 1 - (f.radius - f.maxRadius * 0.5) / (f.maxRadius * 0.5);
+                            
+                            if (f.alpha > 0) {
+                                // Círculo de fogo
+                                ctx.strokeStyle = f.color;
+                                ctx.lineWidth = 4;
+                                ctx.globalAlpha = f.alpha * 0.8;
+                                ctx.beginPath();
+                                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                                ctx.stroke();
+                                
+                                // Partículas do fogo
+                                for (let j = 0; j < 12; j++) {
+                                    const angle = (j / 12) * Math.PI * 2 + frame * 0.05;
+                                    const px = f.x + Math.cos(angle) * f.radius;
+                                    const py = f.y + Math.sin(angle) * f.radius;
+                                    ctx.fillStyle = f.color;
+                                    ctx.beginPath();
+                                    ctx.arc(px, py, 6, 0, Math.PI * 2);
+                                    ctx.fill();
+                                }
+                                ctx.globalAlpha = 1;
+                            }
+                        }
+                    });
+                }
+                
+                // Título CÁPSULA ABERTA com efeito de aparição
+                if (frame > 50) {
+                    const titleAlpha = Math.min(1, (frame - 50) / 30);
+                    const titleScale = 0.5 + titleAlpha * 0.5;
+                    
+                    ctx.save();
+                    ctx.translate(canvas.width/2, 200);
+                    ctx.scale(titleScale, titleScale);
+                    ctx.globalAlpha = titleAlpha;
+                    
+                    // Glow
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 40;
+                    ctx.font = 'bold 72px Arial';
+                    ctx.fillStyle = '#ffd700';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🎉 CÁPSULA ABERTA! 🎉', 0, 0);
+                    ctx.shadowBlur = 0;
+                    
+                    ctx.restore();
+                    
+                    // Subtítulo
+                    ctx.globalAlpha = titleAlpha;
+                    ctx.font = '36px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(eventoData?.nome || 'Cápsula do Tempo', canvas.width/2, 280);
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Foto circular com animação de revelação
+                if (frame > 80 && fotoImg && fotoImg.complete) {
+                    const fotoY = 500;
+                    const fotoSize = 300;
+                    const fotoAlpha = Math.min(1, (frame - 80) / 30);
+                    const fotoScale = 0.3 + fotoAlpha * 0.7;
+                    
+                    ctx.save();
+                    ctx.translate(canvas.width/2, fotoY);
+                    ctx.scale(fotoScale, fotoScale);
+                    ctx.globalAlpha = fotoAlpha;
+                    
+                    // Borda brilhante animada
+                    const hue = (frame * 3) % 360;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, fotoSize/2 + 20, 0, Math.PI * 2);
+                    const borderGrad = ctx.createLinearGradient(-200, 0, 200, 0);
+                    borderGrad.addColorStop(0, `hsl(${hue}, 100%, 60%)`);
+                    borderGrad.addColorStop(0.5, '#ffd700');
+                    borderGrad.addColorStop(1, `hsl(${(hue + 120) % 360}, 100%, 60%)`);
+                    ctx.fillStyle = borderGrad;
+                    ctx.fill();
+                    
+                    // Foto
+                    ctx.beginPath();
+                    ctx.arc(0, 0, fotoSize/2, 0, Math.PI * 2);
+                    ctx.clip();
+                    
+                    const imgRatio = fotoImg.width / fotoImg.height;
+                    let drawW = fotoSize, drawH = fotoSize;
+                    if (imgRatio > 1) drawW = fotoSize * imgRatio;
+                    else drawH = fotoSize / imgRatio;
+                    ctx.drawImage(fotoImg, -drawW/2, -drawH/2, drawW, drawH);
+                    
+                    ctx.restore();
+                }
+                
+                // Nome com typewriter
+                if (frame > 100) {
+                    const nameChars = Math.min(nome.length, Math.floor((frame - 100) / 2));
+                    ctx.font = 'bold 64px Arial';
+                    ctx.fillStyle = '#ffd700';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 25;
+                    ctx.fillText(nome.substring(0, nameChars), canvas.width/2, 720);
+                    ctx.shadowBlur = 0;
+                }
+                
+                // Datas
+                if (frame > 120) {
+                    ctx.font = '28px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.fillText(`Criada: ${dataCriacao}  →  Aberta: ${dataAbertura}`, canvas.width/2, 790);
+                }
+                
+                // Palavra do momento com destaque
+                if (frame > 140 && palavra) {
+                    ctx.font = '28px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.fillText('Palavra que me definia:', canvas.width/2, 880);
+                    
+                    const wordScale = 1 + Math.sin(frame * 0.1) * 0.05;
+                    ctx.save();
+                    ctx.translate(canvas.width/2, 950);
+                    ctx.scale(wordScale, wordScale);
+                    ctx.font = 'bold 52px Arial';
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillText(`"${palavra}"`, 0, 0);
+                    ctx.restore();
+                }
+                
+                // Felicidade com barra animada
+                if (frame > 160 && felicidade) {
+                    ctx.font = '28px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.fillText('Felicidade naquela época:', canvas.width/2, 1050);
+                    
+                    // Barra
+                    const barWidth = 500;
+                    const barX = (canvas.width - barWidth) / 2;
+                    const barY = 1090;
+                    const fillProgress = Math.min(1, (frame - 160) / 30);
+                    
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.fillRect(barX, barY, barWidth, 30);
+                    
+                    const fillGrad = ctx.createLinearGradient(barX, 0, barX + barWidth, 0);
+                    fillGrad.addColorStop(0, '#ffd700');
+                    fillGrad.addColorStop(1, '#ff6b6b');
+                    ctx.fillStyle = fillGrad;
+                    ctx.fillRect(barX, barY, barWidth * (felicidade / 10) * fillProgress, 30);
+                    
+                    ctx.font = 'bold 48px Arial';
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillText(`${felicidade}/10 ⭐`, canvas.width/2, 1180);
+                }
+                
+                // Prioridades
+                if (frame > 180 && prioridades) {
+                    ctx.font = '26px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.fillText('Minhas prioridades eram:', canvas.width/2, 1280);
+                    ctx.font = 'bold 30px Arial';
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillText(prioridades, canvas.width/2, 1330);
+                }
+                
+                // Confetes caindo (sempre após frame 60)
+                if (frame > 60) {
+                    confetes.forEach(c => {
+                        c.y += c.speedY;
+                        c.x += c.speedX;
+                        c.rotation += c.rotSpeed;
+                        
+                        if (c.y > canvas.height + 50) {
+                            c.y = -50;
+                            c.x = Math.random() * canvas.width;
+                        }
+                        
+                        ctx.save();
+                        ctx.translate(c.x, c.y);
+                        ctx.rotate(c.rotation * Math.PI / 180);
+                        ctx.fillStyle = c.color;
+                        ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                        ctx.restore();
+                    });
+                }
+                
+                // Rodapé
+                ctx.font = '28px Arial';
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.textAlign = 'center';
+                ctx.fillText('🎄 capsuladotempo.com 🎄', canvas.width/2, canvas.height - 60);
+                
+                // Continuar
+                if (frame < totalFrames) {
+                    requestAnimationFrame(animate);
+                } else {
+                    recorder.stop();
+                }
+            }
+            
+            animate();
+        }
+
+        async function criarImagemEstatica() {
+            const preview = document.getElementById('sharePreview');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 1080;
+            canvas.height = 1920;
             
             // Background
-            const bg = ctx.createLinearGradient(0, 0, w, h);
+            const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             bg.addColorStop(0, '#0a0e14');
             bg.addColorStop(0.3, '#1a3a1a');
-            bg.addColorStop(0.6, '#2a1a2a');
+            bg.addColorStop(0.7, '#2a1a2a');
             bg.addColorStop(1, '#0a0e14');
             ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, w, h);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             // Estrelas
             for (let i = 0; i < 150; i++) {
                 ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.8})`;
                 ctx.beginPath();
-                ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 1, 0, Math.PI * 2);
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2 + 1, 0, Math.PI * 2);
                 ctx.fill();
             }
             
-            // Confetes decorativos
-            const cores = ['#c41e3a', '#165b33', '#ffd700', '#ff6b6b', '#4ecdc4'];
-            for (let i = 0; i < 50; i++) {
+            // Confetes
+            const cores = ['#ffd700', '#c41e3a', '#165b33', '#ff6b6b', '#4ecdc4'];
+            for (let i = 0; i < 60; i++) {
                 ctx.fillStyle = cores[Math.floor(Math.random() * cores.length)];
-                ctx.fillRect(Math.random() * w, Math.random() * h, Math.random() * 15 + 5, Math.random() * 15 + 5);
+                ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 15 + 5, Math.random() * 15 + 5);
             }
             
-            // Emoji celebração
-            ctx.font = '100px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('🎉', w/2, 150);
-            
             // Título
-            ctx.font = 'bold 64px Arial, sans-serif';
+            ctx.font = 'bold 64px Arial';
             ctx.fillStyle = '#ffd700';
-            ctx.fillText('CÁPSULA ABERTA!', w/2, 280);
+            ctx.textAlign = 'center';
+            ctx.fillText('🎉 CÁPSULA ABERTA! 🎉', canvas.width/2, 180);
             
             // Subtítulo
-            ctx.font = '36px Arial, sans-serif';
+            ctx.font = '36px Arial';
             ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            ctx.fillText(eventoData?.nome || 'Cápsula do Tempo', w/2, 340);
+            ctx.fillText(eventoData?.nome || 'Cápsula do Tempo', canvas.width/2, 250);
             
             // Foto
-            const fotoY = 420;
-            const fotoSize = 300;
-            
-            // Borda
-            ctx.beginPath();
-            ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2 + 15, 0, Math.PI * 2);
-            const borderGrad = ctx.createLinearGradient(w/2 - 200, fotoY, w/2 + 200, fotoY + fotoSize);
-            borderGrad.addColorStop(0, '#ffd700');
-            borderGrad.addColorStop(0.5, '#fff');
-            borderGrad.addColorStop(1, '#ffd700');
-            ctx.fillStyle = borderGrad;
-            ctx.fill();
-            
-            if (capsulaData.foto) {
-                try {
-                    const img = await loadImage(capsulaData.foto);
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                    ctx.clip();
-                    const imgRatio = img.width / img.height;
-                    let drawW, drawH, drawX, drawY;
-                    if (imgRatio > 1) { drawH = fotoSize; drawW = fotoSize * imgRatio; drawX = w/2 - drawW/2; drawY = fotoY; }
-                    else { drawW = fotoSize; drawH = fotoSize / imgRatio; drawX = w/2 - fotoSize/2; drawY = fotoY - (drawH - fotoSize) / 2; }
-                    ctx.drawImage(img, drawX, drawY, drawW, drawH);
-                    ctx.restore();
-                } catch (e) {
-                    ctx.beginPath();
-                    ctx.arc(w/2, fotoY + fotoSize/2, fotoSize/2, 0, Math.PI * 2);
-                    ctx.fillStyle = '#333';
-                    ctx.fill();
-                    ctx.font = '80px Arial';
-                    ctx.fillText('👤', w/2, fotoY + fotoSize/2 + 30);
-                }
+            if (fotoImg && fotoImg.complete) {
+                const fotoY = 450;
+                const fotoSize = 280;
+                
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, fotoY, fotoSize/2 + 15, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffd700';
+                ctx.fill();
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(canvas.width/2, fotoY, fotoSize/2, 0, Math.PI * 2);
+                ctx.clip();
+                const imgRatio = fotoImg.width / fotoImg.height;
+                let drawW = fotoSize, drawH = fotoSize;
+                if (imgRatio > 1) drawW = fotoSize * imgRatio;
+                else drawH = fotoSize / imgRatio;
+                ctx.drawImage(fotoImg, canvas.width/2 - drawW/2, fotoY - drawH/2, drawW, drawH);
+                ctx.restore();
             }
             
             // Nome
-            ctx.font = 'bold 56px Arial, sans-serif';
+            ctx.font = 'bold 56px Arial';
             ctx.fillStyle = '#ffd700';
-            ctx.fillText(capsulaData.nome, w/2, fotoY + fotoSize + 70);
+            ctx.fillText(capsulaData.nome, canvas.width/2, 680);
             
             // Datas
-            ctx.font = '30px Arial, sans-serif';
+            ctx.font = '28px Arial';
             ctx.fillStyle = 'rgba(255,255,255,0.8)';
-            ctx.fillText(`Criada: ${formatarData(capsulaData.dataCriacao)}`, w/2, fotoY + fotoSize + 130);
-            ctx.fillText(`Aberta: ${formatarData(new Date())}`, w/2, fotoY + fotoSize + 175);
-            
-            let yPos = fotoY + fotoSize + 250;
+            ctx.fillText(`Criada: ${formatarData(capsulaData.dataCriacao)}`, canvas.width/2, 750);
+            ctx.fillText(`Aberta: ${formatarData(new Date())}`, canvas.width/2, 790);
             
             // Palavra
             if (capsulaData.perguntas?.palavra) {
-                ctx.font = '28px Arial, sans-serif';
+                ctx.font = '28px Arial';
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('Palavra que me definia:', w/2, yPos);
-                ctx.font = 'bold 48px Arial, sans-serif';
+                ctx.fillText('Palavra que me definia:', canvas.width/2, 880);
+                ctx.font = 'bold 48px Arial';
                 ctx.fillStyle = '#ffd700';
-                ctx.fillText(`"${capsulaData.perguntas.palavra}"`, w/2, yPos + 60);
-                yPos += 130;
+                ctx.fillText(`"${capsulaData.perguntas.palavra}"`, canvas.width/2, 940);
             }
             
             // Felicidade
             if (capsulaData.perguntas?.felicidade) {
-                ctx.font = '28px Arial, sans-serif';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('Felicidade naquela época:', w/2, yPos);
-                
-                // Barra
-                const barWidth = 400, barX = (w - barWidth) / 2;
-                yPos += 40;
+                const barWidth = 400;
+                const barX = (canvas.width - barWidth) / 2;
                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
-                ctx.fillRect(barX, yPos, barWidth, 25);
+                ctx.fillRect(barX, 1020, barWidth, 25);
                 ctx.fillStyle = '#ffd700';
-                ctx.fillRect(barX, yPos, barWidth * (capsulaData.perguntas.felicidade / 10), 25);
+                ctx.fillRect(barX, 1020, barWidth * (capsulaData.perguntas.felicidade / 10), 25);
                 
-                ctx.font = 'bold 40px Arial, sans-serif';
-                ctx.fillText(`${capsulaData.perguntas.felicidade}/10`, w/2, yPos + 80);
-                yPos += 130;
+                ctx.font = 'bold 40px Arial';
+                ctx.fillText(`${capsulaData.perguntas.felicidade}/10 ⭐`, canvas.width/2, 1100);
             }
             
             // Prioridades
             if (capsulaData.desejos?.length > 0) {
-                ctx.font = '26px Arial, sans-serif';
+                ctx.font = '28px Arial';
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.fillText('Minhas prioridades eram:', w/2, yPos);
-                ctx.font = 'bold 32px Arial, sans-serif';
+                ctx.fillText('Minhas prioridades eram:', canvas.width/2, 1200);
+                ctx.font = 'bold 30px Arial';
                 ctx.fillStyle = '#ffd700';
-                ctx.fillText(capsulaData.desejos.slice(0, 4).join(' • '), w/2, yPos + 45);
+                ctx.fillText(capsulaData.desejos.slice(0, 4).join(' • '), canvas.width/2, 1250);
             }
             
             // Rodapé
-            ctx.font = '26px Arial, sans-serif';
+            ctx.font = '28px Arial';
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.fillText('🎄 Cápsula do Tempo 🎄', w/2, h - 60);
+            ctx.fillText('🎄 capsuladotempo.com 🎄', canvas.width/2, canvas.height - 60);
             
+            // Converter
             canvas.toBlob((blob) => {
-                imagemGeradaBlob = blob;
+                imagemBlob = blob;
                 const url = URL.createObjectURL(blob);
-                document.getElementById('sharePreview').innerHTML = `<img src="${url}">`;
-            }, 'image/png', 1.0);
+                preview.innerHTML = `<img src="${url}" style="width:100%;height:auto">`;
+                document.getElementById('btnBaixarImg').disabled = false;
+                document.getElementById('btnBaixarVideo').disabled = true;
+                document.getElementById('progressBar').style.width = '100%';
+            }, 'image/png');
         }
 
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
+        function baixarVideo() {
+            if (!videoBlob) { mostrarToast('Aguarde...'); return; }
+            const url = URL.createObjectURL(videoBlob);
+            const link = document.createElement('a');
+            link.download = `capsula-aberta-${Date.now()}.webm`;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            mostrarToast('🎬 Vídeo salvo!');
         }
-
+        
         function baixarImagem() {
-            if (!imagemGeradaBlob) { mostrarToast('Aguarde...'); return; }
-            const url = URL.createObjectURL(imagemGeradaBlob);
+            if (!imagemBlob) { mostrarToast('Aguarde...'); return; }
+            const url = URL.createObjectURL(imagemBlob);
             const link = document.createElement('a');
             link.download = `capsula-aberta-${Date.now()}.png`;
             link.href = url;
@@ -747,7 +1154,7 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            mostrarToast('📥 Imagem salva!');
+            mostrarToast('📸 Imagem salva!');
         }
         
         function copiarLink() {
