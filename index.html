@@ -2,1243 +2,594 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎄 Cápsula do Tempo - Painel do Guardião</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Cápsula do Tempo - Painel do Guardião</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         :root {
-            --natal-red: #c41e3a;
-            --natal-green: #165b33;
-            --natal-gold: #ffd700;
-            --midnight: #0a0e14;
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #fbbf24;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --dark: #0f0f0f;
+            --card-bg: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(180deg, #0a0e14 0%, #1a2e1a 50%, #2a1a1a 100%);
+            font-family: 'Outfit', sans-serif;
+            background: var(--dark);
             min-height: 100vh;
             color: white;
             overflow-x: hidden;
         }
-        
-        h1, h2, h3 { font-family: 'Pacifico', cursive; }
 
-        /* PARTÍCULAS */
-        .particles {
+        .bg-animation {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
         }
         
-        .snowflake {
+        .bg-animation::before {
+            content: '';
             position: absolute;
-            top: -20px;
-            color: rgba(255,255,255,0.8);
-            animation: snowfall linear infinite;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
         }
         
-        @keyframes snowfall {
-            0% { transform: translateY(-10vh) rotate(0deg); }
-            100% { transform: translateY(110vh) rotate(360deg); }
-        }
-        
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle ease-in-out infinite;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-3%, -3%); }
         }
 
-        /* HEADER */
-        header {
-            position: sticky;
-            top: 0;
-            background: rgba(10,14,20,0.95);
-            backdrop-filter: blur(20px);
-            padding: 16px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            border-bottom: 2px solid rgba(255,215,0,0.3);
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 32px;
         }
         
         .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 28px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 24px;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
+            animation: float 3s ease-in-out infinite;
         }
         
-        .logo h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(135deg, var(--natal-gold), #ffaa00);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .logo-sub {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .btn-header {
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .btn-header:hover {
-            background: rgba(255,255,255,0.2);
+        .header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.95rem;
         }
 
-        /* TABS */
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .tab-btn {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7);
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--natal-gold), #ffaa00);
-            color: var(--midnight);
-            border-color: var(--natal-gold);
-        }
-        
-        .tab-badge {
-            background: var(--natal-red);
-            color: white;
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            animation: pulseBadge 2s infinite;
-        }
-        
-        @keyframes pulseBadge {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .tab-btn.active .tab-badge {
-            background: var(--midnight);
-            color: var(--natal-gold);
-        }
-
-        /* CONTAINER */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px 40px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .tab-panel {
+        /* Telas */
+        .tela {
             display: none;
-            animation: fadeIn 0.4s ease;
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        .tab-panel.active { display: block; }
+        .tela.active { display: block; }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* SEÇÃO CRIAR */
-        .section-criar {
-            background: rgba(255,255,255,0.05);
+        /* Login */
+        .login-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 32px;
-            margin-bottom: 32px;
-            border: 1px solid rgba(255,215,0,0.2);
-        }
-        
-        .section-title {
-            font-size: 1.6rem;
-            margin-bottom: 24px;
-            color: var(--natal-gold);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 20px;
-            align-items: end;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .form-group label {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .form-group input {
-            padding: 14px 18px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--natal-gold);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--natal-gold), #ffaa00);
-            color: var(--midnight);
-            border: none;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
-            transition: all 0.3s;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,215,0,0.4);
-        }
-
-        /* GRID DE EVENTOS */
-        .eventos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 24px;
-        }
-        
-        .evento-card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.4s;
-        }
-        
-        .evento-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--natal-gold);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        
-        .evento-card.arquivado { opacity: 0.7; }
-        
-        .evento-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        
-        .evento-nome {
-            font-size: 1.4rem;
-            color: var(--natal-gold);
-        }
-        
-        .evento-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-ativo {
-            background: rgba(22,91,51,0.3);
-            color: #4ade80;
-        }
-        
-        .status-arquivado {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.5);
-        }
-        
-        .qr-container {
-            background: white;
-            padding: 12px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-bottom: 16px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .qr-container:hover { transform: scale(1.05); }
-        
-        .evento-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 16px 0;
-        }
-        
-        .stat-item {
-            background: rgba(0,0,0,0.2);
-            padding: 12px;
-            border-radius: 10px;
+            padding: 40px 32px;
             text-align: center;
         }
         
-        .stat-value {
+        .login-box h2 {
+            font-family: 'Sora', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--natal-gold);
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .link-container {
-            display: flex;
-            gap: 8px;
-            margin: 12px 0;
-        }
-        
-        .link-input {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            background: rgba(0,0,0,0.3);
-            color: white;
-            font-size: 0.8rem;
-            font-family: monospace;
-        }
-        
-        .btn-sm {
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s;
-        }
-        
-        .btn-copy {
-            background: var(--natal-green);
-            color: white;
-        }
-        
-        .evento-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-action {
-            flex: 1;
-            min-width: 100px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s;
-        }
-        
-        .btn-fechar {
-            background: rgba(196,30,58,0.2);
-            border: 2px solid var(--natal-red);
-            color: var(--natal-red);
-        }
-        
-        .btn-fechar:hover {
-            background: var(--natal-red);
-            color: white;
-        }
-        
-        .btn-cerimonia {
-            background: rgba(255,215,0,0.2);
-            border: 2px solid var(--natal-gold);
-            color: var(--natal-gold);
-        }
-        
-        .btn-cerimonia:hover {
-            background: var(--natal-gold);
-            color: var(--midnight);
-        }
-        
-        .btn-lista {
-            background: rgba(22,91,51,0.2);
-            border: 2px solid var(--natal-green);
-            color: #4ade80;
-        }
-        
-        .btn-lista:hover {
-            background: var(--natal-green);
-            color: white;
-        }
-
-        /* PARTICIPANTES LIVE */
-        .participantes-live {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .participantes-title {
-            font-size: 1rem;
-            color: var(--natal-gold);
-            margin-bottom: 16px;
-        }
-        
-        .participantes-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        
-        .participante-mini {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.05);
-            padding: 8px 12px;
-            border-radius: 20px;
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .participante-foto {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid var(--natal-gold);
-        }
-        
-        .participante-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .participante-nome {
-            font-size: 0.85rem;
-        }
-
-        /* ========================================== */
-        /* NOTIFICAÇÃO NOVA CÁPSULA - FULLSCREEN */
-        /* ========================================== */
-        .notif-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, rgba(10,14,20,0.95), rgba(0,0,0,0.98));
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s;
-        }
-        
-        .notif-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .notif-foto {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 6px solid var(--natal-gold);
-            margin-bottom: 24px;
-            animation: notifZoom 0.8s ease-out;
-            box-shadow: 0 0 100px rgba(255,215,0,0.6);
-        }
-        
-        @keyframes notifZoom {
-            0% { transform: scale(0) rotate(-180deg); }
-            50% { transform: scale(1.2) rotate(10deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
-        
-        .notif-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .notif-foto-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--natal-red), var(--natal-green));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-        }
-        
-        .notif-nome {
-            font-family: 'Pacifico', cursive;
-            font-size: 3rem;
-            color: var(--natal-gold);
-            margin-bottom: 12px;
-            text-shadow: 0 0 40px rgba(255,215,0,0.8);
-            animation: notifSlide 0.6s ease-out 0.3s both;
-        }
-        
-        @keyframes notifSlide {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .notif-msg {
-            font-size: 1.5rem;
-            color: white;
-            animation: notifSlide 0.6s ease-out 0.5s both;
-        }
-        
-        .notif-desejos {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 24px;
-            max-width: 600px;
-            animation: notifSlide 0.6s ease-out 0.7s both;
-        }
-        
-        .notif-desejo {
-            background: rgba(255,215,0,0.2);
-            color: var(--natal-gold);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            border: 1px solid var(--natal-gold);
-        }
-
-        /* ========================================== */
-        /* CERIMÔNIA DE FECHAMENTO */
-        /* ========================================== */
-        .cerimonia-fechamento {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, #1a1a2e, #0a0e14);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s;
-            overflow: hidden;
-        }
-        
-        .cerimonia-fechamento.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .cerimonia-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 10;
-        }
-        
-        .cerimonia-titulo {
-            font-family: 'Pacifico', cursive;
-            font-size: 3rem;
-            color: var(--natal-gold);
-            margin-bottom: 40px;
-            text-shadow: 0 0 50px rgba(255,215,0,0.5);
-            animation: glowPulse 2s ease-in-out infinite;
-            z-index: 5;
-        }
-        
-        @keyframes glowPulse {
-            0%, 100% { text-shadow: 0 0 50px rgba(255,215,0,0.5); }
-            50% { text-shadow: 0 0 100px rgba(255,215,0,0.8); }
-        }
-        
-        .avatares-circulo {
-            position: relative;
-            width: 500px;
-            height: 500px;
-        }
-        
-        .avatar-circulo {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid var(--natal-gold);
-            box-shadow: 0 0 30px rgba(255,215,0,0.4);
-            animation: floatAvatar 3s ease-in-out infinite;
-        }
-        
-        @keyframes floatAvatar {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.1); }
-        }
-        
-        .avatar-circulo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .nuvem-palavras {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-        
-        .palavra-nuvem {
-            position: absolute;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            color: var(--natal-gold);
-            text-shadow: 0 0 20px rgba(255,215,0,0.5);
-            animation: palavraFloat 4s ease-in-out infinite;
-        }
-        
-        @keyframes palavraFloat {
-            0%, 100% { transform: translateY(0); opacity: 0.6; }
-            50% { transform: translateY(-15px); opacity: 1; }
-        }
-        
-        .cerimonia-contador {
-            margin-top: 40px;
-            text-align: center;
-            z-index: 5;
-        }
-        
-        .contador-valor {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 5rem;
-            font-weight: 900;
-            color: var(--natal-gold);
-            text-shadow: 0 0 30px rgba(255,215,0,0.5);
-        }
-        
-        .contador-label {
-            color: rgba(255,255,255,0.7);
-            font-size: 1.2rem;
-        }
-
-        /* ========================================== */
-        /* CERIMÔNIA DE ABERTURA - MARIO PARTY */
-        /* ========================================== */
-        .cerimonia-abertura {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, #1a1a2e, #0a0e14);
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s;
-            overflow: hidden;
-        }
-        
-        .cerimonia-abertura.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .abertura-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .abertura-titulo {
-            font-family: 'Pacifico', cursive;
-            font-size: 4rem;
-            color: var(--natal-gold);
-            text-shadow: 0 0 60px rgba(255,215,0,0.8);
-            animation: titlePop 1s ease-out;
-            z-index: 10;
-        }
-        
-        @keyframes titlePop {
-            0% { transform: scale(0) rotate(-10deg); }
-            50% { transform: scale(1.3) rotate(5deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
-        
-        .avatares-voando {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .avatar-voador {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid var(--natal-gold);
-            box-shadow: 0 0 50px rgba(255,215,0,0.5);
-        }
-        
-        .avatar-voador img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .avatar-voador.anim1 { animation: voar1 8s ease-in-out infinite; }
-        .avatar-voador.anim2 { animation: voar2 9s ease-in-out infinite; }
-        .avatar-voador.anim3 { animation: voar3 7s ease-in-out infinite; }
-        .avatar-voador.anim4 { animation: voar4 10s ease-in-out infinite; }
-        
-        @keyframes voar1 {
-            0%, 100% { transform: translate(0, 0) rotate(0) scale(1); }
-            25% { transform: translate(100px, -80px) rotate(15deg) scale(1.2); }
-            50% { transform: translate(50px, 60px) rotate(-10deg) scale(0.9); }
-            75% { transform: translate(-80px, -40px) rotate(5deg) scale(1.1); }
-        }
-        
-        @keyframes voar2 {
-            0%, 100% { transform: translate(0, 0) rotate(0) scale(1); }
-            25% { transform: translate(-120px, 60px) rotate(-20deg) scale(1.15); }
-            50% { transform: translate(80px, -50px) rotate(10deg) scale(0.95); }
-            75% { transform: translate(-40px, 80px) rotate(-5deg) scale(1.05); }
-        }
-        
-        @keyframes voar3 {
-            0%, 100% { transform: translate(0, 0) rotate(0) scale(1); }
-            25% { transform: translate(60px, 100px) rotate(10deg) scale(1.1); }
-            50% { transform: translate(-100px, -30px) rotate(-15deg) scale(0.85); }
-            75% { transform: translate(90px, -70px) rotate(8deg) scale(1.2); }
-        }
-        
-        @keyframes voar4 {
-            0%, 100% { transform: translate(0, 0) rotate(0) scale(1); }
-            25% { transform: translate(-80px, -90px) rotate(-12deg) scale(1.05); }
-            50% { transform: translate(120px, 40px) rotate(18deg) scale(0.9); }
-            75% { transform: translate(-60px, 60px) rotate(-8deg) scale(1.15); }
-        }
-        
-        .palavras-voando {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        
-        .palavra-voando {
-            position: absolute;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            color: rgba(255,215,0,0.8);
-            animation: palavraVoar 12s linear infinite;
-            text-shadow: 0 0 30px rgba(255,215,0,0.5);
-        }
-        
-        @keyframes palavraVoar {
-            0% { transform: translateY(100vh) rotate(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-        }
-        
-        .stats-finais {
-            background: rgba(0,0,0,0.6);
-            padding: 40px 60px;
-            border-radius: 24px;
-            margin-top: 40px;
-            text-align: center;
-            z-index: 10;
-            animation: statsUp 1s ease-out 0.5s both;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,215,0,0.3);
-        }
-        
-        @keyframes statsUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .stats-finais h3 {
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 24px;
-            font-family: 'Pacifico', cursive;
-            font-size: 1.5rem;
-        }
-        
-        .stats-grid {
-            display: flex;
-            gap: 50px;
-            justify-content: center;
-        }
-        
-        .stat-final {
-            text-align: center;
-        }
-        
-        .stat-final-valor {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--natal-gold);
-        }
-        
-        .stat-final-label {
-            color: rgba(255,255,255,0.6);
-        }
-
-        /* ========================================== */
-        /* TAB CERIMÔNIA - GERENCIAMENTO */
-        /* ========================================== */
-        .cerimonia-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .cerimonia-title {
-            font-size: 3rem;
-            color: var(--natal-gold);
-            text-shadow: 0 0 30px rgba(255,215,0,0.5);
-        }
-        
-        .cerimonia-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        
-        .cerimonia-stat {
-            text-align: center;
-        }
-        
-        .cerimonia-stat-value {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--natal-gold);
-            font-family: 'Orbitron', sans-serif;
-        }
-        
-        .cerimonia-stat-label {
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .cerimonia-actions {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .avatares-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-        }
-        
-        .avatar-card {
-            width: 180px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 16px;
-            text-align: center;
-            border: 2px solid rgba(255,255,255,0.1);
-            transition: all 0.4s;
-        }
-        
-        .avatar-card.aguardando {
-            filter: grayscale(0.3);
-        }
-        
-        .avatar-card.liberada {
-            border-color: var(--natal-gold);
-            animation: cardPulse 2s infinite;
-        }
-        
-        @keyframes cardPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
-            50% { box-shadow: 0 0 50px rgba(255,215,0,0.6); }
-        }
-        
-        .avatar-card.aberta {
-            border-color: var(--natal-green);
-            background: rgba(22,91,51,0.2);
-        }
-        
-        .avatar-foto {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            overflow: hidden;
-            border: 3px solid rgba(255,255,255,0.3);
-        }
-        
-        .avatar-foto img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--natal-red), var(--natal-green));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-        
-        .avatar-nome {
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 0.95rem;
-        }
-        
-        .avatar-status {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 10px;
-            display: inline-block;
             margin-bottom: 8px;
         }
         
-        .avatar-status.aguardando {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.6);
+        .login-box p {
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
         }
         
-        .avatar-status.liberada {
-            background: rgba(255,215,0,0.2);
-            color: var(--natal-gold);
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
         }
         
-        .avatar-status.aberta {
-            background: rgba(22,91,51,0.3);
-            color: #4ade80;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
         }
         
-        .avatar-desejos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            justify-content: center;
-            margin: 8px 0;
-        }
-        
-        .avatar-desejo-tag {
-            background: rgba(255,215,0,0.15);
-            color: var(--natal-gold);
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 8px;
-        }
-        
-        .avatar-btn {
-            margin-top: 10px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            font-family: 'Poppins', sans-serif;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
             transition: all 0.3s;
         }
         
-        .avatar-btn.liberar {
-            background: var(--natal-gold);
-            color: var(--midnight);
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
         }
         
-        .avatar-btn.ver {
-            background: var(--natal-green);
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 8px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
         }
 
-        /* MODAIS */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
+        /* Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card .value {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .stat-card.highlight {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.15));
+            border-color: rgba(99,102,241,0.3);
+        }
+        
+        .stat-card.highlight .value {
+            color: var(--primary);
+        }
+
+        /* Cards de Ação */
+        .action-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .action-card h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 500;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
+            gap: 10px;
         }
         
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .action-card h3 .emoji {
+            font-size: 1.3rem;
         }
-        
-        .modal {
-            background: linear-gradient(180deg, #1a2e1a, #0f1922);
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 700px;
-            width: 90%;
-            max-height: 85vh;
+
+        /* Lista de Cápsulas */
+        .capsulas-list {
+            max-height: 400px;
             overflow-y: auto;
-            border: 1px solid rgba(255,215,0,0.3);
-            transform: scale(0.9);
-            transition: all 0.3s;
         }
         
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--natal-gold);
-        }
-        
-        .btn-close {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        .btn-close:hover { background: var(--natal-red); }
-        
-        .lista-participantes {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .lista-item {
+        .capsula-item {
             display: flex;
             align-items: center;
             gap: 16px;
-            background: rgba(255,255,255,0.05);
             padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.02);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
         }
         
-        .lista-item-foto {
+        .capsula-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .capsula-avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            overflow: hidden;
-            border: 2px solid var(--natal-gold);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
             flex-shrink: 0;
+            overflow: hidden;
         }
         
-        .lista-item-foto img {
+        .capsula-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .lista-item-info { flex: 1; }
-        .lista-item-nome { font-weight: 600; }
-        .lista-item-status { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        
-        .busca-input {
-            width: 100%;
-            padding: 14px 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            margin-bottom: 20px;
+        .capsula-info {
+            flex: 1;
+            min-width: 0;
         }
         
-        .busca-input:focus {
-            outline: none;
-            border-color: var(--natal-gold);
+        .capsula-info .nome {
+            font-weight: 600;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .senha-modal .modal {
-            max-width: 400px;
+        .capsula-info .data {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .capsula-status {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .capsula-status.lacrada {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+        
+        .capsula-status.aberta {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+        
+        .empty-state {
             text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.4);
         }
         
-        .senha-input {
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        /* Link Box */
+        .link-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .link-box label {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+        
+        .link-box .link-content {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .link-box input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Space Grotesk', monospace;
+        }
+        
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .btn-copy:hover {
+            background: #5558e3;
+        }
+
+        /* Botões de Ação */
+        .btn-action {
             width: 100%;
             padding: 16px;
-            border: 2px solid rgba(255,255,255,0.2);
             border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+            border: none;
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        .btn-secondary:hover {
             background: rgba(255,255,255,0.1);
             color: white;
-            text-align: center;
-            font-size: 1.2rem;
-            font-family: 'Poppins', sans-serif;
-            margin: 20px 0;
-        }
-        
-        .senha-input:focus {
-            outline: none;
-            border-color: var(--natal-gold);
-        }
-        
-        .qr-modal .modal {
-            max-width: 420px;
-            text-align: center;
-        }
-        
-        .qr-ampliado {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            display: inline-block;
-            margin: 20px 0;
         }
 
-        /* CONFETES */
-        .confetes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 3000;
+        /* Seção de Criar Evento */
+        .create-section {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1));
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
         
-        .confete {
+        .create-section h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-label {
+            font-weight: 500;
+        }
+        
+        .toggle-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: var(--success);
+        }
+        
+        .toggle-switch::after {
+            content: '';
             position: absolute;
-            animation: confeteFall 3s ease-out forwards;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
         }
         
-        @keyframes confeteFall {
-            0% { transform: translateY(-100vh) rotate(0deg); }
-            100% { transform: translateY(110vh) rotate(720deg); }
+        .toggle-switch.active::after {
+            left: 27px;
         }
 
-        /* TOAST */
+        /* Navegação */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 6px;
+            background: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        /* Logout */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
-            bottom: 24px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: var(--natal-green);
-            color: white;
-            padding: 16px 28px;
-            border-radius: 12px;
-            font-weight: 500;
-            z-index: 4000;
+            background: rgba(255,255,255,0.95);
+            color: #111;
+            padding: 14px 24px;
+            border-radius: 100px;
+            font-weight: 600;
+            z-index: 3000;
             opacity: 0;
-            transition: all 0.4s;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         .toast.show {
@@ -1246,236 +597,255 @@
             opacity: 1;
         }
         
-        .toast.error { background: var(--natal-red); }
+        .toast.error {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .toast.success {
+            background: var(--success);
+            color: white;
+        }
 
-        /* ESTADOS VAZIOS */
-        .empty-state {
-            text-align: center;
-            padding: 60px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 24px;
-            border: 2px dashed rgba(255,255,255,0.2);
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        .empty-text {
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .loading {
-            display: flex;
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            padding: 40px;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: #1a1a2e;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .modal p {
             color: rgba(255,255,255,0.6);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: var(--natal-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
         }
         
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-buttons button {
+            flex: 1;
+        }
 
-        /* RESPONSIVO */
-        @media (max-width: 1024px) {
-            .container { padding: 20px; }
-            .form-grid { grid-template-columns: 1fr; }
-            .eventos-grid { grid-template-columns: 1fr; }
-        }
-        
-        @media (max-width: 768px) {
-            header {
-                padding: 12px 16px;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .logo h1 { font-size: 1.4rem; }
-            .tabs { flex-wrap: wrap; }
-            .cerimonia-title { font-size: 2rem; }
-            .avatar-card { width: 140px; }
-            .avatares-circulo { width: 300px; height: 300px; }
-            .cerimonia-titulo, .abertura-titulo { font-size: 2rem; }
-            .stats-grid { flex-direction: column; gap: 20px; }
-            .notif-foto { width: 150px; height: 150px; }
-            .notif-nome { font-size: 2rem; }
+        /* Responsivo */
+        @media (max-width: 500px) {
+            .container { padding: 16px; }
+            .header { padding: 30px 16px; }
+            .header h1 { font-size: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card .value { font-size: 2rem; }
+            .logout-btn { top: 10px; right: 10px; padding: 8px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    <div class="confetes" id="confetes"></div>
+    <div class="bg-animation"></div>
+    
+    <button class="logout-btn" id="logoutBtn" style="display:none" onclick="logout()">Sair</button>
 
-    <!-- NOTIFICAÇÃO NOVA CÁPSULA -->
-    <div class="notif-overlay" id="notifOverlay">
-        <div class="notif-foto" id="notifFoto"></div>
-        <h2 class="notif-nome" id="notifNome">Nome</h2>
-        <p class="notif-msg" id="notifMsg">✨ Lacrou sua cápsula! ✨</p>
-        <div class="notif-desejos" id="notifDesejos"></div>
-    </div>
-
-    <!-- CERIMÔNIA DE FECHAMENTO -->
-    <div class="cerimonia-fechamento" id="cerimoniaFechamento">
-        <button class="cerimonia-close" onclick="fecharCerimoniaFechamento()">×</button>
-        <h1 class="cerimonia-titulo" id="fechamentoTitulo">🔒 Lacrando Cápsulas...</h1>
-        <div class="avatares-circulo" id="avataresFechamento"></div>
-        <div class="nuvem-palavras" id="nuvemFechamento"></div>
-        <div class="cerimonia-contador">
-            <div class="contador-valor" id="contadorFechamento">0</div>
-            <div class="contador-label">cápsulas lacradas</div>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎁</div>
+            <h1>Cápsula do Tempo</h1>
+            <p>Painel do Guardião</p>
         </div>
-    </div>
 
-    <!-- CERIMÔNIA DE ABERTURA -->
-    <div class="cerimonia-abertura" id="cerimoniaAbertura">
-        <button class="cerimonia-close" onclick="fecharCerimoniaAbertura()">×</button>
-        <div class="abertura-container">
-            <div class="avatares-voando" id="avataresVoando"></div>
-            <div class="palavras-voando" id="palavrasVoando"></div>
-            <h1 class="abertura-titulo">🎉 Hora de Abrir!</h1>
-            <div class="stats-finais">
-                <h3>✨ Resumo do Evento ✨</h3>
+        <!-- TELA LOGIN -->
+        <div class="tela active" id="telaLogin">
+            <div class="login-box">
+                <h2>🔐 Área Restrita</h2>
+                <p>Digite a senha do guardião para acessar</p>
+                
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="senhaInput" placeholder="Digite a senha..." onkeypress="if(event.key==='Enter')login()">
+                </div>
+                
+                <button class="btn-primary" onclick="login()">Entrar</button>
+            </div>
+        </div>
+
+        <!-- TELA DASHBOARD -->
+        <div class="tela" id="telaDashboard">
+            <!-- Nav Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('eventos')">📅 Eventos</button>
+                <button class="nav-tab" onclick="showTab('capsulas')">💊 Cápsulas</button>
+            </div>
+
+            <!-- Tab Eventos -->
+            <div id="tabEventos">
+                <!-- Stats -->
                 <div class="stats-grid">
-                    <div class="stat-final">
-                        <div class="stat-final-valor" id="statCapsulas">0</div>
-                        <div class="stat-final-label">Cápsulas</div>
+                    <div class="stat-card highlight">
+                        <div class="value" id="totalEventos">0</div>
+                        <div class="label">Eventos</div>
                     </div>
-                    <div class="stat-final">
-                        <div class="stat-final-valor" id="statDesejos">0</div>
-                        <div class="stat-final-label">Desejos</div>
-                    </div>
-                    <div class="stat-final">
-                        <div class="stat-final-valor" id="statChars">0</div>
-                        <div class="stat-final-label">Caracteres</div>
+                    <div class="stat-card">
+                        <div class="value" id="totalCapsulas">0</div>
+                        <div class="label">Cápsulas</div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- HEADER -->
-    <header>
-        <div class="logo">
-            <span style="font-size:1.6rem">🎄</span>
-            <div>
-                <h1>Cápsula do Tempo</h1>
-                <p class="logo-sub">Painel do Guardião</p>
-            </div>
-            <span style="font-size:1.6rem">🎊</span>
-        </div>
-        <button class="btn-header" onclick="abrirBusca()">🔍 Recuperar Link</button>
-    </header>
-
-    <!-- TABS -->
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="eventos" onclick="trocarTab('eventos')">📦 Eventos</button>
-        <button class="tab-btn" data-tab="cerimonia" onclick="trocarTab('cerimonia')">
-            🎉 Cerimônia 
-            <span class="tab-badge" id="badgeCaps">0</span>
-        </button>
-    </div>
-
-    <!-- CONTAINER -->
-    <div class="container">
-        <!-- PANEL EVENTOS -->
-        <div class="tab-panel active" id="panelEventos">
-            <section class="section-criar">
-                <h2 class="section-title">➕ Criar Novo Evento</h2>
-                <form class="form-grid" onsubmit="criarEvento(event)">
+                <!-- Criar Evento -->
+                <div class="create-section">
+                    <h3><span class="emoji">✨</span> Criar Novo Evento</h3>
+                    
                     <div class="form-group">
                         <label>Nome do Evento</label>
-                        <input type="text" id="nomeEvento" placeholder='ex: "Natal 2024"' required>
+                        <input type="text" id="nomeEvento" placeholder="Ex: Natal 2024, Ano Novo...">
                     </div>
+                    
                     <div class="form-group">
                         <label>Data de Abertura</label>
-                        <input type="date" id="dataAbertura" required>
+                        <input type="date" id="dataEvento">
                     </div>
-                    <button type="submit" class="btn-primary" id="btnCriar">🎁 CRIAR</button>
-                </form>
-            </section>
+                    
+                    <button class="btn-primary" onclick="criarEvento()">Criar Evento</button>
+                </div>
+
+                <!-- Lista de Eventos -->
+                <div class="action-card">
+                    <h3><span class="emoji">📋</span> Seus Eventos</h3>
+                    <div id="listaEventos" class="capsulas-list">
+                        <div class="empty-state">
+                            <div class="emoji">📭</div>
+                            <p>Nenhum evento criado ainda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Cápsulas -->
+            <div id="tabCapsulas" style="display:none">
+                <div class="action-card">
+                    <h3><span class="emoji">💊</span> Todas as Cápsulas</h3>
+                    
+                    <div class="form-group" style="margin-bottom:16px">
+                        <select id="filtroEvento" onchange="filtrarCapsulas()">
+                            <option value="">Todos os eventos</option>
+                        </select>
+                    </div>
+                    
+                    <div id="listaCapsulas" class="capsulas-list">
+                        <div class="empty-state">
+                            <div class="emoji">📭</div>
+                            <p>Nenhuma cápsula criada ainda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA EVENTO -->
+        <div class="tela" id="telaEvento">
+            <button class="btn-secondary" onclick="voltarDashboard()" style="margin-bottom:24px;width:auto;padding:12px 20px">
+                ← Voltar
+            </button>
             
-            <div id="eventosContainer">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <span>Carregando eventos...</span>
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">📅</span> <span id="eventoNome">Evento</span></h3>
+                <p style="color:rgba(255,255,255,0.5);margin-bottom:16px">
+                    Abertura: <strong id="eventoData">--/--/----</strong>
+                </p>
+                
+                <div class="link-box">
+                    <label>Link para participantes</label>
+                    <div class="link-content">
+                        <input type="text" id="linkEvento" readonly>
+                        <button class="btn-copy" onclick="copiarLink()">Copiar</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- PANEL CERIMÔNIA -->
-        <div class="tab-panel" id="panelCerimonia">
-            <div id="cerimoniaContainer">
-                <div class="empty-state">
-                    <div class="empty-icon">🎭</div>
-                    <p class="empty-text">Selecione um evento para gerenciar a cerimônia</p>
+            
+            <!-- Ações do Evento -->
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">⚙️</span> Configurações</h3>
+                
+                <div class="toggle-row">
+                    <div>
+                        <div class="toggle-label">Liberar cápsulas</div>
+                        <div class="toggle-desc">Permitir abertura antecipada</div>
+                    </div>
+                    <div class="toggle-switch" id="toggleLiberar" onclick="toggleLiberacao()"></div>
                 </div>
             </div>
+            
+            <!-- Cápsulas do Evento -->
+            <div class="action-card" style="margin-bottom:24px">
+                <h3><span class="emoji">💊</span> Cápsulas (<span id="eventoTotalCapsulas">0</span>)</h3>
+                <div id="eventoCapsulas" class="capsulas-list">
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula ainda</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações Perigosas -->
+            <div class="action-card">
+                <h3><span class="emoji">⚠️</span> Zona de Perigo</h3>
+                <button class="btn-action btn-danger" onclick="confirmarArquivar()">
+                    🗑️ Arquivar Evento
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAIS -->
-    <div class="modal-overlay" id="modalBusca">
+    <!-- Modal Confirmação -->
+    <div class="modal-overlay" id="modalConfirm">
         <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">🔍 Recuperar Link por Nome</h3>
-                <button class="btn-close" onclick="fecharModal('modalBusca')">×</button>
+            <h3>⚠️ Tem certeza?</h3>
+            <p id="modalMsg">Esta ação não pode ser desfeita.</p>
+            <div class="modal-buttons">
+                <button class="btn-action btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-action btn-danger" id="modalConfirmBtn">Confirmar</button>
             </div>
-            <input type="text" class="busca-input" id="buscaInput" placeholder="Digite nome ou sobrenome..." oninput="buscarCapsulas()">
-            <div class="lista-participantes" id="buscaResultados">
-                <p style="text-align:center;color:rgba(255,255,255,0.5)">Digite para buscar...</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modalLista">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">📋 Lista de Participantes</h3>
-                <button class="btn-close" onclick="fecharModal('modalLista')">×</button>
-            </div>
-            <div class="lista-participantes" id="listaParticipantes"></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay qr-modal" id="modalQR">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="qrTitulo">QR Code</h3>
-                <button class="btn-close" onclick="fecharModal('modalQR')">×</button>
-            </div>
-            <div class="qr-ampliado" id="qrAmpliado"></div>
-            <p style="color:rgba(255,255,255,0.6)">📱 Escaneie para participar</p>
-        </div>
-    </div>
-
-    <div class="modal-overlay senha-modal" id="modalSenha">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title">🔐 Senha do Guardião</h3>
-                <button class="btn-close" onclick="fecharModal('modalSenha')">×</button>
-            </div>
-            <p style="color:rgba(255,255,255,0.7)">Digite a senha para liberar:</p>
-            <input type="password" class="senha-input" id="senhaInput" placeholder="••••••••" onkeypress="if(event.key==='Enter')verificarSenha()">
-            <button class="btn-primary" onclick="verificarSenha()" style="width:100%">🔓 LIBERAR</button>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO FIREBASE
-        // ==========================================
+        // Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
             authDomain: "capsuladotempo-f86bf.firebaseapp.com",
@@ -1489,804 +859,296 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // ==========================================
-        // VARIÁVEIS GLOBAIS
-        // ==========================================
+        // Config
         const SENHA_GUARDIAO = 'otacilia';
-        let eventosData = {};
-        let capsulasData = {};
-        let capsulasAnteriores = {};
-        let eventoCerimoniaId = null;
-        let capsulaParaLiberar = null;
-        let primeiraCarrega = true;
+        let eventoAtual = null;
+        let eventos = {};
+        let capsulas = {};
 
-        // ==========================================
-        // FUNÇÕES UTILITÁRIAS
-        // ==========================================
-        const gerarID = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Utils
         const formatarData = (d) => new Date(d).toLocaleDateString('pt-BR');
         
-        const mostrarToast = (msg, tipo = 'success') => {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast show' + (tipo === 'error' ? ' error' : '');
-            setTimeout(() => toast.className = 'toast', 3000);
+        const toast = (msg, tipo = '') => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + tipo;
+            setTimeout(() => t.className = 'toast', 3000);
         };
 
-        const copiarLink = async (link) => {
-            try {
-                await navigator.clipboard.writeText(link);
-                mostrarToast('✓ Link copiado!');
-            } catch {
-                const input = document.createElement('input');
-                input.value = link;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                document.body.removeChild(input);
-                mostrarToast('✓ Link copiado!');
-            }
-        };
-
-        const getBaseUrl = () => {
-            return window.location.origin + window.location.pathname.replace('index.html', '');
-        };
-
-        // ==========================================
-        // PARTÍCULAS DE FUNDO
-        // ==========================================
-        function criarParticulas() {
-            const container = document.getElementById('particles');
-            
-            // Flocos de neve
-            const flocos = ['❄', '❅', '❆', '✧'];
-            flocos.forEach(floco => {
-                for (let i = 0; i < 8; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'snowflake';
-                    el.textContent = floco;
-                    el.style.left = Math.random() * 100 + 'vw';
-                    el.style.animationDuration = (8 + Math.random() * 5) + 's';
-                    el.style.animationDelay = Math.random() * 10 + 's';
-                    el.style.fontSize = (0.5 + Math.random() * 0.8) + 'rem';
-                    container.appendChild(el);
-                }
-            });
-            
-            // Estrelas
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + 'vw';
-                star.style.top = Math.random() * 100 + 'vh';
-                const size = 1 + Math.random() * 3;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                star.style.animationDuration = (2 + Math.random() * 3) + 's';
-                star.style.animationDelay = Math.random() * 5 + 's';
-                container.appendChild(star);
-            }
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        // ==========================================
-        // CONFETES
-        // ==========================================
-        function criarConfetes() {
-            const container = document.getElementById('confetes');
-            container.innerHTML = '';
+        function showTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
             
-            const cores = ['#c41e3a', '#165b33', '#ffd700', '#fff', '#ff6b6b', '#4ecdc4', '#ff69b4'];
-            
-            for (let i = 0; i < 150; i++) {
-                const confete = document.createElement('div');
-                confete.className = 'confete';
-                confete.style.left = Math.random() * 100 + 'vw';
-                confete.style.background = cores[Math.floor(Math.random() * cores.length)];
-                confete.style.animationDelay = Math.random() * 2 + 's';
-                const size = 5 + Math.random() * 10;
-                confete.style.width = size + 'px';
-                confete.style.height = size + 'px';
-                confete.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                container.appendChild(confete);
-            }
+            document.getElementById('tabEventos').style.display = tab === 'eventos' ? 'block' : 'none';
+            document.getElementById('tabCapsulas').style.display = tab === 'capsulas' ? 'block' : 'none';
         }
 
-        // ==========================================
-        // TABS
-        // ==========================================
-        function trocarTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tab);
-            });
-            document.querySelectorAll('.tab-panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-            });
-        }
-
-        // ==========================================
-        // NOTIFICAÇÃO DE NOVA CÁPSULA
-        // ==========================================
-        function mostrarNotificacaoNovaCapsula(capsula, tipo = 'lacrou') {
-            const overlay = document.getElementById('notifOverlay');
-            const fotoEl = document.getElementById('notifFoto');
-            const nomeEl = document.getElementById('notifNome');
-            const msgEl = document.getElementById('notifMsg');
-            const desejosEl = document.getElementById('notifDesejos');
-            
-            // Foto
-            if (capsula.foto) {
-                fotoEl.innerHTML = `<img src="${capsula.foto}" alt="${capsula.nome}">`;
-            } else {
-                fotoEl.innerHTML = '<div class="notif-foto-placeholder">👤</div>';
-            }
-            
-            // Nome
-            nomeEl.textContent = `${capsula.nome} ${capsula.sobrenome}`;
-            
-            // Mensagem
-            msgEl.textContent = tipo === 'lacrou' ? '✨ Lacrou sua cápsula! ✨' : '✨ Abriu sua cápsula! ✨';
-            
-            // Desejos
-            desejosEl.innerHTML = '';
-            if (capsula.desejos && capsula.desejos.length > 0) {
-                capsula.desejos.forEach(desejo => {
-                    const tag = document.createElement('span');
-                    tag.className = 'notif-desejo';
-                    tag.textContent = desejo;
-                    desejosEl.appendChild(tag);
-                });
-            }
-            
-            // Mostrar overlay
-            overlay.classList.add('active');
-            criarConfetes();
-            
-            // Fechar automaticamente após 6 segundos
-            setTimeout(() => {
-                overlay.classList.remove('active');
-            }, 6000);
-        }
-
-        // ==========================================
-        // CERIMÔNIA DE FECHAMENTO
-        // ==========================================
-        async function iniciarCerimoniaFechamento(eventoId) {
-            const capsulas = Object.entries(capsulasData)
-                .filter(([id, cap]) => cap.eventoId === eventoId)
-                .map(([id, cap]) => ({ id, ...cap }));
-            
-            if (capsulas.length === 0) {
-                mostrarToast('Nenhuma cápsula para lacrar!', 'error');
-                return;
-            }
-            
-            if (!confirm(`Lacrar ${capsulas.length} cápsulas? Isso iniciará a cerimônia de fechamento!`)) {
-                return;
-            }
-            
-            const overlay = document.getElementById('cerimoniaFechamento');
-            const avataresContainer = document.getElementById('avataresFechamento');
-            const nuvemContainer = document.getElementById('nuvemFechamento');
-            const contador = document.getElementById('contadorFechamento');
-            
-            // Limpar
-            avataresContainer.innerHTML = '';
-            nuvemContainer.innerHTML = '';
-            contador.textContent = '0';
-            
-            // Posicionar avatares em círculo
-            const raio = 180;
-            capsulas.forEach((cap, i) => {
-                const angle = (i / capsulas.length) * 2 * Math.PI - Math.PI / 2;
-                const x = 250 + raio * Math.cos(angle) - 40;
-                const y = 250 + raio * Math.sin(angle) - 40;
-                
-                const avatar = document.createElement('div');
-                avatar.className = 'avatar-circulo';
-                avatar.style.left = x + 'px';
-                avatar.style.top = y + 'px';
-                avatar.style.animationDelay = (i * 0.2) + 's';
-                
-                if (cap.foto) {
-                    avatar.innerHTML = `<img src="${cap.foto}" alt="${cap.nome}">`;
-                } else {
-                    avatar.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:2rem">👤</div>';
-                }
-                
-                avataresContainer.appendChild(avatar);
-            });
-            
-            // Criar nuvem de palavras (top 10 desejos)
-            const todosDesejos = capsulas.flatMap(c => c.desejos || []);
-            const contagem = {};
-            todosDesejos.forEach(d => contagem[d] = (contagem[d] || 0) + 1);
-            
-            const top10 = Object.entries(contagem)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-            
-            top10.forEach(([desejo, count], i) => {
-                const palavra = document.createElement('div');
-                palavra.className = 'palavra-nuvem';
-                palavra.textContent = desejo;
-                palavra.style.fontSize = (1 + count * 0.3) + 'rem';
-                palavra.style.left = (15 + Math.random() * 70) + '%';
-                palavra.style.top = (15 + Math.random() * 70) + '%';
-                palavra.style.animationDelay = (i * 0.4) + 's';
-                nuvemContainer.appendChild(palavra);
-            });
-            
-            // Mostrar cerimônia
-            overlay.classList.add('active');
-            criarConfetes();
-            
-            // Animar contador
-            let count = 0;
-            const interval = setInterval(() => {
-                count++;
-                contador.textContent = count;
-                if (count >= capsulas.length) {
-                    clearInterval(interval);
-                }
-            }, 150);
-            
-            // Após animação, arquivar evento
-            setTimeout(async () => {
-                await database.ref(`eventos/${eventoId}/arquivado`).set(true);
-                mostrarToast('✅ Evento lacrado com sucesso!');
-            }, capsulas.length * 150 + 2000);
-        }
-
-        function fecharCerimoniaFechamento() {
-            document.getElementById('cerimoniaFechamento').classList.remove('active');
-        }
-
-        // ==========================================
-        // CERIMÔNIA DE ABERTURA - MARIO PARTY
-        // ==========================================
-        function iniciarCerimoniaAbertura(eventoId) {
-            const capsulas = Object.entries(capsulasData)
-                .filter(([id, cap]) => cap.eventoId === eventoId)
-                .map(([id, cap]) => ({ id, ...cap }));
-            
-            if (capsulas.length === 0) {
-                mostrarToast('Nenhuma cápsula neste evento!', 'error');
-                return;
-            }
-            
-            const overlay = document.getElementById('cerimoniaAbertura');
-            const avataresContainer = document.getElementById('avataresVoando');
-            const palavrasContainer = document.getElementById('palavrasVoando');
-            
-            // Limpar
-            avataresContainer.innerHTML = '';
-            palavrasContainer.innerHTML = '';
-            
-            // Avatares voando estilo Mario Party
-            const animacoes = ['anim1', 'anim2', 'anim3', 'anim4'];
-            capsulas.forEach((cap, i) => {
-                const avatar = document.createElement('div');
-                avatar.className = `avatar-voador ${animacoes[i % 4]}`;
-                avatar.style.left = (5 + Math.random() * 75) + '%';
-                avatar.style.top = (5 + Math.random() * 75) + '%';
-                avatar.style.animationDelay = (i * 0.3) + 's';
-                avatar.style.animationDuration = (6 + Math.random() * 4) + 's';
-                
-                if (cap.foto) {
-                    avatar.innerHTML = `<img src="${cap.foto}" alt="${cap.nome}">`;
-                } else {
-                    avatar.innerHTML = '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:3rem">👤</div>';
-                }
-                
-                avataresContainer.appendChild(avatar);
-            });
-            
-            // Palavras voando (top 15 desejos)
-            const todosDesejos = capsulas.flatMap(c => c.desejos || []);
-            const contagem = {};
-            todosDesejos.forEach(d => contagem[d] = (contagem[d] || 0) + 1);
-            
-            const top15 = Object.entries(contagem)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 15);
-            
-            top15.forEach(([desejo, count], i) => {
-                const palavra = document.createElement('div');
-                palavra.className = 'palavra-voando';
-                palavra.textContent = desejo;
-                palavra.style.fontSize = (1.5 + count * 0.4) + 'rem';
-                palavra.style.left = (5 + Math.random() * 90) + '%';
-                palavra.style.animationDelay = (i * 1.2) + 's';
-                palavrasContainer.appendChild(palavra);
-            });
-            
-            // Stats
-            document.getElementById('statCapsulas').textContent = capsulas.length;
-            document.getElementById('statDesejos').textContent = todosDesejos.length;
-            document.getElementById('statChars').textContent = capsulas.reduce((sum, c) => sum + (c.mensagemPessoal?.length || 0), 0).toLocaleString();
-            
-            // Mostrar cerimônia
-            overlay.classList.add('active');
-            criarConfetes();
-            
-            // Após 20 segundos, redirecionar para gerenciamento
-            setTimeout(() => {
-                gerenciarEvento(eventoId);
-            }, 20000);
-        }
-
-        function fecharCerimoniaAbertura() {
-            document.getElementById('cerimoniaAbertura').classList.remove('active');
-        }
-
-        // ==========================================
-        // GERENCIAR EVENTO (Tab Cerimônia)
-        // ==========================================
-        function gerenciarEvento(eventoId) {
-            document.getElementById('cerimoniaAbertura').classList.remove('active');
-            eventoCerimoniaId = eventoId;
-            trocarTab('cerimonia');
-            renderizarCerimonia(eventoId);
-        }
-
-        function renderizarCerimonia(eventoId) {
-            const container = document.getElementById('cerimoniaContainer');
-            const evento = eventosData[eventoId];
-            
-            if (!evento) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p class="empty-text">Evento não encontrado</p></div>';
-                return;
-            }
-            
-            const capsulas = Object.entries(capsulasData)
-                .filter(([id, cap]) => cap.eventoId === eventoId)
-                .map(([id, cap]) => ({ id, ...cap }));
-            
-            const total = capsulas.length;
-            const liberadas = capsulas.filter(c => c.liberada).length;
-            const abertas = capsulas.filter(c => c.aberta).length;
-            
-            container.innerHTML = `
-                <div class="cerimonia-header">
-                    <h1 class="cerimonia-title">🎉 ${evento.nome}</h1>
-                </div>
-                
-                <div class="cerimonia-stats">
-                    <div class="cerimonia-stat">
-                        <div class="cerimonia-stat-value">${total}</div>
-                        <div class="cerimonia-stat-label">Total</div>
-                    </div>
-                    <div class="cerimonia-stat">
-                        <div class="cerimonia-stat-value">${liberadas}</div>
-                        <div class="cerimonia-stat-label">Liberadas</div>
-                    </div>
-                    <div class="cerimonia-stat">
-                        <div class="cerimonia-stat-value">${abertas}</div>
-                        <div class="cerimonia-stat-label">Abertas</div>
-                    </div>
-                </div>
-                
-                <div class="cerimonia-actions">
-                    <button class="btn-primary" onclick="liberarTodas('${eventoId}')">🔓 Liberar Todas</button>
-                    ${evento.arquivado ? `<button class="btn-primary" onclick="iniciarCerimoniaAbertura('${eventoId}')" style="background:var(--natal-red)">🎊 Replay Animação</button>` : ''}
-                </div>
-                
-                <div class="avatares-grid" id="avataresGrid"></div>
-            `;
-            
-            const grid = document.getElementById('avataresGrid');
-            
-            if (capsulas.length === 0) {
-                grid.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;width:100%">Nenhuma cápsula ainda</p>';
-                return;
-            }
-            
-            capsulas.forEach(cap => {
-                const status = cap.aberta ? 'aberta' : (cap.liberada ? 'liberada' : 'aguardando');
-                const statusLabel = cap.aberta ? '✅ Aberta' : (cap.liberada ? '🔓 Liberada' : '🔒 Aguardando');
-                
-                const card = document.createElement('div');
-                card.className = `avatar-card ${status}`;
-                
-                card.innerHTML = `
-                    <div class="avatar-foto">
-                        ${cap.foto ? `<img src="${cap.foto}" alt="${cap.nome}">` : '<div class="avatar-placeholder">👤</div>'}
-                    </div>
-                    <div class="avatar-nome">${cap.nome} ${cap.sobrenome}</div>
-                    <div class="avatar-status ${status}">${statusLabel}</div>
-                    ${cap.desejos && cap.desejos.length > 0 ? `
-                        <div class="avatar-desejos">
-                            ${cap.desejos.slice(0, 3).map(d => `<span class="avatar-desejo-tag">${d}</span>`).join('')}
-                        </div>
-                    ` : ''}
-                    ${cap.aberta 
-                        ? `<button class="avatar-btn ver" onclick="verCapsula('${cap.id}')">👁️ Ver Cápsula</button>`
-                        : `<button class="avatar-btn liberar" onclick="solicitarSenha('${cap.id}')">${cap.liberada ? '✨ Já liberada' : '🔓 Liberar'}</button>`
-                    }
-                `;
-                
-                grid.appendChild(card);
-            });
-        }
-
-        // ==========================================
-        // SISTEMA DE LIBERAÇÃO
-        // ==========================================
-        async function liberarTodas(eventoId) {
-            const senha = prompt('Digite a senha do guardião:');
-            if (!senha || senha.toLowerCase() !== SENHA_GUARDIAO) {
-                mostrarToast('Senha incorreta!', 'error');
-                return;
-            }
-            
-            const capsulas = Object.entries(capsulasData)
-                .filter(([id, cap]) => cap.eventoId === eventoId && !cap.liberada);
-            
-            for (const [id] of capsulas) {
-                await database.ref(`capsulas/${id}/liberada`).set(true);
-            }
-            
-            mostrarToast(`🔓 ${capsulas.length} cápsulas liberadas!`);
-            criarConfetes();
-        }
-
-        function solicitarSenha(capsulaId) {
-            capsulaParaLiberar = capsulaId;
-            document.getElementById('senhaInput').value = '';
-            document.getElementById('modalSenha').classList.add('active');
-            document.getElementById('senhaInput').focus();
-        }
-
-        async function verificarSenha() {
+        // Login
+        function login() {
             const senha = document.getElementById('senhaInput').value;
-            
-            if (senha.toLowerCase() === SENHA_GUARDIAO) {
-                await database.ref(`capsulas/${capsulaParaLiberar}/liberada`).set(true);
-                fecharModal('modalSenha');
-                mostrarToast('🔓 Cápsula liberada!');
-                criarConfetes();
+            if (senha === SENHA_GUARDIAO) {
+                mostrarTela('telaDashboard');
+                document.getElementById('logoutBtn').style.display = 'block';
+                carregarDados();
+                toast('Bem-vindo, Guardião! 🎉', 'success');
             } else {
-                mostrarToast('Senha incorreta!', 'error');
+                toast('Senha incorreta', 'error');
             }
         }
 
-        function verCapsula(id) {
-            window.open(`${getBaseUrl()}capsula.html?id=${id}&guardiao=true`, '_blank');
+        function logout() {
+            mostrarTela('telaLogin');
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('senhaInput').value = '';
         }
 
-        // ==========================================
-        // LISTA E BUSCA DE PARTICIPANTES
-        // ==========================================
-        function verLista(eventoId) {
-            const capsulas = Object.entries(capsulasData)
-                .filter(([id, cap]) => cap.eventoId === eventoId)
-                .map(([id, cap]) => ({ id, ...cap }));
+        // Carregar Dados
+        function carregarDados() {
+            // Eventos
+            database.ref('eventos').on('value', (snap) => {
+                eventos = snap.val() || {};
+                renderizarEventos();
+                atualizarFiltro();
+            });
             
-            const container = document.getElementById('listaParticipantes');
+            // Cápsulas
+            database.ref('capsulas').on('value', (snap) => {
+                capsulas = snap.val() || {};
+                renderizarCapsulas();
+                atualizarStats();
+                
+                if (eventoAtual) {
+                    renderizarCapsulasEvento();
+                }
+            });
+        }
+
+        function atualizarStats() {
+            const eventosAtivos = Object.values(eventos).filter(e => !e.arquivado).length;
+            const totalCaps = Object.keys(capsulas).length;
             
-            if (capsulas.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Nenhum participante ainda</p>';
-            } else {
-                container.innerHTML = capsulas.map(cap => `
-                    <div class="lista-item">
-                        <div class="lista-item-foto">
-                            ${cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center">👤</div>'}
-                        </div>
-                        <div class="lista-item-info">
-                            <div class="lista-item-nome">${cap.nome} ${cap.sobrenome}</div>
-                            <div class="lista-item-status">${cap.aberta ? '✅ Aberta' : (cap.liberada ? '🔓 Liberada' : '🔒 Lacrada')}</div>
-                        </div>
-                        <button class="btn-sm btn-copy" onclick="copiarLink('${getBaseUrl()}capsula.html?id=${cap.id}')">📋 Link</button>
+            document.getElementById('totalEventos').textContent = eventosAtivos;
+            document.getElementById('totalCapsulas').textContent = totalCaps;
+        }
+
+        function renderizarEventos() {
+            const lista = document.getElementById('listaEventos');
+            const eventosAtivos = Object.entries(eventos).filter(([id, e]) => !e.arquivado);
+            
+            if (eventosAtivos.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhum evento criado ainda</p>
                     </div>
-                `).join('');
-            }
-            
-            document.getElementById('modalLista').classList.add('active');
-        }
-
-        function abrirBusca() {
-            document.getElementById('buscaInput').value = '';
-            document.getElementById('buscaResultados').innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Digite nome ou sobrenome...</p>';
-            document.getElementById('modalBusca').classList.add('active');
-            document.getElementById('buscaInput').focus();
-        }
-
-        function buscarCapsulas() {
-            const termo = document.getElementById('buscaInput').value.toLowerCase().trim();
-            const container = document.getElementById('buscaResultados');
-            
-            if (termo.length < 2) {
-                container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Digite pelo menos 2 caracteres...</p>';
+                `;
                 return;
             }
             
-            const resultados = Object.entries(capsulasData)
-                .filter(([id, cap]) => {
-                    const nomeCompleto = `${cap.nome} ${cap.sobrenome}`.toLowerCase();
-                    return nomeCompleto.includes(termo);
-                })
-                .map(([id, cap]) => ({ id, ...cap }));
+            lista.innerHTML = eventosAtivos.map(([id, evento]) => {
+                const capsulasEvento = Object.values(capsulas).filter(c => c.eventoId === id).length;
+                return `
+                    <div class="capsula-item" onclick="abrirEvento('${id}')" style="cursor:pointer">
+                        <div class="capsula-avatar">📅</div>
+                        <div class="capsula-info">
+                            <div class="nome">${evento.nome}</div>
+                            <div class="data">Abertura: ${formatarData(evento.dataAbertura)} • ${capsulasEvento} cápsulas</div>
+                        </div>
+                        <span style="color:rgba(255,255,255,0.3)">→</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderizarCapsulas() {
+            const lista = document.getElementById('listaCapsulas');
+            const filtro = document.getElementById('filtroEvento').value;
             
-            if (resultados.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">Nenhum resultado encontrado</p>';
+            let caps = Object.entries(capsulas);
+            if (filtro) {
+                caps = caps.filter(([id, c]) => c.eventoId === filtro);
+            }
+            
+            if (caps.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula encontrada</p>
+                    </div>
+                `;
                 return;
             }
             
-            container.innerHTML = resultados.map(cap => `
-                <div class="lista-item">
-                    <div class="lista-item-foto">
-                        ${cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center">👤</div>'}
+            lista.innerHTML = caps.map(([id, cap]) => `
+                <div class="capsula-item">
+                    <div class="capsula-avatar">
+                        ${cap.foto ? `<img src="${cap.foto}">` : '👤'}
                     </div>
-                    <div class="lista-item-info">
-                        <div class="lista-item-nome">${cap.nome} ${cap.sobrenome}</div>
-                        <div class="lista-item-status">📦 ${eventosData[cap.eventoId]?.nome || 'Evento'}</div>
+                    <div class="capsula-info">
+                        <div class="nome">${cap.nome} ${cap.sobrenome || ''}</div>
+                        <div class="data">${formatarData(cap.dataCriacao)}</div>
                     </div>
-                    <button class="btn-sm btn-copy" onclick="copiarLink('${getBaseUrl()}capsula.html?id=${cap.id}')">📋 Copiar Link</button>
+                    <span class="capsula-status ${cap.aberta ? 'aberta' : 'lacrada'}">
+                        ${cap.aberta ? '🔓 Aberta' : '🔒 Lacrada'}
+                    </span>
                 </div>
             `).join('');
         }
 
-        // ==========================================
-        // MODAIS
-        // ==========================================
-        function fecharModal(id) {
-            document.getElementById(id).classList.remove('active');
+        function atualizarFiltro() {
+            const select = document.getElementById('filtroEvento');
+            const eventosAtivos = Object.entries(eventos).filter(([id, e]) => !e.arquivado);
+            
+            select.innerHTML = '<option value="">Todos os eventos</option>' +
+                eventosAtivos.map(([id, e]) => `<option value="${id}">${e.nome}</option>`).join('');
         }
 
-        function ampliarQR(eventoId, nome) {
-            document.getElementById('qrTitulo').textContent = nome;
-            const container = document.getElementById('qrAmpliado');
-            container.innerHTML = '';
-            
-            new QRCode(container, {
-                text: `${getBaseUrl()}jogador.html?evento=${eventoId}`,
-                width: 280,
-                height: 280,
-                colorDark: "#165b33",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            document.getElementById('modalQR').classList.add('active');
+        function filtrarCapsulas() {
+            renderizarCapsulas();
         }
 
-        // ==========================================
-        // CRIAR EVENTO
-        // ==========================================
-        async function criarEvento(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('btnCriar');
+        // Criar Evento
+        async function criarEvento() {
             const nome = document.getElementById('nomeEvento').value.trim();
-            const data = document.getElementById('dataAbertura').value;
+            const data = document.getElementById('dataEvento').value;
             
             if (!nome || !data) {
-                mostrarToast('Preencha todos os campos!', 'error');
+                toast('Preencha todos os campos', 'error');
                 return;
             }
-            
-            btn.disabled = true;
-            btn.textContent = '⏳ Criando...';
             
             try {
-                const id = gerarID('evt');
+                const id = 'evt_' + Date.now();
                 await database.ref(`eventos/${id}`).set({
-                    nome: nome,
+                    nome,
+                    dataAbertura: data,
                     dataCriacao: new Date().toISOString(),
-                    dataAbertura: new Date(data + 'T12:00:00').toISOString(),
-                    arquivado: false
+                    arquivado: false,
+                    liberado: false
                 });
                 
-                mostrarToast('🎉 Evento criado com sucesso!');
                 document.getElementById('nomeEvento').value = '';
-            } catch (error) {
-                console.error(error);
-                mostrarToast('Erro ao criar evento', 'error');
+                document.getElementById('dataEvento').value = '';
+                
+                toast('Evento criado! 🎉', 'success');
+            } catch (e) {
+                toast('Erro ao criar evento', 'error');
             }
-            
-            btn.disabled = false;
-            btn.textContent = '🎁 CRIAR';
         }
 
-        // ==========================================
-        // RENDERIZAR EVENTOS
-        // ==========================================
-        function renderizarEventos() {
-            const container = document.getElementById('eventosContainer');
-            const eventosArray = Object.entries(eventosData).sort((a, b) => 
-                new Date(b[1].dataCriacao) - new Date(a[1].dataCriacao)
-            );
+        // Abrir Evento
+        function abrirEvento(id) {
+            eventoAtual = id;
+            const evento = eventos[id];
             
-            if (eventosArray.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🎁</div><p class="empty-text">Nenhum evento criado ainda.<br>Crie seu primeiro evento acima!</p></div>';
+            document.getElementById('eventoNome').textContent = evento.nome;
+            document.getElementById('eventoData').textContent = formatarData(evento.dataAbertura);
+            
+            const base = window.location.href.replace('index.html', '');
+            document.getElementById('linkEvento').value = `${base}jogador.html?evento=${id}`;
+            
+            document.getElementById('toggleLiberar').classList.toggle('active', evento.liberado || false);
+            
+            renderizarCapsulasEvento();
+            mostrarTela('telaEvento');
+        }
+
+        function renderizarCapsulasEvento() {
+            const lista = document.getElementById('eventoCapsulas');
+            const caps = Object.entries(capsulas).filter(([id, c]) => c.eventoId === eventoAtual);
+            
+            document.getElementById('eventoTotalCapsulas').textContent = caps.length;
+            
+            if (caps.length === 0) {
+                lista.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">📭</div>
+                        <p>Nenhuma cápsula ainda</p>
+                    </div>
+                `;
                 return;
             }
             
-            container.innerHTML = '<div class="eventos-grid" id="eventosGrid"></div>';
-            const grid = document.getElementById('eventosGrid');
-            
-            eventosArray.forEach(([id, evento]) => {
-                const card = criarCardEvento(id, evento);
-                grid.appendChild(card);
-            });
-        }
-
-        function criarCardEvento(id, evento) {
-            const card = document.createElement('div');
-            card.className = `evento-card ${evento.arquivado ? 'arquivado' : ''}`;
-            
-            const link = `${getBaseUrl()}jogador.html?evento=${id}`;
-            
-            // Contar cápsulas deste evento
-            const capsulas = Object.values(capsulasData).filter(c => c.eventoId === id);
-            const total = capsulas.length;
-            const abertas = capsulas.filter(c => c.aberta).length;
-            const liberadas = capsulas.filter(c => c.liberada).length;
-            
-            card.innerHTML = `
-                <div class="evento-header">
-                    <h3 class="evento-nome">${evento.nome}</h3>
-                    <span class="evento-status ${evento.arquivado ? 'status-arquivado' : 'status-ativo'}">
-                        ${evento.arquivado ? '📁 Arquivado' : '✅ Ativo'}
+            lista.innerHTML = caps.map(([id, cap]) => `
+                <div class="capsula-item">
+                    <div class="capsula-avatar">
+                        ${cap.foto ? `<img src="${cap.foto}">` : '👤'}
+                    </div>
+                    <div class="capsula-info">
+                        <div class="nome">${cap.nome} ${cap.sobrenome || ''}</div>
+                        <div class="data">${formatarData(cap.dataCriacao)}</div>
+                    </div>
+                    <span class="capsula-status ${cap.aberta ? 'aberta' : 'lacrada'}">
+                        ${cap.aberta ? '🔓' : '🔒'}
                     </span>
                 </div>
-                
-                ${!evento.arquivado ? `
-                    <div class="qr-container" onclick="ampliarQR('${id}', '${evento.nome}')">
-                        <div id="qr-${id}"></div>
-                    </div>
-                ` : ''}
-                
-                <div class="evento-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${total}</div>
-                        <div class="stat-label">Cápsulas</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${liberadas}</div>
-                        <div class="stat-label">Liberadas</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${abertas}</div>
-                        <div class="stat-label">Abertas</div>
-                    </div>
-                </div>
-                
-                <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-bottom:12px">
-                    📅 Abre em: <strong style="color:var(--natal-gold)">${formatarData(evento.dataAbertura)}</strong>
-                </div>
-                
-                ${!evento.arquivado ? `
-                    <div class="link-container">
-                        <input type="text" class="link-input" value="${link}" readonly>
-                        <button class="btn-sm btn-copy" onclick="copiarLink('${link}')">📋</button>
-                    </div>
-                ` : ''}
-                
-                ${total > 0 ? `
-                    <div class="participantes-live">
-                        <h4 class="participantes-title">👥 Participantes (${total})</h4>
-                        <div class="participantes-grid" id="participantes-${id}"></div>
-                    </div>
-                ` : ''}
-                
-                <div class="evento-actions">
-                    ${!evento.arquivado ? `
-                        <button class="btn-action btn-lista" onclick="verLista('${id}')">📋 Lista</button>
-                        <button class="btn-action btn-cerimonia" onclick="gerenciarEvento('${id}')">🎉 Gerenciar</button>
-                        <button class="btn-action btn-fechar" onclick="iniciarCerimoniaFechamento('${id}')">🔒 Lacrar</button>
-                    ` : `
-                        <button class="btn-action btn-lista" onclick="verLista('${id}')">📋 Lista</button>
-                        <button class="btn-action btn-cerimonia" onclick="iniciarCerimoniaAbertura('${id}')">🎊 Abrir!</button>
-                    `}
-                </div>
-            `;
-            
-            // Gerar QR Code
-            if (!evento.arquivado) {
-                setTimeout(() => {
-                    const qrContainer = document.getElementById(`qr-${id}`);
-                    if (qrContainer && !qrContainer.hasChildNodes()) {
-                        new QRCode(qrContainer, {
-                            text: link,
-                            width: 140,
-                            height: 140,
-                            colorDark: "#165b33",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                    }
-                }, 100);
-            }
-            
-            // Renderizar participantes
-            setTimeout(() => {
-                const partContainer = document.getElementById(`participantes-${id}`);
-                if (partContainer) {
-                    const caps = capsulas.slice(0, 8);
-                    partContainer.innerHTML = caps.map(cap => `
-                        <div class="participante-mini">
-                            <div class="participante-foto">
-                                ${cap.foto ? `<img src="${cap.foto}">` : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#c41e3a,#165b33);display:flex;align-items:center;justify-content:center;font-size:1rem">👤</div>'}
-                            </div>
-                            <span class="participante-nome">${cap.nome}</span>
-                        </div>
-                    `).join('') + (capsulas.length > 8 ? `<span style="color:rgba(255,255,255,0.5);padding:8px">+${capsulas.length - 8}</span>` : '');
-                }
-            }, 150);
-            
-            return card;
+            `).join('');
         }
 
-        // ==========================================
-        // INICIALIZAÇÃO E LISTENERS FIREBASE
-        // ==========================================
+        function voltarDashboard() {
+            eventoAtual = null;
+            mostrarTela('telaDashboard');
+        }
+
+        function copiarLink() {
+            const input = document.getElementById('linkEvento');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            toast('Link copiado! 🔗', 'success');
+        }
+
+        async function toggleLiberacao() {
+            const toggle = document.getElementById('toggleLiberar');
+            const novoEstado = !toggle.classList.contains('active');
+            
+            try {
+                await database.ref(`eventos/${eventoAtual}/liberado`).set(novoEstado);
+                
+                // Atualizar todas as cápsulas deste evento
+                const caps = Object.entries(capsulas).filter(([id, c]) => c.eventoId === eventoAtual);
+                for (const [id, cap] of caps) {
+                    await database.ref(`capsulas/${id}/liberada`).set(novoEstado);
+                }
+                
+                toggle.classList.toggle('active', novoEstado);
+                toast(novoEstado ? 'Cápsulas liberadas! 🔓' : 'Cápsulas bloqueadas 🔒', 'success');
+            } catch (e) {
+                toast('Erro ao atualizar', 'error');
+            }
+        }
+
+        // Modal
+        function confirmarArquivar() {
+            document.getElementById('modalMsg').textContent = 'O evento será arquivado e não aparecerá mais na lista.';
+            document.getElementById('modalConfirmBtn').onclick = arquivarEvento;
+            document.getElementById('modalConfirm').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirm').classList.remove('active');
+        }
+
+        async function arquivarEvento() {
+            try {
+                await database.ref(`eventos/${eventoAtual}/arquivado`).set(true);
+                fecharModal();
+                voltarDashboard();
+                toast('Evento arquivado', 'success');
+            } catch (e) {
+                toast('Erro ao arquivar', 'error');
+            }
+        }
+
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
-            criarParticulas();
-            
-            // Data padrão: 1 ano a partir de hoje
-            const dataDefault = new Date();
-            dataDefault.setFullYear(dataDefault.getFullYear() + 1);
-            document.getElementById('dataAbertura').value = dataDefault.toISOString().split('T')[0];
-            
-            // Listener de eventos
-            database.ref('eventos').on('value', (snapshot) => {
-                eventosData = snapshot.val() || {};
-                renderizarEventos();
-            });
-            
-            // Listener de cápsulas - DETECTA NOVAS CÁPSULAS EM TEMPO REAL
-            database.ref('capsulas').on('value', (snapshot) => {
-                const novasCapsulas = snapshot.val() || {};
-                
-                // Detectar novas cápsulas (após primeira carga)
-                if (!primeiraCarrega) {
-                    Object.entries(novasCapsulas).forEach(([id, cap]) => {
-                        // Nova cápsula criada
-                        if (!capsulasAnteriores[id] && cap.nome) {
-                            console.log('🎉 Nova cápsula detectada:', cap.nome, cap.sobrenome);
-                            mostrarNotificacaoNovaCapsula(cap, 'lacrou');
-                        }
-                        // Cápsula foi aberta
-                        else if (capsulasAnteriores[id] && !capsulasAnteriores[id].aberta && cap.aberta) {
-                            console.log('📬 Cápsula aberta:', cap.nome, cap.sobrenome);
-                            mostrarNotificacaoNovaCapsula(cap, 'abriu');
-                        }
-                    });
-                }
-                
-                // Atualizar cache
-                capsulasAnteriores = JSON.parse(JSON.stringify(novasCapsulas));
-                capsulasData = novasCapsulas;
-                primeiraCarrega = false;
-                
-                // Atualizar badge
-                document.getElementById('badgeCaps').textContent = Object.keys(capsulasData).length;
-                
-                // Re-renderizar eventos
-                renderizarEventos();
-                
-                // Atualizar cerimônia se aberta
-                if (eventoCerimoniaId) {
-                    renderizarCerimonia(eventoCerimoniaId);
-                }
-            });
-            
-            // Fechar modais com ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-                    fecharCerimoniaFechamento();
-                    fecharCerimoniaAbertura();
-                }
-            });
-            
-            // Fechar modais clicando fora
-            document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) {
-                        overlay.classList.remove('active');
-                    }
-                });
-            });
+            // Set data mínima como hoje
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataEvento').min = hoje;
         });
     </script>
 </body>
