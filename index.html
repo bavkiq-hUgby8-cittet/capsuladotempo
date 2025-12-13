@@ -253,17 +253,49 @@
         }
         
         .auth-error {
-            background: rgba(192,57,43,0.15);
-            border: 1px solid rgba(192,57,43,0.3);
-            color: #e74c3c;
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
+            background: rgba(192,57,43,0.2);
+            border: 2px solid rgba(231,76,60,0.5);
+            color: #ff6b6b;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 600;
             margin-top: 16px;
             display: none;
+            text-align: center;
         }
         
-        .auth-error.show { display: block; }
+        .auth-error.show { display: block; animation: shake 0.5s ease; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .auth-status {
+            text-align: center;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .auth-status.checking {
+            background: rgba(241,196,15,0.15);
+            color: #f1c40f;
+        }
+        
+        .auth-status.ok {
+            background: rgba(39,174,96,0.15);
+            color: #2ecc71;
+        }
+        
+        .auth-status.error {
+            background: rgba(231,76,60,0.15);
+            color: #e74c3c;
+        }
 
         .app { display: none; }
         .app.active { display: block; }
@@ -1031,6 +1063,8 @@
             </div>
             
             <div class="auth-card">
+                <div class="auth-status checking" id="authStatus">🔄 Verificando conexão com Firebase...</div>
+                
                 <div class="auth-tabs">
                     <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
                     <button class="auth-tab" onclick="switchAuthTab('register')">Criar Conta</button>
@@ -1207,6 +1241,58 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
+        // Verificação inicial
+        console.log('🔥 Firebase inicializado');
+        console.log('🔐 Auth disponível:', !!auth);
+        
+        // Teste de conexão com Auth
+        function checkAuthStatus() {
+            const statusEl = document.getElementById('authStatus');
+            
+            auth.fetchSignInMethodsForEmail('teste@teste.com')
+                .then(() => {
+                    console.log('✅ Firebase Auth está ATIVADO!');
+                    statusEl.className = 'auth-status ok';
+                    statusEl.innerHTML = '✅ Firebase Auth conectado!';
+                    setTimeout(() => statusEl.style.display = 'none', 3000);
+                })
+                .catch(err => {
+                    if (err.code === 'auth/invalid-email' || err.code === 'auth/user-not-found') {
+                        console.log('✅ Firebase Auth está ATIVADO!');
+                        statusEl.className = 'auth-status ok';
+                        statusEl.innerHTML = '✅ Firebase Auth conectado!';
+                        setTimeout(() => statusEl.style.display = 'none', 3000);
+                    } else if (err.code === 'auth/operation-not-allowed' || err.code === 'auth/configuration-not-found') {
+                        console.error('❌ Firebase Auth NÃO está ativado!');
+                        statusEl.className = 'auth-status error';
+                        statusEl.innerHTML = '❌ ERRO: Firebase Auth não está ativado!<br><small>Vá no Firebase Console → Authentication → Sign-in method → Ative Email/Password</small>';
+                    } else {
+                        console.log('🔍 Status:', err.code);
+                        statusEl.className = 'auth-status ok';
+                        statusEl.innerHTML = '✅ Conectado';
+                        setTimeout(() => statusEl.style.display = 'none', 3000);
+                    }
+                });
+        }
+        
+        // Executar após DOM carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            createAtmosphere();
+            checkAuthStatus();
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+                }
+            });
+            
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.classList.remove('active');
+                });
+            });
+        });
+
         let currentUser = null;
         let eventsData = {};
         let capsulesData = {};
@@ -1254,12 +1340,24 @@
             btn.textContent = 'Entrando...';
             error.classList.remove('show');
             
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
+            console.log('🔐 Tentando login com:', email);
+            
+            if (!email || !password) {
+                error.textContent = 'Preencha email e senha';
+                error.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Entrar';
+                return;
+            }
+            
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                const result = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ Login bem sucedido:', result.user.email);
             } catch (err) {
+                console.error('❌ Erro no login:', err.code, err.message);
                 error.textContent = translateError(err.code);
                 error.classList.add('show');
                 btn.disabled = false;
@@ -1276,19 +1374,47 @@
             btn.textContent = 'Criando...';
             error.classList.remove('show');
             
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             
+            console.log('📝 Tentando registrar:', email, name);
+            
+            if (!name || !email || !password) {
+                error.textContent = 'Preencha todos os campos';
+                error.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Criar Conta';
+                return;
+            }
+            
+            if (password.length < 6) {
+                error.textContent = 'A senha deve ter pelo menos 6 caracteres';
+                error.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Criar Conta';
+                return;
+            }
+            
             try {
+                console.log('🔄 Criando usuário no Firebase Auth...');
                 const result = await auth.createUserWithEmailAndPassword(email, password);
+                console.log('✅ Usuário criado:', result.user.uid);
+                
+                console.log('🔄 Salvando dados no Database...');
                 await database.ref(`operadores/${result.user.uid}`).set({
                     nome: name,
                     email: email,
                     criadoEm: new Date().toISOString()
                 });
+                console.log('✅ Dados salvos no Database');
+                
+                console.log('🔄 Atualizando displayName...');
                 await result.user.updateProfile({ displayName: name });
+                console.log('✅ Registro completo!');
+                
             } catch (err) {
+                console.error('❌ Erro no registro:', err.code, err.message);
                 error.textContent = translateError(err.code);
                 error.classList.add('show');
                 btn.disabled = false;
@@ -1316,15 +1442,19 @@
         }
 
         auth.onAuthStateChanged((user) => {
+            console.log('🔄 Estado de autenticação mudou:', user ? user.email : 'Nenhum usuário');
+            
             if (user) {
                 currentUser = user;
+                console.log('👤 Usuário logado:', user.email, user.uid);
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('app').classList.add('active');
-                document.getElementById('userName').textContent = user.displayName || 'Guardião';
-                document.getElementById('userAvatar').textContent = (user.displayName || 'G')[0].toUpperCase();
+                document.getElementById('userName').textContent = user.displayName || user.email || 'Guardião';
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email || 'G')[0].toUpperCase();
                 initializeApp();
             } else {
                 currentUser = null;
+                console.log('🚪 Usuário deslogado');
                 document.getElementById('authScreen').classList.remove('hidden');
                 document.getElementById('app').classList.remove('active');
                 document.getElementById('loginForm').reset();
@@ -1333,6 +1463,8 @@
                 document.getElementById('loginBtn').textContent = 'Entrar';
                 document.getElementById('registerBtn').disabled = false;
                 document.getElementById('registerBtn').textContent = 'Criar Conta';
+                document.getElementById('loginError').classList.remove('show');
+                document.getElementById('registerError').classList.remove('show');
             }
         });
 
@@ -1735,22 +1867,6 @@
             
             setTimeout(() => container.innerHTML = '', 5000);
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            createAtmosphere();
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-                }
-            });
-            
-            document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) overlay.classList.remove('active');
-                });
-            });
-        });
     </script>
 </body>
 </html>
