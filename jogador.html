@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⏳ Criar Cápsula do Tempo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-deep: #0c0f14;
+            --bg-card: rgba(255,255,255,0.04);
+            --gold-primary: #d4af37;
+            --gold-light: #f4d03f;
+            --gold-dark: #b8962e;
+            --accent-warm: #e67e22;
+            --accent-success: #27ae60;
+            --accent-danger: #c0392b;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --border-subtle: rgba(255,255,255,0.1);
+            --border-gold: rgba(212,175,55,0.4);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #0d1117 50%, #111827 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        .atmosphere {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tela {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tela.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 28px;
+            padding: 0 10px;
+        }
+        
+        .progress-step {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.15);
+            transition: all 0.4s;
+        }
+        
+        .progress-step.active {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+            box-shadow: 0 0 12px rgba(212,175,55,0.5);
+        }
+        
+        .progress-step.done { background: var(--accent-success); }
+
+        .tela-boas {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .logo-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+        
+        .titulo-evento {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-primary), var(--accent-warm));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        
+        .subtitulo {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+        
+        .data-abertura {
+            background: rgba(212,175,55,0.12);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-light);
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
+            margin: 28px 0 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .btn-iniciar {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-deep);
+            border: none;
+            padding: 20px 48px;
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(212,175,55,0.3);
+        }
+        
+        .btn-iniciar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(212,175,55,0.4);
+        }
+
+        .header-tela {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .header-tela .passo {
+            font-size: 0.85rem;
+            color: var(--gold-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .header-tela h2 {
+            font-size: 1.9rem;
+            color: var(--gold-light);
+            margin-bottom: 10px;
+        }
+        
+        .header-tela p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .foto-section { text-align: center; margin-bottom: 28px; }
+        
+        .foto-container {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid var(--border-gold);
+            background: var(--bg-card);
+            transition: all 0.3s;
+        }
+        
+        .foto-container.has-photo {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 40px rgba(212,175,55,0.4);
+        }
+        
+        .foto-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            cursor: pointer;
+        }
+        
+        .foto-placeholder span { font-size: 3.5rem; }
+        .foto-placeholder p { font-size: 0.9rem; margin-top: 8px; font-weight: 500; }
+        .foto-preview { width: 100%; height: 100%; object-fit: cover; }
+        
+        .foto-opcoes {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-foto {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-foto:hover {
+            border-color: var(--gold-primary);
+            background: rgba(212,175,55,0.1);
+        }
+        
+        .camera-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+        
+        .camera-container.active { display: flex; }
+        
+        .camera-video {
+            width: 100%;
+            max-width: 300px;
+            border-radius: var(--radius-md);
+            background: #000;
+            transform: scaleX(-1);
+        }
+        
+        .camera-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .btn-capturar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--accent-danger);
+            border: 4px solid white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .btn-cancelar-camera {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        .foto-input { display: none; }
+
+        .form-group { margin-bottom: 20px; }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 4px rgba(212,175,55,0.15);
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-group textarea {
+            resize: none;
+            min-height: 120px;
+            line-height: 1.6;
+        }
+
+        .btn-continuar {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            border: none;
+            color: var(--bg-deep);
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: auto;
+            transition: all 0.3s;
+        }
+        
+        .btn-continuar:hover { transform: translateY(-2px); }
+        
+        .btn-voltar {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+
+        .categoria {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .categoria-titulo {
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: var(--gold-light);
+            font-size: 1.05rem;
+        }
+        
+        .tags-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tag {
+            background: rgba(255,255,255,0.06);
+            border: 2px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 10px 18px;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .tag:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+        
+        .tag.selected {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-deep);
+            border-color: var(--gold-primary);
+            font-weight: 600;
+        }
+        
+        .contador-selecao {
+            text-align: center;
+            color: var(--gold-primary);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .pessoas-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        
+        .pessoa-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pessoa-card:hover { border-color: var(--gold-primary); }
+        
+        .pessoa-card.selected {
+            background: rgba(212,175,55,0.15);
+            border-color: var(--gold-primary);
+        }
+        
+        .pessoa-card .emoji { font-size: 2.2rem; margin-bottom: 8px; }
+        .pessoa-card .nome { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+        .pessoa-card.selected .nome { color: var(--gold-primary); }
+
+        .pergunta-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--gold-primary);
+        }
+        
+        .pergunta-box label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--gold-light);
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .pergunta-box input,
+        .pergunta-box textarea {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--border-subtle);
+        }
+        
+        .escala-felicidade {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        
+        .escala-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .escala-num:hover { border-color: var(--gold-primary); }
+        
+        .escala-num.selected {
+            background: var(--gold-primary);
+            color: var(--bg-deep);
+            border-color: var(--gold-primary);
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
+
+        .audio-section {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(230,126,34,0.05));
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-gold);
+        }
+        
+        .audio-icon { font-size: 4rem; margin-bottom: 16px; }
+        .audio-title { font-size: 1.4rem; color: var(--gold-light); margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+        .audio-desc { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+        
+        .tempo-gravacao {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.8rem;
+            color: var(--gold-primary);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .btn-gravar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-danger), #a93226);
+            border: 4px solid white;
+            cursor: pointer;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(192,57,43,0.4);
+        }
+        
+        .btn-gravar.gravando {
+            animation: pulse 1s ease-in-out infinite;
+            background: linear-gradient(135deg, #27ae60, #219a52);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        
+        .tempo-limite {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .audio-preview {
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-md);
+        }
+        
+        .audio-preview audio {
+            width: 100%;
+            height: 50px;
+            margin-bottom: 16px;
+        }
+        
+        .audio-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .audio-actions button {
+            flex: 1;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+        
+        .btn-regravar {
+            background: transparent;
+            border: 2px solid var(--border-subtle);
+            color: white;
+        }
+        
+        .btn-confirmar-audio {
+            background: var(--accent-success);
+            border: none;
+            color: white;
+        }
+        
+        .audio-confirmado {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px;
+            background: rgba(39,174,96,0.15);
+            border-radius: var(--radius-md);
+            margin-top: 20px;
+            border: 1px solid rgba(39,174,96,0.3);
+        }
+        
+        .audio-confirmado .check { font-size: 2rem; }
+        .audio-confirmado .info { flex: 1; text-align: left; }
+        .audio-confirmado .info strong { font-size: 1rem; }
+        .audio-confirmado .duracao { color: var(--gold-primary); font-size: 0.9rem; margin-top: 4px; }
+        
+        .btn-pular {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: underline;
+        }
+
+        .resumo-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .resumo-section h4 {
+            color: var(--gold-primary);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .resumo-item {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        
+        .mini-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .mini-tag {
+            background: var(--gold-primary);
+            color: var(--bg-deep);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-capsula {
+            font-size: 6rem;
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        .loading-text {
+            margin-top: 24px;
+            font-size: 1.3rem;
+            color: var(--gold-primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        .tela-sucesso {
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .sucesso-foto {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            border: 5px solid var(--gold-primary);
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--gold-primary), var(--accent-warm));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            animation: successPop 0.6s ease;
+            box-shadow: 0 0 50px rgba(212,175,55,0.4);
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .sucesso-titulo {
+            font-size: 2.2rem;
+            color: var(--gold-light);
+            margin-bottom: 14px;
+        }
+        
+        .sucesso-msg {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+        
+        .sucesso-data {
+            background: rgba(212,175,55,0.12);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-primary);
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .sucesso-dias {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 32px;
+        }
+        
+        .sucesso-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+        
+        .sucesso-btns button {
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-compartilhar {
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            border: none;
+            color: white;
+        }
+        
+        .btn-ver {
+            background: var(--gold-primary);
+            border: none;
+            color: var(--bg-deep);
+        }
+
+        .share-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.98);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .share-modal.active { display: flex; }
+        
+        .share-modal-content {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .share-modal h3 {
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            margin: 15px 0;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .share-preview {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto 20px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(212,175,55,0.4);
+            background: #000;
+        }
+        
+        .share-preview img,
+        .share-preview canvas { width: 100%; display: block; }
+        
+        .share-status {
+            background: rgba(212,175,55,0.1);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--radius-md);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .share-status .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212,175,55,0.3);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .share-status p { color: var(--gold-primary); font-weight: 600; }
+        
+        .share-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .share-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--accent-warm), var(--gold-primary));
+            width: 0%;
+            transition: width 0.3s;
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .share-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .share-btns button {
+            padding: 14px 10px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .share-btns button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .share-btns button span.icon { font-size: 1.5rem; }
+        
+        .btn-img {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-deep);
+        }
+        
+        .btn-gif {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .btn-link {
+            background: var(--accent-success);
+            color: white;
+        }
+        
+        .btn-fechar {
+            background: var(--bg-card);
+            color: white;
+            border: 1px solid var(--border-subtle) !important;
+        }
+        
+        .share-btns .full-width { grid-column: span 2; }
+
+        .tela-erro {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .erro-icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.7; }
+        .erro-msg { color: var(--text-secondary); font-size: 1.1rem; }
+
+        .confetes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1500;
+        }
+        
+        .confete {
+            position: absolute;
+            animation: confeteFall 3s ease-out forwards;
+        }
+        
+        @keyframes confeteFall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent-success);
+            color: white;
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.4s;
+            font-size: 1rem;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.error { background: var(--accent-danger); }
+
+        @media (max-width: 400px) {
+            .container { padding: 16px; }
+            .header-tela h2 { font-size: 1.5rem; }
+            .pessoas-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .escala-num { width: 40px; height: 40px; font-size: 1rem; }
+            .foto-opcoes { flex-direction: column; }
+            .share-btns { grid-template-columns: 1fr; }
+            .share-btns .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="atmosphere" id="atmosphere"></div>
+    <div class="confetes" id="confetes"></div>
+
+    <div class="container">
+        <div class="tela tela-boas active" id="telaBoas">
+            <div class="logo-icon">⏳</div>
+            <h1 class="titulo-evento" id="nomeEvento">Cápsula do Tempo</h1>
+            <p class="subtitulo">Guarde suas memórias, sonhos e desejos</p>
+            <p class="subtitulo">para o seu eu do futuro! ✨</p>
+            <div class="data-abertura">📅 Abertura: <span id="dataEvento">--/--/----</span></div>
+            <button class="btn-iniciar" onclick="iniciar()">⏳ CRIAR MINHA CÁPSULA</button>
+        </div>
+
+        <div class="tela" id="telaCadastro">
+            <div class="progress-bar"><div class="progress-step active"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 1 de 6</p>
+                <h2>📸 Quem é você?</h2>
+                <p>Tire uma foto para se reconhecer no futuro</p>
+            </div>
+            <div class="foto-section">
+                <div class="foto-container" id="fotoContainer">
+                    <div class="foto-placeholder" id="fotoPlaceholder" onclick="abrirGaleria()">
+                        <span>📷</span>
+                        <p>Toque para adicionar</p>
+                    </div>
+                </div>
+                <div class="foto-opcoes" id="fotoOpcoes">
+                    <button class="btn-foto" onclick="abrirCamera()"><span>📸</span> Selfie</button>
+                    <button class="btn-foto" onclick="abrirGaleria()"><span>🖼️</span> Galeria</button>
+                </div>
+                <div class="camera-container" id="cameraContainer">
+                    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+                    <div class="camera-actions">
+                        <button class="btn-cancelar-camera" onclick="fecharCamera()">Cancelar</button>
+                        <button class="btn-capturar" onclick="capturarFoto()">📷</button>
+                    </div>
+                </div>
+                <input type="file" id="fotoInput" class="foto-input" accept="image/*" onchange="processarFotoGaleria(event)">
+                <canvas id="fotoCanvas" style="display:none"></canvas>
+            </div>
+            <div class="form-group">
+                <label>Seu nome</label>
+                <input type="text" id="nome" placeholder="Como você se chama?" maxlength="30">
+            </div>
+            <div class="form-group">
+                <label>Seu sobrenome</label>
+                <input type="text" id="sobrenome" placeholder="Seu sobrenome" maxlength="30">
+            </div>
+            <button class="btn-continuar" onclick="irParaDesejos()">Continuar →</button>
+        </div>
+
+        <div class="tela" id="telaDesejos">
+            <div class="progress-bar"><div class="progress-step done"></div><div class="progress-step active"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 2 de 6</p>
+                <h2>🌟 Suas Prioridades</h2>
+                <p>O que é importante para você no próximo ano?</p>
+            </div>
+            <div class="contador-selecao">✨ Selecionados: <span id="contadorDesejos">0</span> / 10</div>
+            
+            <div class="categoria">
+                <div class="categoria-titulo">❤️ Vida Pessoal</div>
+                <div class="tags-grid">
+                    <span class="tag" onclick="toggleTag(this)">Saúde</span>
+                    <span class="tag" onclick="toggleTag(this)">Família</span>
+                    <span class="tag" onclick="toggleTag(this)">Romance</span>
+                    <span class="tag" onclick="toggleTag(this)">Amizades</span>
+                    <span class="tag" onclick="toggleTag(this)">Paz interior</span>
+                    <span class="tag" onclick="toggleTag(this)">Felicidade</span>
+                </div>
+            </div>
+            <div class="categoria">
+                <div class="categoria-titulo">🎯 Conquistas</div>
+                <div class="tags-grid">
+                    <span class="tag" onclick="toggleTag(this)">Viajar</span>
+                    <span class="tag" onclick="toggleTag(this)">Carreira</span>
+                    <span class="tag" onclick="toggleTag(this)">Estudos</span>
+                    <span class="tag" onclick="toggleTag(this)">Promoção</span>
+                    <span class="tag" onclick="toggleTag(this)">Negócio próprio</span>
+                    <span class="tag" onclick="toggleTag(this)">Casa própria</span>
+                </div>
+            </div>
+            <div class="categoria">
+                <div class="categoria-titulo">💰 Financeiro</div>
+                <div class="tags-grid">
+                    <span class="tag" onclick="toggleTag(this)">Economizar</span>
+                    <span class="tag" onclick="toggleTag(this)">Investir</span>
+                    <span class="tag" onclick="toggleTag(this)">Quitar dívidas</span>
+                    <span class="tag" onclick="toggleTag(this)">Carro novo</span>
+                    <span class="tag" onclick="toggleTag(this)">Renda extra</span>
+                </div>
+            </div>
+            <div class="categoria">
+                <div class="categoria-titulo">🌈 Bem-estar</div>
+                <div class="tags-grid">
+                    <span class="tag" onclick="toggleTag(this)">Exercícios</span>
+                    <span class="tag" onclick="toggleTag(this)">Meditação</span>
+                    <span class="tag" onclick="toggleTag(this)">Terapia</span>
+                    <span class="tag" onclick="toggleTag(this)">Hobby novo</span>
+                    <span class="tag" onclick="toggleTag(this)">Menos stress</span>
+                    <span class="tag" onclick="toggleTag(this)">Ler mais</span>
+                </div>
+            </div>
+            <button class="btn-continuar" onclick="irParaPessoas()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaCadastro')">← Voltar</button>
+        </div>
+
+        <div class="tela" id="telaPessoas">
+            <div class="progress-bar"><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step active"></div><div class="progress-step"></div><div class="progress-step"></div><div class="progress-step"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 3 de 6</p>
+                <h2>👥 Pessoas Importantes</h2>
+                <p>Com quem você quer se dedicar mais?</p>
+            </div>
+            <div class="pessoas-grid">
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Família"><div class="emoji">👨‍👩‍👧‍👦</div><div class="nome">Família</div></div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Amigos"><div class="emoji">👯</div><div class="nome">Amigos</div></div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Parceiro(a)"><div class="emoji">💑</div><div class="nome">Parceiro(a)</div></div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Filhos"><div class="emoji">👶</div><div class="nome">Filhos</div></div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Colegas"><div class="emoji">💼</div><div class="nome">Colegas</div></div>
+                <div class="pessoa-card" onclick="togglePessoa(this)" data-pessoa="Eu mesmo"><div class="emoji">🪞</div><div class="nome">Eu mesmo</div></div>
+            </div>
+            <button class="btn-continuar" onclick="irParaPerguntas()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaDesejos')">← Voltar</button>
+        </div>
+
+        <div class="tela" id="telaPerguntas">
+            <div class="progress-bar"><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step active"></div><div class="progress-step"></div><div class="progress-step"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 4 de 6</p>
+                <h2>💭 Reflexões</h2>
+                <p>Responda para seu eu do futuro</p>
+            </div>
+            <div class="pergunta-box">
+                <label>🎯 O que você acha que vai conquistar?</label>
+                <input type="text" id="perguntaConquista" placeholder="Ex: Falar inglês, aprender a dirigir...">
+            </div>
+            <div class="pergunta-box">
+                <label>✨ Momento mais marcante do seu ano?</label>
+                <textarea id="perguntaMomento" placeholder="Conte o que te marcou esse ano..." rows="3"></textarea>
+            </div>
+            <div class="pergunta-box">
+                <label>📝 Uma palavra que define seu momento:</label>
+                <input type="text" id="perguntaPalavra" placeholder="Esperança, Gratidão, Luta, Fé..." maxlength="25">
+            </div>
+            <div class="pergunta-box">
+                <label>😊 De 1 a 10, sua felicidade hoje?</label>
+                <div class="escala-felicidade" id="escalaFelicidade">
+                    <div class="escala-num" onclick="selecionarNota(1)">1</div>
+                    <div class="escala-num" onclick="selecionarNota(2)">2</div>
+                    <div class="escala-num" onclick="selecionarNota(3)">3</div>
+                    <div class="escala-num" onclick="selecionarNota(4)">4</div>
+                    <div class="escala-num" onclick="selecionarNota(5)">5</div>
+                    <div class="escala-num" onclick="selecionarNota(6)">6</div>
+                    <div class="escala-num" onclick="selecionarNota(7)">7</div>
+                    <div class="escala-num" onclick="selecionarNota(8)">8</div>
+                    <div class="escala-num" onclick="selecionarNota(9)">9</div>
+                    <div class="escala-num" onclick="selecionarNota(10)">10</div>
+                </div>
+            </div>
+            <div class="pergunta-box">
+                <label>🔮 Faça uma previsão para o ano:</label>
+                <textarea id="perguntaPrevisao" placeholder="O que você acha que vai acontecer?" rows="3"></textarea>
+            </div>
+            <button class="btn-continuar" onclick="irParaAudio()">Continuar →</button>
+            <button class="btn-voltar" onclick="voltarPara('telaPessoas')">← Voltar</button>
+        </div>
+
+        <div class="tela" id="telaAudio">
+            <div class="progress-bar"><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step active"></div><div class="progress-step"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 5 de 6</p>
+                <h2>🎤 Mensagem de Voz</h2>
+                <p>Grave um recado para seu eu do futuro!</p>
+            </div>
+            <div class="audio-section">
+                <div class="audio-icon">🎙️</div>
+                <div class="audio-title">Fale para você mesmo!</div>
+                <div class="audio-desc">Conte seus sonhos, medos, esperanças...</div>
+                <div class="tempo-gravacao" id="tempoGravacao">00:00</div>
+                <button class="btn-gravar" id="btnGravar" onclick="toggleGravacao()">🎤</button>
+                <div class="tempo-limite">⏱️ Máximo: 60 segundos</div>
+                <div class="audio-preview" id="audioPreview" style="display:none">
+                    <audio id="audioPlayer" controls></audio>
+                    <div class="audio-actions">
+                        <button class="btn-regravar" onclick="regravar()">🔄 Regravar</button>
+                        <button class="btn-confirmar-audio" onclick="confirmarAudio()">✓ Usar este</button>
+                    </div>
+                </div>
+                <div class="audio-confirmado" id="audioConfirmado" style="display:none">
+                    <span class="check">✅</span>
+                    <div class="info">
+                        <strong>Áudio gravado!</strong>
+                        <div class="duracao" id="duracaoAudio">Duração: 00:00</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-continuar" onclick="irParaMensagem()">Continuar →</button>
+            <button class="btn-pular" onclick="pularAudio()">Pular esta etapa</button>
+            <button class="btn-voltar" onclick="voltarPara('telaPerguntas')">← Voltar</button>
+        </div>
+
+        <div class="tela" id="telaMensagem">
+            <div class="progress-bar"><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step active"></div></div>
+            <div class="header-tela">
+                <p class="passo">Passo 6 de 6</p>
+                <h2>💌 Mensagem Final</h2>
+                <p>Escreva algo especial para o futuro</p>
+            </div>
+            <div class="resumo-section">
+                <h4>📋 Resumo da sua cápsula</h4>
+                <div class="mini-tags" id="resumoDesejos"></div>
+                <div class="resumo-item" style="margin-top: 12px;">👥 Pessoas: <span id="resumoPessoas">-</span></div>
+                <div class="resumo-item">😊 Felicidade: <span id="resumoFelicidade">-</span>/10</div>
+                <div class="resumo-item">🎤 Áudio: <span id="resumoAudio">-</span></div>
+            </div>
+            <div class="form-group">
+                <label>💌 Sua mensagem para o futuro</label>
+                <textarea id="mensagem" placeholder="Querido eu do futuro..." rows="6" maxlength="2000" oninput="atualizarContador()"></textarea>
+                <div class="char-counter"><span id="charCounter">0</span>/2000</div>
+            </div>
+            <button class="btn-continuar" id="btnLacrar" onclick="lacrarCapsula()">🔒 LACRAR CÁPSULA</button>
+            <button class="btn-voltar" onclick="voltarPara('telaAudio')">← Voltar</button>
+        </div>
+
+        <div class="tela tela-sucesso" id="telaSucesso">
+            <div class="sucesso-foto" id="sucessoFoto">⏳</div>
+            <h2 class="sucesso-titulo">Cápsula Lacrada!</h2>
+            <p class="sucesso-msg" id="sucessoNome">Sua cápsula foi criada com sucesso!</p>
+            <div class="sucesso-data">📅 Abertura: <span id="sucessoData">--/--/----</span></div>
+            <div class="sucesso-dias">⏳ Faltam <span id="sucessoDias">--</span> dias</div>
+            <div class="sucesso-btns">
+                <button class="btn-compartilhar" onclick="abrirCompartilhar()">📸 Compartilhar no Instagram</button>
+                <button class="btn-ver" onclick="verCapsula()">👁️ Ver minha cápsula</button>
+            </div>
+        </div>
+
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 style="color: var(--gold-light); margin-bottom: 12px;">Evento não encontrado</h2>
+            <p class="erro-msg">O link pode estar incorreto ou o evento foi encerrado.</p>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loading-capsula">⏳</div>
+        <div class="loading-text">Lacrando sua cápsula...</div>
+    </div>
+
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-content">
+            <h3>📸 Compartilhar</h3>
+            <div class="share-preview" id="sharePreview">
+                <canvas id="shareCanvas"></canvas>
+            </div>
+            <div class="share-status" id="shareStatus" style="display:none">
+                <div class="spinner"></div>
+                <p id="shareStatusText">Gerando...</p>
+                <div class="share-progress"><div class="share-progress-bar" id="shareProgressBar"></div></div>
+            </div>
+            <div class="share-btns" id="shareBtns">
+                <button class="btn-img" onclick="salvarImagem()"><span class="icon">📷</span>Salvar Imagem</button>
+                <button class="btn-gif" onclick="criarGif()" id="btnSalvarGif"><span class="icon">🎬</span>Criar GIF</button>
+                <button class="btn-link full-width" onclick="copiarLink()"><span class="icon">🔗</span>Copiar Link</button>
+                <button class="btn-fechar full-width" onclick="fecharCompartilhar()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        let eventoId = null, eventoData = null, capsulaId = null;
+        let fotoBase64 = null, audioBase64 = null;
+        let desejosSelecionados = [], pessoasSelecionadas = [];
+        let notaFelicidade = null, audioConfirmadoFlag = false;
+        let mediaRecorder = null, audioChunks = [], tempoInicio = 0, timerInterval = null, duracaoFinal = 0;
+        let cameraStream = null, linkCapsula = '';
+
+        function criarEstrelas() {
+            const c = document.getElementById('atmosphere');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                const sz = 1 + Math.random() * 2;
+                s.style.width = sz + 'px';
+                s.style.height = sz + 'px';
+                s.style.animationDelay = Math.random() * 4 + 's';
+                c.appendChild(s);
+            }
+        }
+
+        function criarConfetes() {
+            const c = document.getElementById('confetes');
+            c.innerHTML = '';
+            const cores = ['#d4af37', '#f4d03f', '#e67e22', '#27ae60', '#fff', '#ff6b6b'];
+            for (let i = 0; i < 100; i++) {
+                const cf = document.createElement('div');
+                cf.className = 'confete';
+                cf.style.left = Math.random() * 100 + 'vw';
+                cf.style.background = cores[Math.floor(Math.random() * cores.length)];
+                cf.style.animationDelay = Math.random() * 2 + 's';
+                const sz = 5 + Math.random() * 10;
+                cf.style.width = sz + 'px';
+                cf.style.height = sz + 'px';
+                cf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                c.appendChild(cf);
+            }
+        }
+
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function voltarPara(id) { mostrarTela(id); }
+
+        function formatarData(d) { return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR'); }
+        
+        function gerarID(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); }
+
+        function mostrarToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (type === 'error' ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            criarEstrelas();
+            const params = new URLSearchParams(window.location.search);
+            eventoId = params.get('evento');
+            if (!eventoId) { mostrarTela('telaErro'); return; }
+            try {
+                const snap = await database.ref(`eventos/${eventoId}`).once('value');
+                eventoData = snap.val();
+                if (!eventoData || eventoData.arquivado) { mostrarTela('telaErro'); return; }
+                document.getElementById('nomeEvento').textContent = eventoData.nome;
+                document.getElementById('dataEvento').textContent = formatarData(eventoData.dataAbertura);
+            } catch (err) { mostrarTela('telaErro'); }
+        });
+
+        function iniciar() { mostrarTela('telaCadastro'); }
+
+        async function abrirCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
+                document.getElementById('cameraVideo').srcObject = cameraStream;
+                document.getElementById('cameraContainer').classList.add('active');
+                document.getElementById('fotoOpcoes').style.display = 'none';
+            } catch (err) { mostrarToast('Erro ao acessar câmera', 'error'); }
+        }
+
+        function fecharCamera() {
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+            document.getElementById('cameraContainer').classList.remove('active');
+            document.getElementById('fotoOpcoes').style.display = 'flex';
+        }
+
+        function capturarFoto() {
+            const v = document.getElementById('cameraVideo');
+            const c = document.getElementById('fotoCanvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            const ctx = c.getContext('2d');
+            ctx.translate(c.width, 0); ctx.scale(-1, 1);
+            ctx.drawImage(v, 0, 0);
+            fotoBase64 = c.toDataURL('image/jpeg', 0.8);
+            mostrarPreviewFoto(fotoBase64);
+            fecharCamera();
+        }
+
+        function abrirGaleria() { document.getElementById('fotoInput').click(); }
+
+        function processarFotoGaleria(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = document.getElementById('fotoCanvas');
+                    const max = 800;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > max) { h *= max / w; w = max; } }
+                    else { if (h > max) { w *= max / h; h = max; } }
+                    c.width = w; c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    fotoBase64 = c.toDataURL('image/jpeg', 0.8);
+                    mostrarPreviewFoto(fotoBase64);
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function mostrarPreviewFoto(src) {
+            const c = document.getElementById('fotoContainer');
+            c.classList.add('has-photo');
+            c.innerHTML = `<img class="foto-preview" src="${src}"><div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="removerFoto(event)">🔄</div>`;
+        }
+
+        function removerFoto(e) {
+            e.stopPropagation();
+            fotoBase64 = null;
+            const c = document.getElementById('fotoContainer');
+            c.classList.remove('has-photo');
+            c.innerHTML = `<div class="foto-placeholder" onclick="abrirGaleria()"><span>📷</span><p>Toque para adicionar</p></div>`;
+            document.getElementById('fotoInput').value = '';
+        }
+
+        function irParaDesejos() {
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            if (!nome || !sobrenome) { mostrarToast('Preencha nome e sobrenome', 'error'); return; }
+            mostrarTela('telaDesejos');
+        }
+
+        function toggleTag(el) {
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                desejosSelecionados = desejosSelecionados.filter(d => d !== el.textContent);
+            } else {
+                if (desejosSelecionados.length >= 10) { mostrarToast('Máximo 10!', 'error'); return; }
+                el.classList.add('selected');
+                desejosSelecionados.push(el.textContent);
+            }
+            document.getElementById('contadorDesejos').textContent = desejosSelecionados.length;
+        }
+
+        function irParaPessoas() {
+            if (desejosSelecionados.length === 0) { mostrarToast('Selecione pelo menos 1', 'error'); return; }
+            mostrarTela('telaPessoas');
+        }
+
+        function togglePessoa(el) {
+            const p = el.dataset.pessoa;
+            if (el.classList.contains('selected')) {
+                el.classList.remove('selected');
+                pessoasSelecionadas = pessoasSelecionadas.filter(x => x !== p);
+            } else {
+                el.classList.add('selected');
+                pessoasSelecionadas.push(p);
+            }
+        }
+
+        function irParaPerguntas() { mostrarTela('telaPerguntas'); }
+
+        function selecionarNota(n) {
+            notaFelicidade = n;
+            document.querySelectorAll('.escala-num').forEach((el, i) => el.classList.toggle('selected', i + 1 === n));
+        }
+
+        function irParaAudio() { mostrarTela('telaAudio'); }
+
+        async function toggleGravacao() {
+            const btn = document.getElementById('btnGravar');
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+                    let mimeType = 'audio/webm';
+                    if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+                    mediaRecorder = new MediaRecorder(stream, { mimeType });
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+                    mediaRecorder.onstop = async () => {
+                        duracaoFinal = Math.floor((Date.now() - tempoInicio) / 1000);
+                        const blob = new Blob(audioChunks, { type: mimeType });
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            audioBase64 = reader.result;
+                            document.getElementById('audioPlayer').src = URL.createObjectURL(blob);
+                            document.getElementById('audioPreview').style.display = 'block';
+                            document.getElementById('btnGravar').style.display = 'none';
+                            document.getElementById('tempoGravacao').style.display = 'none';
+                        };
+                        reader.readAsDataURL(blob);
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                    mediaRecorder.start(100);
+                    btn.classList.add('gravando');
+                    btn.innerHTML = '⏹️';
+                    tempoInicio = Date.now();
+                    timerInterval = setInterval(atualizarTempo, 100);
+                    setTimeout(() => { if (mediaRecorder?.state === 'recording') pararGravacao(); }, 60000);
+                } catch (err) { mostrarToast('Erro no microfone', 'error'); }
+            } else { pararGravacao(); }
+        }
+
+        function pararGravacao() {
+            if (mediaRecorder?.state === 'recording') {
+                mediaRecorder.stop();
+                clearInterval(timerInterval);
+                document.getElementById('btnGravar').classList.remove('gravando');
+            }
+        }
+
+        function atualizarTempo() {
+            const elapsed = Math.floor((Date.now() - tempoInicio) / 1000);
+            document.getElementById('tempoGravacao').textContent = `${Math.floor(elapsed / 60).toString().padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`;
+        }
+
+        function regravar() {
+            audioBase64 = null; audioConfirmadoFlag = false; mediaRecorder = null;
+            document.getElementById('audioPreview').style.display = 'none';
+            document.getElementById('audioConfirmado').style.display = 'none';
+            document.getElementById('btnGravar').style.display = 'flex';
+            document.getElementById('btnGravar').innerHTML = '🎤';
+            document.getElementById('tempoGravacao').style.display = 'block';
+            document.getElementById('tempoGravacao').textContent = '00:00';
+        }
+
+        function confirmarAudio() {
+            audioConfirmadoFlag = true;
+            document.getElementById('audioPreview').style.display = 'none';
+            document.getElementById('audioConfirmado').style.display = 'flex';
+            document.getElementById('duracaoAudio').textContent = `Duração: ${Math.floor(duracaoFinal / 60).toString().padStart(2, '0')}:${(duracaoFinal % 60).toString().padStart(2, '0')}`;
+            mostrarToast('✓ Áudio confirmado!');
+        }
+
+        function pularAudio() { audioBase64 = null; audioConfirmadoFlag = false; irParaMensagem(); }
+
+        function irParaMensagem() {
+            document.getElementById('resumoDesejos').innerHTML = desejosSelecionados.map(d => `<span class="mini-tag">${d}</span>`).join('');
+            document.getElementById('resumoPessoas').textContent = pessoasSelecionadas.length > 0 ? pessoasSelecionadas.join(', ') : '-';
+            document.getElementById('resumoFelicidade').textContent = notaFelicidade || '-';
+            document.getElementById('resumoAudio').textContent = audioConfirmadoFlag ? '✅ Gravado' : '❌ Não';
+            mostrarTela('telaMensagem');
+        }
+
+        function atualizarContador() {
+            document.getElementById('charCounter').textContent = document.getElementById('mensagem').value.length;
+        }
+
+        async function lacrarCapsula() {
+            const nome = document.getElementById('nome').value.trim();
+            const sobrenome = document.getElementById('sobrenome').value.trim();
+            const mensagem = document.getElementById('mensagem').value.trim();
+            const conquista = document.getElementById('perguntaConquista').value.trim();
+            const momento = document.getElementById('perguntaMomento').value.trim();
+            const palavra = document.getElementById('perguntaPalavra').value.trim();
+            const previsao = document.getElementById('perguntaPrevisao').value.trim();
+
+            document.getElementById('btnLacrar').disabled = true;
+            document.getElementById('loading').classList.add('active');
+
+            try {
+                capsulaId = gerarID('cap');
+                let fotoUrl = null, audioUrl = null;
+
+                if (fotoBase64) {
+                    const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
+                    const fotoBlob = await (await fetch(fotoBase64)).blob();
+                    await fotoRef.put(fotoBlob, { contentType: 'image/jpeg' });
+                    fotoUrl = await fotoRef.getDownloadURL();
+                }
+
+                if (audioBase64 && audioConfirmadoFlag) {
+                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio`);
+                    const audioBlob = await (await fetch(audioBase64)).blob();
+                    await audioRef.put(audioBlob);
+                    audioUrl = await audioRef.getDownloadURL();
+                }
+
+                const capsula = {
+                    eventoId,
+                    nome,
+                    sobrenome,
+                    foto: fotoUrl,
+                    audio: audioUrl,
+                    desejos: desejosSelecionados,
+                    pessoas: pessoasSelecionadas,
+                    perguntas: { conquista, momento, palavra, felicidade: notaFelicidade, previsao },
+                    mensagem,
+                    criadaEm: new Date().toISOString(),
+                    liberada: false,
+                    aberta: false
+                };
+
+                await database.ref(`capsulas/${capsulaId}`).set(capsula);
+
+                document.getElementById('loading').classList.remove('active');
+                
+                const sf = document.getElementById('sucessoFoto');
+                sf.innerHTML = fotoUrl ? `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;">` : '⏳';
+                document.getElementById('sucessoNome').textContent = `${nome}, sua cápsula está lacrada!`;
+                document.getElementById('sucessoData').textContent = formatarData(eventoData.dataAbertura);
+                
+                const dias = Math.ceil((new Date(eventoData.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
+                document.getElementById('sucessoDias').textContent = dias > 0 ? dias : 0;
+                
+                linkCapsula = window.location.origin + window.location.pathname.replace('jogador.html', '') + `capsula.html?id=${capsulaId}`;
+                
+                mostrarTela('telaSucesso');
+                criarConfetes();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('btnLacrar').disabled = false;
+                mostrarToast('Erro ao lacrar. Tente novamente.', 'error');
+            }
+        }
+
+        function abrirCompartilhar() {
+            document.getElementById('shareModal').classList.add('active');
+            gerarImagemShare();
+        }
+
+        function gerarImagemShare() {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = 540, h = 960;
+            canvas.width = w; canvas.height = h;
+
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, '#0c0f14');
+            grad.addColorStop(0.5, '#111827');
+            grad.addColorStop(1, '#0c0f14');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            for (let i = 0; i < 50; i++) {
+                ctx.fillStyle = `rgba(212,175,55,${0.1 + Math.random() * 0.3})`;
+                ctx.beginPath();
+                ctx.arc(Math.random() * w, Math.random() * h, 1 + Math.random() * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 80px serif';
+            ctx.fillText('⏳', w / 2, 120);
+
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 36px serif';
+            ctx.fillText(eventoData?.nome || 'Cápsula do Tempo', w / 2, 200);
+
+            ctx.save();
+            ctx.translate(w / 2, 380);
+            ctx.fillStyle = '#d4af37';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 70, 90, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(-25, -35, 15, 25, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '40px serif';
+            ctx.fillStyle = '#0c0f14';
+            ctx.fillText('🔒', 0, 15);
+            ctx.restore();
+
+            if (fotoBase64) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(w / 2, 560, 60, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(img, w / 2 - 60, 500, 120, 120);
+                    ctx.restore();
+                    ctx.strokeStyle = '#d4af37';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(w / 2, 560, 62, 0, Math.PI * 2);
+                    ctx.stroke();
+                    finalizarImagem(ctx, w, h);
+                };
+                img.src = fotoBase64;
+            } else {
+                finalizarImagem(ctx, w, h);
+            }
+        }
+
+        function finalizarImagem(ctx, w, h) {
+            const nome = document.getElementById('nome').value;
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.fillText(nome, w / 2, 660);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillText('✨ CÁPSULA LACRADA! ✨', w / 2, 710);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.font = '18px sans-serif';
+            ctx.fillText(`📅 Abre em: ${formatarData(eventoData?.dataAbertura)}`, w / 2, 760);
+
+            const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
+            ctx.fillStyle = '#d4af37';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.fillText(`${dias} DIAS`, w / 2, 830);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('⏳ Cápsula do Tempo', w / 2, h - 30);
+        }
+
+        function salvarImagem() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = `capsula-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            mostrarToast('📷 Imagem salva!');
+        }
+
+        async function criarGif() {
+            const btn = document.getElementById('btnSalvarGif');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="icon">⏳</span>Gerando...';
+            
+            document.getElementById('shareStatus').style.display = 'block';
+            document.getElementById('shareStatusText').textContent = 'Criando GIF animado...';
+            
+            try {
+                const gif = new GIF({ workers: 2, quality: 10, width: 540, height: 960, workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js' });
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 540; tempCanvas.height = 960;
+                const tempCtx = tempCanvas.getContext('2d');
+                const nome = document.getElementById('nome').value;
+                const dataAbertura = formatarData(eventoData?.dataAbertura);
+                const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
+                
+                let fotoImg = null;
+                if (fotoBase64) {
+                    fotoImg = new Image();
+                    await new Promise(r => { fotoImg.onload = r; fotoImg.src = fotoBase64; });
+                }
+                
+                const totalFrames = 30;
+                for (let frame = 0; frame < totalFrames; frame++) {
+                    const progress = ((frame + 1) / totalFrames) * 100;
+                    document.getElementById('shareProgressBar').style.width = progress + '%';
+                    
+                    const grad = tempCtx.createLinearGradient(0, 0, 0, 960);
+                    grad.addColorStop(0, '#0c0f14');
+                    grad.addColorStop(0.5, '#111827');
+                    grad.addColorStop(1, '#0c0f14');
+                    tempCtx.fillStyle = grad;
+                    tempCtx.fillRect(0, 0, 540, 960);
+                    
+                    for (let i = 0; i < 30; i++) {
+                        const opacity = 0.2 + Math.sin((frame + i) * 0.3) * 0.3;
+                        tempCtx.fillStyle = `rgba(212,175,55,${opacity})`;
+                        tempCtx.beginPath();
+                        tempCtx.arc((i * 37) % 540, (i * 53 + frame * 5) % 960, 2, 0, Math.PI * 2);
+                        tempCtx.fill();
+                    }
+                    
+                    tempCtx.textAlign = 'center';
+                    const bounce = Math.sin(frame * 0.3) * 10;
+                    tempCtx.font = 'bold 80px serif';
+                    tempCtx.fillText('⏳', 270, 120 + bounce);
+                    
+                    tempCtx.fillStyle = '#d4af37';
+                    tempCtx.font = 'bold 32px serif';
+                    tempCtx.fillText(eventoData?.nome || 'Cápsula do Tempo', 270, 200);
+                    
+                    tempCtx.save();
+                    tempCtx.translate(270, 380);
+                    const capFloat = Math.sin(frame * 0.2) * 8;
+                    tempCtx.translate(0, capFloat);
+                    tempCtx.fillStyle = '#d4af37';
+                    tempCtx.beginPath();
+                    tempCtx.ellipse(0, 0, 70, 90, 0, 0, Math.PI * 2);
+                    tempCtx.fill();
+                    tempCtx.font = '40px serif';
+                    tempCtx.fillStyle = '#0c0f14';
+                    tempCtx.fillText('🔒', 0, 15);
+                    tempCtx.restore();
+                    
+                    if (fotoImg && frame > 8) {
+                        const alpha = Math.min(1, (frame - 8) / 8);
+                        tempCtx.globalAlpha = alpha;
+                        tempCtx.save();
+                        tempCtx.beginPath();
+                        tempCtx.arc(270, 560, 60, 0, Math.PI * 2);
+                        tempCtx.clip();
+                        tempCtx.drawImage(fotoImg, 210, 500, 120, 120);
+                        tempCtx.restore();
+                        tempCtx.strokeStyle = '#d4af37';
+                        tempCtx.lineWidth = 4;
+                        tempCtx.beginPath();
+                        tempCtx.arc(270, 560, 62, 0, Math.PI * 2);
+                        tempCtx.stroke();
+                        tempCtx.globalAlpha = 1;
+                    }
+                    
+                    if (frame > 12) {
+                        tempCtx.fillStyle = '#d4af37';
+                        tempCtx.font = 'bold 28px sans-serif';
+                        tempCtx.fillText(nome, 270, 660);
+                    }
+                    
+                    if (frame > 16) {
+                        tempCtx.fillStyle = '#fff';
+                        tempCtx.font = 'bold 20px sans-serif';
+                        tempCtx.fillText('✨ CÁPSULA LACRADA! ✨', 270, 710);
+                    }
+                    
+                    if (frame > 20) {
+                        tempCtx.fillStyle = 'rgba(255,255,255,0.8)';
+                        tempCtx.font = '18px sans-serif';
+                        tempCtx.fillText(`📅 Abre em: ${dataAbertura}`, 270, 760);
+                        
+                        const scale = 1 + Math.sin(frame * 0.3) * 0.05;
+                        tempCtx.save();
+                        tempCtx.translate(270, 830);
+                        tempCtx.scale(scale, scale);
+                        tempCtx.fillStyle = '#d4af37';
+                        tempCtx.font = 'bold 48px sans-serif';
+                        tempCtx.fillText(`${dias} DIAS`, 0, 0);
+                        tempCtx.restore();
+                    }
+                    
+                    tempCtx.fillStyle = 'rgba(255,255,255,0.5)';
+                    tempCtx.font = '14px sans-serif';
+                    tempCtx.fillText('⏳ Cápsula do Tempo', 270, 930);
+                    
+                    gif.addFrame(tempCtx, { copy: true, delay: 100 });
+                }
+                
+                gif.on('finished', (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `capsula-animada-${Date.now()}.gif`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span class="icon">🎬</span>Criar GIF';
+                    document.getElementById('shareStatus').style.display = 'none';
+                    mostrarToast('🎬 GIF salvo!');
+                });
+                
+                gif.render();
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerHTML = '<span class="icon">🎬</span>Criar GIF';
+                document.getElementById('shareStatus').style.display = 'none';
+                mostrarToast('Erro ao criar GIF', 'error');
+            }
+        }
+
+        function copiarLink() {
+            navigator.clipboard.writeText(linkCapsula).then(() => mostrarToast('🔗 Link copiado!'));
+        }
+
+        function fecharCompartilhar() { document.getElementById('shareModal').classList.remove('active'); }
+
+        function verCapsula() { if (linkCapsula) window.location.href = linkCapsula; }
+    </script>
+</body>
+</html>

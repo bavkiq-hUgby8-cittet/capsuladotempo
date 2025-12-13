@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⏳ Minha Cápsula do Tempo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-deep: #0c0f14;
+            --bg-card: rgba(255,255,255,0.04);
+            --gold-primary: #d4af37;
+            --gold-light: #f4d03f;
+            --gold-dark: #b8962e;
+            --accent-warm: #e67e22;
+            --accent-success: #27ae60;
+            --accent-danger: #c0392b;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --text-muted: rgba(255,255,255,0.4);
+            --border-subtle: rgba(255,255,255,0.1);
+            --border-gold: rgba(212,175,55,0.4);
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #0d1117 50%, #111827 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        .atmosphere {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tela {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tela.active { display: flex; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tela-lacrada {
+            align-items: center;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .foto-lacrada {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid var(--gold-primary);
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--accent-warm));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            box-shadow: 0 0 50px rgba(212,175,55,0.4);
+        }
+        
+        .foto-lacrada img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .nome-lacrada {
+            font-size: 2rem;
+            color: var(--gold-light);
+            margin-bottom: 6px;
+        }
+        
+        .evento-lacrada {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+
+        .capsula-3d {
+            position: relative;
+            width: 180px;
+            height: 220px;
+            margin: 20px auto;
+        }
+        
+        .capsula-corpo {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: inset -20px -20px 40px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4);
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .capsula-tampa {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+            border-radius: 50% 50% 0 0;
+        }
+        
+        .capsula-lacre {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            z-index: 2;
+        }
+        
+        .capsula-brilho {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 30px;
+            height: 30px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+
+        .status-badge {
+            padding: 14px 28px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin: 24px 0;
+            font-size: 1.1rem;
+        }
+        
+        .status-lacrada {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+        }
+        
+        .status-liberada {
+            background: rgba(212,175,55,0.2);
+            color: var(--gold-light);
+            animation: pulse 2s infinite;
+            border: 2px solid var(--gold-primary);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 28px 0;
+        }
+        
+        .countdown-item { text-align: center; }
+        
+        .countdown-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            background: rgba(0,0,0,0.4);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            min-width: 65px;
+            border: 2px solid var(--border-gold);
+        }
+        
+        .countdown-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .btn-abrir {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-deep);
+            border: none;
+            padding: 20px 52px;
+            border-radius: var(--radius-md);
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 8px 30px rgba(212,175,55,0.4);
+            transition: all 0.3s;
+            margin-top: 24px;
+        }
+        
+        .btn-abrir:hover { transform: translateY(-3px) scale(1.02); }
+        .btn-abrir:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .msg-aguarde {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        .tela-aberta { padding: 20px 0; }
+        
+        .header-aberta {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        
+        .foto-mini {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--gold-primary);
+            flex-shrink: 0;
+        }
+        
+        .foto-mini img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .info-header h2 { font-size: 1.5rem; color: var(--gold-light); }
+        .info-header p { font-size: 0.95rem; color: var(--text-secondary); margin-top: 4px; }
+
+        .secao {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 18px;
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .secao-titulo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            color: var(--gold-light);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+        
+        .secao-conteudo {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tag-item {
+            background: rgba(212,175,55,0.18);
+            color: var(--gold-primary);
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: 1px solid var(--border-gold);
+        }
+
+        .secao-audio {
+            background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(230,126,34,0.05));
+            border: 2px solid var(--gold-primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .secao-audio::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+            animation: audioGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes audioGlow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .audio-player {
+            background: rgba(0,0,0,0.4);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .audio-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .audio-icon-big {
+            font-size: 3.5rem;
+            animation: micPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes micPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .audio-info h3 {
+            color: var(--gold-light);
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .audio-info p { color: var(--text-secondary); font-size: 0.95rem; }
+        
+        .audio-player audio {
+            width: 100%;
+            height: 60px;
+            border-radius: var(--radius-md);
+        }
+        
+        .btn-play-audio {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-deep);
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .btn-play-audio:hover { transform: scale(1.02); }
+        .btn-play-audio.playing { background: var(--accent-success); }
+
+        .pergunta-item {
+            background: rgba(0,0,0,0.25);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 14px;
+            border-left: 4px solid var(--gold-primary);
+        }
+        
+        .pergunta-label {
+            font-size: 0.9rem;
+            color: var(--gold-primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .pergunta-resposta {
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .felicidade-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        
+        .felicidade-nota {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            color: var(--gold-primary);
+            font-weight: 700;
+        }
+        
+        .felicidade-barra {
+            flex: 1;
+            height: 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .felicidade-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-primary), var(--accent-warm));
+            border-radius: 6px;
+        }
+
+        .mensagem-texto {
+            white-space: pre-wrap;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .mensagem-chars {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        .reflexao-form textarea {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            color: white;
+            font-size: 1.1rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 130px;
+            line-height: 1.6;
+        }
+        
+        .reflexao-form textarea:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+        }
+        
+        .btn-salvar {
+            background: var(--accent-success);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            font-family: inherit;
+            font-size: 1.1rem;
+        }
+        
+        .reflexao-salva {
+            background: rgba(39,174,96,0.15);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border-left: 4px solid var(--accent-success);
+        }
+        
+        .reflexao-salva-titulo {
+            color: var(--accent-success);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .reflexao-salva-texto {
+            color: white;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .btn-compartilhar {
+            width: 100%;
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            border: none;
+            color: white;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .abertura-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s;
+        }
+        
+        .abertura-overlay.active { opacity: 1; visibility: visible; }
+        
+        .abertura-capsula { font-size: 9rem; }
+        
+        .abertura-capsula.shake { animation: shakeOpen 0.5s ease; }
+        
+        @keyframes shakeOpen {
+            0%, 100% { transform: rotate(0); }
+            25% { transform: rotate(-12deg); }
+            75% { transform: rotate(12deg); }
+        }
+        
+        .abertura-capsula.explode { animation: explodeOpen 0.8s ease forwards; }
+        
+        @keyframes explodeOpen {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        .flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            opacity: 0;
+            z-index: 1001;
+            pointer-events: none;
+        }
+        
+        .flash.active { animation: flashAnim 0.8s ease; }
+        
+        @keyframes flashAnim {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .confetes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1500;
+        }
+        
+        .confete {
+            position: absolute;
+            animation: confeteFall 3s ease-out forwards;
+        }
+        
+        @keyframes confeteFall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent-success);
+            color: white;
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.4s;
+        }
+        
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .tela-erro {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .erro-icon { font-size: 5rem; margin-bottom: 24px; opacity: 0.7; }
+
+        @media (max-width: 400px) {
+            .countdown-value { font-size: 1.8rem; padding: 10px 14px; min-width: 55px; }
+            .nome-lacrada { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="atmosphere" id="atmosphere"></div>
+    <div class="confetes" id="confetes"></div>
+
+    <div class="container">
+        <div class="tela tela-lacrada active" id="telaLacrada">
+            <div class="foto-lacrada" id="fotoLacrada">⏳</div>
+            <h2 class="nome-lacrada" id="nomeLacrada">Carregando...</h2>
+            <p class="evento-lacrada" id="eventoLacrada">Cápsula do Tempo</p>
+            
+            <div class="capsula-3d">
+                <div class="capsula-corpo"></div>
+                <div class="capsula-tampa"></div>
+                <div class="capsula-lacre" id="capsulaLacre">🔒</div>
+                <div class="capsula-brilho"></div>
+            </div>
+            
+            <div class="status-badge status-lacrada" id="statusBadge">🔒 LACRADA</div>
+            
+            <div class="countdown" id="countdown">
+                <div class="countdown-item"><div class="countdown-value" id="dias">--</div><div class="countdown-label">DIAS</div></div>
+                <div class="countdown-item"><div class="countdown-value" id="horas">--</div><div class="countdown-label">HORAS</div></div>
+                <div class="countdown-item"><div class="countdown-value" id="mins">--</div><div class="countdown-label">MIN</div></div>
+                <div class="countdown-item"><div class="countdown-value" id="segs">--</div><div class="countdown-label">SEG</div></div>
+            </div>
+            
+            <button class="btn-abrir" id="btnAbrir" onclick="abrirCapsula()" disabled>🔒 AGUARDE A DATA</button>
+            <p class="msg-aguarde" id="msgAguarde">Sua cápsula será liberada na data programada.</p>
+        </div>
+
+        <div class="tela tela-aberta" id="telaAberta">
+            <div class="header-aberta">
+                <div class="foto-mini" id="fotoMini"><img src="" alt=""></div>
+                <div class="info-header">
+                    <h2 id="nomeAberta">Nome</h2>
+                    <p id="eventoAberta">Cápsula do Tempo</p>
+                </div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">🌟 Minhas Prioridades</div>
+                <div class="tags-container" id="desejosContainer"></div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">👥 Pessoas Importantes</div>
+                <div class="secao-conteudo" id="pessoasContainer">-</div>
+            </div>
+            
+            <div class="secao" id="secaoAudio" style="display:none">
+                <div class="secao-titulo">🎤 Mensagem de Voz</div>
+                <div class="audio-player">
+                    <div class="audio-header">
+                        <div class="audio-icon-big">🎙️</div>
+                        <div class="audio-info">
+                            <h3>Minha voz do passado</h3>
+                            <p>Ouça o que você gravou</p>
+                        </div>
+                    </div>
+                    <audio id="audioElement" controls style="width:100%"></audio>
+                </div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">💭 Reflexões</div>
+                <div id="perguntasContainer"></div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">💌 Mensagem para o Futuro</div>
+                <div class="secao-conteudo">
+                    <div class="mensagem-texto" id="mensagemTexto">-</div>
+                </div>
+            </div>
+            
+            <div class="secao">
+                <div class="secao-titulo">✍️ Reflexão Atual</div>
+                <div class="reflexao-form" id="reflexaoForm">
+                    <textarea id="reflexaoInput" placeholder="E aí, o que você acha? As previsões se concretizaram?"></textarea>
+                    <button class="btn-salvar" onclick="salvarReflexao()">💾 Salvar Reflexão</button>
+                </div>
+                <div class="reflexao-salva" id="reflexaoSalva" style="display:none">
+                    <div class="reflexao-salva-titulo">✅ Sua reflexão</div>
+                    <div class="reflexao-salva-texto" id="reflexaoTexto"></div>
+                </div>
+            </div>
+            
+            <button class="btn-compartilhar" onclick="compartilhar()">📸 Compartilhar</button>
+        </div>
+
+        <div class="tela tela-erro" id="telaErro">
+            <div class="erro-icon">😕</div>
+            <h2 style="color: var(--gold-light); margin-bottom: 12px;">Cápsula não encontrada</h2>
+            <p style="color: var(--text-secondary);">O link pode estar incorreto.</p>
+        </div>
+    </div>
+
+    <div class="abertura-overlay" id="aberturaOverlay">
+        <div class="abertura-capsula" id="aberturaCapsula">⏳</div>
+    </div>
+    <div class="flash" id="flash"></div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
+            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
+            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
+            projectId: "capsuladotempo-f86bf",
+            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
+            messagingSenderId: "43014678980",
+            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let capsulaId = null, capsulaData = null, eventoData = null;
+        let countdownInterval = null;
+
+        function criarEstrelas() {
+            const c = document.getElementById('atmosphere');
+            for (let i = 0; i < 50; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                const sz = 1 + Math.random() * 2;
+                s.style.width = sz + 'px';
+                s.style.height = sz + 'px';
+                s.style.animationDelay = Math.random() * 4 + 's';
+                c.appendChild(s);
+            }
+        }
+
+        function criarConfetes() {
+            const c = document.getElementById('confetes');
+            c.innerHTML = '';
+            const cores = ['#d4af37', '#f4d03f', '#e67e22', '#27ae60', '#fff', '#ff6b6b'];
+            for (let i = 0; i < 100; i++) {
+                const cf = document.createElement('div');
+                cf.className = 'confete';
+                cf.style.left = Math.random() * 100 + 'vw';
+                cf.style.background = cores[Math.floor(Math.random() * cores.length)];
+                cf.style.animationDelay = Math.random() * 2 + 's';
+                const sz = 5 + Math.random() * 10;
+                cf.style.width = sz + 'px';
+                cf.style.height = sz + 'px';
+                cf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                c.appendChild(cf);
+            }
+        }
+
+        function mostrarTela(id) {
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function formatarData(d) { return new Date(d).toLocaleDateString('pt-BR'); }
+
+        function mostrarToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show';
+            setTimeout(() => t.className = 'toast', 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            criarEstrelas();
+            const params = new URLSearchParams(window.location.search);
+            capsulaId = params.get('id');
+            if (!capsulaId) { mostrarTela('telaErro'); return; }
+            
+            try {
+                const snap = await database.ref(`capsulas/${capsulaId}`).once('value');
+                capsulaData = snap.val();
+                if (!capsulaData) { mostrarTela('telaErro'); return; }
+                
+                const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
+                eventoData = evtSnap.val();
+                
+                preencherTelaLacrada();
+                verificarStatus();
+                
+            } catch (err) {
+                console.error(err);
+                mostrarTela('telaErro');
+            }
+        });
+
+        function preencherTelaLacrada() {
+            const foto = document.getElementById('fotoLacrada');
+            if (capsulaData.foto) {
+                foto.innerHTML = `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`;
+            }
+            document.getElementById('nomeLacrada').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
+            document.getElementById('eventoLacrada').textContent = eventoData?.nome || 'Cápsula do Tempo';
+        }
+
+        function verificarStatus() {
+            const dataAbertura = new Date(eventoData?.dataAbertura + 'T00:00:00');
+            const agora = new Date();
+            const podeAbrir = capsulaData.liberada || agora >= dataAbertura;
+            
+            if (capsulaData.aberta) {
+                mostrarConteudo();
+                return;
+            }
+            
+            if (podeAbrir) {
+                document.getElementById('statusBadge').textContent = '✨ PRONTA PARA ABRIR!';
+                document.getElementById('statusBadge').className = 'status-badge status-liberada';
+                document.getElementById('capsulaLacre').textContent = '✨';
+                document.getElementById('btnAbrir').disabled = false;
+                document.getElementById('btnAbrir').textContent = '🎉 ABRIR CÁPSULA!';
+                document.getElementById('msgAguarde').textContent = 'Sua cápsula está pronta para ser aberta!';
+                document.getElementById('countdown').style.display = 'none';
+            } else {
+                iniciarCountdown(dataAbertura);
+            }
+        }
+
+        function iniciarCountdown(dataAlvo) {
+            function atualizar() {
+                const agora = new Date();
+                const diff = dataAlvo - agora;
+                
+                if (diff <= 0) {
+                    clearInterval(countdownInterval);
+                    verificarStatus();
+                    return;
+                }
+                
+                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const segs = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('dias').textContent = dias.toString().padStart(2, '0');
+                document.getElementById('horas').textContent = horas.toString().padStart(2, '0');
+                document.getElementById('mins').textContent = mins.toString().padStart(2, '0');
+                document.getElementById('segs').textContent = segs.toString().padStart(2, '0');
+            }
+            
+            atualizar();
+            countdownInterval = setInterval(atualizar, 1000);
+        }
+
+        async function abrirCapsula() {
+            const overlay = document.getElementById('aberturaOverlay');
+            const capsula = document.getElementById('aberturaCapsula');
+            const flash = document.getElementById('flash');
+            
+            overlay.classList.add('active');
+            
+            await new Promise(r => setTimeout(r, 500));
+            
+            for (let i = 0; i < 3; i++) {
+                capsula.classList.add('shake');
+                await new Promise(r => setTimeout(r, 500));
+                capsula.classList.remove('shake');
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            capsula.classList.add('explode');
+            flash.classList.add('active');
+            
+            await new Promise(r => setTimeout(r, 800));
+            
+            try {
+                await database.ref(`capsulas/${capsulaId}/aberta`).set(true);
+                await database.ref(`capsulas/${capsulaId}/abertaEm`).set(new Date().toISOString());
+            } catch (err) { console.error(err); }
+            
+            overlay.classList.remove('active');
+            flash.classList.remove('active');
+            capsula.classList.remove('explode');
+            
+            mostrarConteudo();
+            criarConfetes();
+        }
+
+        function mostrarConteudo() {
+            mostrarTela('telaAberta');
+            
+            if (capsulaData.foto) {
+                document.getElementById('fotoMini').innerHTML = `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`;
+            }
+            
+            document.getElementById('nomeAberta').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
+            document.getElementById('eventoAberta').textContent = eventoData?.nome || 'Cápsula do Tempo';
+            
+            const desejosContainer = document.getElementById('desejosContainer');
+            if (capsulaData.desejos?.length > 0) {
+                desejosContainer.innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
+            } else {
+                desejosContainer.innerHTML = '<span style="color: var(--text-muted)">Nenhuma prioridade selecionada</span>';
+            }
+            
+            const pessoasContainer = document.getElementById('pessoasContainer');
+            pessoasContainer.textContent = capsulaData.pessoas?.length > 0 ? capsulaData.pessoas.join(', ') : '-';
+            
+            if (capsulaData.audio) {
+                document.getElementById('secaoAudio').style.display = 'block';
+                document.getElementById('audioElement').src = capsulaData.audio;
+            }
+            
+            const perguntasContainer = document.getElementById('perguntasContainer');
+            const perguntas = capsulaData.perguntas || {};
+            let perguntasHTML = '';
+            
+            if (perguntas.conquista) {
+                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">🎯 O que achava que iria conquistar:</div><div class="pergunta-resposta">${perguntas.conquista}</div></div>`;
+            }
+            if (perguntas.momento) {
+                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">✨ Momento mais marcante:</div><div class="pergunta-resposta">${perguntas.momento}</div></div>`;
+            }
+            if (perguntas.palavra) {
+                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">📝 Palavra que me definia:</div><div class="pergunta-resposta" style="font-size:1.3rem;color:var(--gold-primary);font-weight:600;">"${perguntas.palavra}"</div></div>`;
+            }
+            if (perguntas.felicidade) {
+                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">😊 Nível de felicidade:</div><div class="felicidade-display"><span class="felicidade-nota">${perguntas.felicidade}</span><div class="felicidade-barra"><div class="felicidade-fill" style="width:${perguntas.felicidade * 10}%"></div></div></div></div>`;
+            }
+            if (perguntas.previsao) {
+                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">🔮 Minha previsão:</div><div class="pergunta-resposta">${perguntas.previsao}</div></div>`;
+            }
+            
+            perguntasContainer.innerHTML = perguntasHTML || '<p style="color: var(--text-muted)">Nenhuma reflexão registrada</p>';
+            
+            document.getElementById('mensagemTexto').textContent = capsulaData.mensagem || '-';
+            
+            if (capsulaData.reflexao) {
+                document.getElementById('reflexaoForm').style.display = 'none';
+                document.getElementById('reflexaoSalva').style.display = 'block';
+                document.getElementById('reflexaoTexto').textContent = capsulaData.reflexao;
+            }
+        }
+
+        async function salvarReflexao() {
+            const texto = document.getElementById('reflexaoInput').value.trim();
+            if (!texto) { mostrarToast('Escreva algo primeiro!'); return; }
+            
+            try {
+                await database.ref(`capsulas/${capsulaId}/reflexao`).set(texto);
+                document.getElementById('reflexaoForm').style.display = 'none';
+                document.getElementById('reflexaoSalva').style.display = 'block';
+                document.getElementById('reflexaoTexto').textContent = texto;
+                mostrarToast('✅ Reflexão salva!');
+            } catch (err) {
+                mostrarToast('Erro ao salvar');
+            }
+        }
+
+        function compartilhar() {
+            const texto = `⏳ Acabei de abrir minha Cápsula do Tempo!\n\n${eventoData?.nome || 'Cápsula do Tempo'}\n\nFoi incrível relembrar minhas previsões e desejos!`;
+            
+            if (navigator.share) {
+                navigator.share({ title: 'Cápsula do Tempo', text: texto, url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                mostrarToast('🔗 Link copiado!');
+            }
+        }
+    </script>
+</body>
+</html>
