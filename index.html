@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⏳ Cápsula do Tempo - Painel do Guardião</title>
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⏳&lt;/text&gt;&lt;/svg&gt;">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
@@ -654,11 +654,14 @@
             grid-column: span 2;
         }
         
+        .event-btn.open, .event-btn.largo {
+            grid-column: span 2;
+        }
+        
         .event-btn.open {
             background: linear-gradient(135deg, var(--accent-success), #219a52);
             border: none;
             color: white;
-            grid-column: span 2;
         }
 
         .empty-state {
@@ -697,7 +700,7 @@
             padding: 20px;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s;
+            transition: opacity 0.3s;
         }
         
         .modal-overlay.active {
@@ -711,10 +714,12 @@
             border-radius: var(--radius-xl);
             width: 100%;
             max-width: 480px;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 92vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             transform: scale(0.95);
-            transition: all 0.3s;
+            transition: transform 0.3s;
         }
         
         .modal-overlay.active .modal {
@@ -755,6 +760,9 @@
         
         .modal-body {
             padding: 24px;
+            overflow: auto;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
         }
         
         .qr-display {
@@ -902,7 +910,8 @@
         
         .capsule-btn {
             width: 100%;
-            padding: 10px;
+            min-height: 44px;
+            padding: 12px;
             border-radius: var(--radius-sm);
             font-family: inherit;
             font-size: 0.85rem;
@@ -1047,6 +1056,151 @@
             .section-title { font-size: 1.4rem; }
             .auth-card { padding: 24px; }
             .manager-stats { flex-wrap: wrap; gap: 20px; }
+            .cerimonia-painel { width: min(920px, 100%); }
+            .avatar-voador { width: 76px; }
+        }
+        
+        .auth-hint {
+            margin-top: 14px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.45;
+        }
+        
+        .event-note {
+            margin-top: 10px;
+            color: var(--gold-light);
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        
+        .event-card.destaque { border-color: var(--border-gold); }
+        
+        .storage-banner {
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            background: rgba(230, 126, 34, 0.16);
+            border: 1px solid rgba(230, 126, 34, 0.55);
+            color: #ffd7a8;
+            line-height: 1.5;
+        }
+        
+        .storage-banner[hidden] { display: none !important; }
+        
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+        }
+        
+        .cerimonia {
+            position: fixed;
+            inset: 0;
+            z-index: 2500;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 18px;
+            padding: 28px 16px 40px;
+            overflow: auto;
+            background: rgba(8, 10, 14, 0.96);
+        }
+        
+        .cerimonia.active { display: flex; }
+        
+        .cerimonia-painel { width: min(980px, 100%); text-align: center; }
+        
+        .cerimonia h2 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: var(--gold-light);
+        }
+        
+        .cerimonia-quando { color: var(--text-secondary); margin-bottom: 8px; }
+        
+        .cerimonia-fechar {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 0;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        
+        .avatares-voando, .nuvem-palavras, .palavras-voando {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin: 8px 0 12px;
+        }
+        
+        .avatar-voador {
+            width: 92px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            animation: voar 4.5s ease-in-out infinite;
+        }
+        
+        .avatar-voador img, .avatar-voador .foto-fallback {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-primary);
+            margin: 0 auto 6px;
+        }
+        
+        @keyframes voar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .palavra-voando {
+            color: var(--gold-light);
+            font-weight: 700;
+            animation: subir 7s ease-in-out infinite;
+        }
+        
+        @keyframes subir {
+            0%, 100% { transform: translateY(8px); opacity: 0.45; }
+            50% { transform: translateY(-8px); opacity: 1; }
+        }
+        
+        .contador-valor {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            color: var(--gold-primary);
+            line-height: 1;
+        }
+        
+        .stats-finais {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin: 12px 0 18px;
+        }
+        
+        button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--gold-light);
+            outline-offset: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-finais { gap: 16px; }
+            .cerimonia { padding-top: 64px; }
         }
     </style>
 </head>
@@ -1063,41 +1217,15 @@
             </div>
             
             <div class="auth-card">
-                <div class="auth-status checking" id="authStatus">🔄 Verificando conexão com Firebase...</div>
-                
-                <div class="auth-tabs">
-                    <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
-                    <button class="auth-tab" onclick="switchAuthTab('register')">Criar Conta</button>
-                </div>
-                
+                <div class="auth-status checking" id="authStatus">Carregando…</div>
                 <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
                     <div class="form-field">
-                        <label>Email</label>
-                        <input type="email" id="loginEmail" placeholder="seu@email.com" required>
-                    </div>
-                    <div class="form-field">
-                        <label>Senha</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <label for="guardiaoSenha">Senha do guardião</label>
+                        <input type="password" id="guardiaoSenha" autocomplete="current-password" placeholder="A senha da família" required>
                     </div>
                     <button type="submit" class="auth-btn" id="loginBtn">Entrar</button>
-                    <div class="auth-error" id="loginError"></div>
-                </form>
-                
-                <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
-                    <div class="form-field">
-                        <label>Nome</label>
-                        <input type="text" id="registerName" placeholder="Seu nome" required>
-                    </div>
-                    <div class="form-field">
-                        <label>Email</label>
-                        <input type="email" id="registerEmail" placeholder="seu@email.com" required>
-                    </div>
-                    <div class="form-field">
-                        <label>Senha</label>
-                        <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
-                    </div>
-                    <button type="submit" class="auth-btn" id="registerBtn">Criar Conta</button>
-                    <div class="auth-error" id="registerError"></div>
+                    <p class="auth-hint">Entrar não altera nenhuma cápsula. A senha é a mesma de 2025.</p>
+                    <div class="auth-error" id="loginError" role="alert"></div>
                 </form>
             </div>
         </div>
@@ -1125,15 +1253,17 @@
         </header>
         
         <main class="main">
+            <div class="storage-banner" id="storageBanner" hidden></div>
             <section class="create-section">
                 <form class="create-form" onsubmit="createEvent(event)">
                     <div class="form-field">
-                        <label>Nome do Evento</label>
-                        <input type="text" id="eventName" placeholder="Ex: Natal 2025" required>
+                        <label for="eventName">Nome do Evento</label>
+                        <input type="text" id="eventName" placeholder="Ex: Natal 2026" required>
                     </div>
                     <div class="form-field">
-                        <label>Data de Abertura</label>
+                        <label for="eventDate">Data de Abertura</label>
                         <input type="date" id="eventDate" required>
+                        <p class="auth-hint">Abre ao meio-dia, horário de Brasília. O evento de 2025 já está marcado para 25/12/2026.</p>
                     </div>
                     <button type="submit" class="btn-primary">
                         <span>✨</span>
@@ -1207,13 +1337,14 @@
                 <h3 class="modal-title"><span>🔐</span> Liberar Cápsula</h3>
                 <button class="modal-close" onclick="closeModal('passwordModal')">×</button>
             </div>
-            <div class="modal-body">
-                <p style="color: var(--text-secondary); margin-bottom: 20px;">Digite sua senha para confirmar:</p>
+            <form class="modal-body" id="formLiberar" onsubmit="confirmRelease(event)">
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">A senha do guardião só libera a cápsula. A carta não é alterada.</p>
                 <div class="form-field">
-                    <input type="password" id="releasePassword" placeholder="Sua senha">
+                    <label for="releasePassword">Senha do guardião</label>
+                    <input type="password" id="releasePassword" name="senha" autocomplete="current-password" placeholder="Senha da família" required>
                 </div>
-                <button class="btn-primary" style="width: 100%;" onclick="confirmRelease()">🔓 Liberar</button>
-            </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">🔓 Liberar</button>
+            </form>
         </div>
     </div>
 
@@ -1224,649 +1355,38 @@
         <div class="notif-tags" id="notifTags"></div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="cerimonia" id="cerimoniaFechamento" role="dialog" aria-modal="true" aria-labelledby="fechamentoTitulo">
+        <button type="button" class="cerimonia-fechar" onclick="fecharCerimoniaFechamento()" aria-label="Fechar cerimônia">×</button>
+        <div class="cerimonia-painel">
+            <h2 id="fechamentoTitulo">Lacrando cápsulas</h2>
+            <p class="cerimonia-quando">As cartas continuam guardadas. Só fechamos a entrada de novas.</p>
+            <div class="avatares-voando" id="avataresFechamento"></div>
+            <div class="palavras-voando" id="nuvemFechamento"></div>
+            <div class="contador-valor" id="contadorFechamento">0</div>
+            <p>cápsulas neste evento</p>
+        </div>
+    </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
-            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
-            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
-            projectId: "capsuladotempo-f86bf",
-            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
-            messagingSenderId: "43014678980",
-            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
+    <div class="cerimonia" id="cerimoniaAbertura" role="dialog" aria-modal="true" aria-labelledby="aberturaTitulo">
+        <button type="button" class="cerimonia-fechar" onclick="fecharCerimoniaAbertura()" aria-label="Fechar cerimônia">×</button>
+        <div class="cerimonia-painel">
+            <h2 id="aberturaTitulo">Hora de abrir</h2>
+            <p class="cerimonia-quando" id="aberturaQuando"></p>
+            <div class="avatares-voando" id="avataresVoando"></div>
+            <div class="palavras-voando" id="palavrasVoando"></div>
+            <div class="stats-finais">
+                <div class="stat-item"><div class="stat-value" id="statCapsulas">0</div><div class="stat-label">Cápsulas</div></div>
+                <div class="stat-item"><div class="stat-value" id="statDesejos">0</div><div class="stat-label">Desejos</div></div>
+                <div class="stat-item"><div class="stat-value" id="statChars">0</div><div class="stat-label">Letras</div></div>
+            </div>
+            <button type="button" class="btn-primary" id="btnSeguirAbertura">Liberar cápsulas</button>
+        </div>
+    </div>
 
-        // Verificação inicial
-        console.log('🔥 Firebase inicializado');
-        console.log('🔐 Auth disponível:', !!auth);
-        
-        // Teste de conexão com Auth
-        function checkAuthStatus() {
-            const statusEl = document.getElementById('authStatus');
-            
-            auth.fetchSignInMethodsForEmail('teste@teste.com')
-                .then(() => {
-                    console.log('✅ Firebase Auth está ATIVADO!');
-                    statusEl.className = 'auth-status ok';
-                    statusEl.innerHTML = '✅ Firebase Auth conectado!';
-                    setTimeout(() => statusEl.style.display = 'none', 3000);
-                })
-                .catch(err => {
-                    if (err.code === 'auth/invalid-email' || err.code === 'auth/user-not-found') {
-                        console.log('✅ Firebase Auth está ATIVADO!');
-                        statusEl.className = 'auth-status ok';
-                        statusEl.innerHTML = '✅ Firebase Auth conectado!';
-                        setTimeout(() => statusEl.style.display = 'none', 3000);
-                    } else if (err.code === 'auth/operation-not-allowed' || err.code === 'auth/configuration-not-found') {
-                        console.error('❌ Firebase Auth NÃO está ativado!');
-                        statusEl.className = 'auth-status error';
-                        statusEl.innerHTML = '❌ ERRO: Firebase Auth não está ativado!<br><small>Vá no Firebase Console → Authentication → Sign-in method → Ative Email/Password</small>';
-                    } else {
-                        console.log('🔍 Status:', err.code);
-                        statusEl.className = 'auth-status ok';
-                        statusEl.innerHTML = '✅ Conectado';
-                        setTimeout(() => statusEl.style.display = 'none', 3000);
-                    }
-                });
-        }
-        
-        // Executar após DOM carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            createAtmosphere();
-            checkAuthStatus();
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-                }
-            });
-            
-            document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) overlay.classList.remove('active');
-                });
-            });
-        });
+    <div class="toast" id="toast" role="status"></div>
 
-        let currentUser = null;
-        let eventsData = {};
-        let capsulesData = {};
-        let previousCapsules = {};
-        let firstLoad = true;
-        let currentEventLink = '';
-        let capsuleToRelease = null;
-        let currentManagerEvent = null;
+    <script src="capsula-logica.js"></script>
+    <script src="painel.js"></script>
 
-        function createAtmosphere() {
-            const container = document.getElementById('atmosphere');
-            for (let i = 0; i < 60; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                const size = 1 + Math.random() * 2;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                star.style.animationDelay = Math.random() * 4 + 's';
-                star.style.animationDuration = (3 + Math.random() * 2) + 's';
-                container.appendChild(star);
-            }
-        }
-
-        function switchAuthTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
-            if (tab === 'login') {
-                document.querySelector('.auth-tab:first-child').classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.querySelector('.auth-tab:last-child').classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const error = document.getElementById('loginError');
-            
-            btn.disabled = true;
-            btn.textContent = 'Entrando...';
-            error.classList.remove('show');
-            
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            console.log('🔐 Tentando login com:', email);
-            
-            if (!email || !password) {
-                error.textContent = 'Preencha email e senha';
-                error.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Entrar';
-                return;
-            }
-            
-            try {
-                const result = await auth.signInWithEmailAndPassword(email, password);
-                console.log('✅ Login bem sucedido:', result.user.email);
-            } catch (err) {
-                console.error('❌ Erro no login:', err.code, err.message);
-                error.textContent = translateError(err.code);
-                error.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Entrar';
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            const btn = document.getElementById('registerBtn');
-            const error = document.getElementById('registerError');
-            
-            btn.disabled = true;
-            btn.textContent = 'Criando...';
-            error.classList.remove('show');
-            
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            
-            console.log('📝 Tentando registrar:', email, name);
-            
-            if (!name || !email || !password) {
-                error.textContent = 'Preencha todos os campos';
-                error.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Criar Conta';
-                return;
-            }
-            
-            if (password.length < 6) {
-                error.textContent = 'A senha deve ter pelo menos 6 caracteres';
-                error.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Criar Conta';
-                return;
-            }
-            
-            try {
-                console.log('🔄 Criando usuário no Firebase Auth...');
-                const result = await auth.createUserWithEmailAndPassword(email, password);
-                console.log('✅ Usuário criado:', result.user.uid);
-                
-                console.log('🔄 Salvando dados no Database...');
-                await database.ref(`operadores/${result.user.uid}`).set({
-                    nome: name,
-                    email: email,
-                    criadoEm: new Date().toISOString()
-                });
-                console.log('✅ Dados salvos no Database');
-                
-                console.log('🔄 Atualizando displayName...');
-                await result.user.updateProfile({ displayName: name });
-                console.log('✅ Registro completo!');
-                
-            } catch (err) {
-                console.error('❌ Erro no registro:', err.code, err.message);
-                error.textContent = translateError(err.code);
-                error.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Criar Conta';
-            }
-        }
-
-        function handleLogout() {
-            if (confirm('Deseja sair da conta?')) {
-                auth.signOut();
-            }
-        }
-
-        function translateError(code) {
-            const errors = {
-                'auth/email-already-in-use': 'Este email já está em uso',
-                'auth/invalid-email': 'Email inválido',
-                'auth/weak-password': 'A senha deve ter pelo menos 6 caracteres',
-                'auth/user-not-found': 'Usuário não encontrado',
-                'auth/wrong-password': 'Senha incorreta',
-                'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde',
-                'auth/invalid-credential': 'Email ou senha incorretos'
-            };
-            return errors[code] || 'Ocorreu um erro. Tente novamente.';
-        }
-
-        auth.onAuthStateChanged((user) => {
-            console.log('🔄 Estado de autenticação mudou:', user ? user.email : 'Nenhum usuário');
-            
-            if (user) {
-                currentUser = user;
-                console.log('👤 Usuário logado:', user.email, user.uid);
-                document.getElementById('authScreen').classList.add('hidden');
-                document.getElementById('app').classList.add('active');
-                document.getElementById('userName').textContent = user.displayName || user.email || 'Guardião';
-                document.getElementById('userAvatar').textContent = (user.displayName || user.email || 'G')[0].toUpperCase();
-                initializeApp();
-            } else {
-                currentUser = null;
-                console.log('🚪 Usuário deslogado');
-                document.getElementById('authScreen').classList.remove('hidden');
-                document.getElementById('app').classList.remove('active');
-                document.getElementById('loginForm').reset();
-                document.getElementById('registerForm').reset();
-                document.getElementById('loginBtn').disabled = false;
-                document.getElementById('loginBtn').textContent = 'Entrar';
-                document.getElementById('registerBtn').disabled = false;
-                document.getElementById('registerBtn').textContent = 'Criar Conta';
-                document.getElementById('loginError').classList.remove('show');
-                document.getElementById('registerError').classList.remove('show');
-            }
-        });
-
-        function initializeApp() {
-            const defaultDate = new Date();
-            defaultDate.setFullYear(defaultDate.getFullYear() + 1);
-            document.getElementById('eventDate').value = defaultDate.toISOString().split('T')[0];
-            
-            database.ref('eventos').orderByChild('operadorId').equalTo(currentUser.uid).on('value', (snapshot) => {
-                eventsData = snapshot.val() || {};
-                renderEvents();
-            });
-            
-            database.ref('capsulas').on('value', (snapshot) => {
-                const newCapsules = snapshot.val() || {};
-                
-                if (!firstLoad) {
-                    Object.entries(newCapsules).forEach(([id, cap]) => {
-                        if (!previousCapsules[id] && cap.nome && eventsData[cap.eventoId]) {
-                            showNotification(cap, 'lacrou');
-                        }
-                    });
-                }
-                
-                previousCapsules = JSON.parse(JSON.stringify(newCapsules));
-                capsulesData = newCapsules;
-                firstLoad = false;
-                
-                renderEvents();
-                
-                if (currentManagerEvent) {
-                    renderCapsuleManager(currentManagerEvent);
-                }
-            });
-        }
-
-        async function createEvent(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('eventName').value.trim();
-            const date = document.getElementById('eventDate').value;
-            
-            if (!name || !date) return;
-            
-            const eventId = 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            try {
-                await database.ref(`eventos/${eventId}`).set({
-                    nome: name,
-                    dataAbertura: date,
-                    operadorId: currentUser.uid,
-                    criadoEm: new Date().toISOString(),
-                    arquivado: false
-                });
-                
-                document.getElementById('eventName').value = '';
-                showToast('✨ Evento criado com sucesso!');
-                createConfetti();
-            } catch (err) {
-                showToast('Erro ao criar evento', 'error');
-                console.error(err);
-            }
-        }
-
-        function renderEvents() {
-            const grid = document.getElementById('eventsGrid');
-            const events = Object.entries(eventsData);
-            
-            if (events.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📦</div>
-                        <h3 class="empty-title">Nenhum evento ainda</h3>
-                        <p class="empty-text">Crie seu primeiro evento para começar a colecionar memórias!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            events.sort((a, b) => {
-                if (a[1].arquivado !== b[1].arquivado) return a[1].arquivado ? 1 : -1;
-                return new Date(b[1].criadoEm) - new Date(a[1].criadoEm);
-            });
-            
-            grid.innerHTML = events.map(([id, event]) => {
-                const capsules = Object.entries(capsulesData).filter(([, c]) => c.eventoId === id);
-                const released = capsules.filter(([, c]) => c.liberada).length;
-                const opened = capsules.filter(([, c]) => c.aberta).length;
-                const openDate = new Date(event.dataAbertura);
-                const canOpen = new Date() >= openDate;
-                
-                return `
-                    <div class="event-card ${event.arquivado ? 'archived' : ''}">
-                        <div class="event-header">
-                            <div class="event-status ${event.arquivado ? 'archived' : 'active'}">
-                                ${event.arquivado ? '📁 Arquivado' : '✨ Ativo'}
-                            </div>
-                            <h3 class="event-name">${event.nome}</h3>
-                            <div class="event-date">📅 Abre em ${formatDate(event.dataAbertura)}</div>
-                        </div>
-                        <div class="event-body">
-                            <div class="event-stats">
-                                <div class="stat-item">
-                                    <div class="stat-value">${capsules.length}</div>
-                                    <div class="stat-label">Cápsulas</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">${released}</div>
-                                    <div class="stat-label">Liberadas</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">${opened}</div>
-                                    <div class="stat-label">Abertas</div>
-                                </div>
-                            </div>
-                            ${capsules.length > 0 ? `
-                                <div class="event-participants">
-                                    ${capsules.slice(0, 5).map(([, c]) => `
-                                        <div class="participant-avatar">
-                                            ${c.foto ? `<img src="${c.foto}" alt="${c.nome}">` : c.nome[0]}
-                                        </div>
-                                    `).join('')}
-                                    ${capsules.length > 5 ? `<div class="participant-avatar participant-more">+${capsules.length - 5}</div>` : ''}
-                                </div>
-                            ` : ''}
-                            <div class="event-actions">
-                                <button class="event-btn qr" onclick="showQR('${id}')">📱 QR Code</button>
-                                <button class="event-btn manage" onclick="openManager('${id}')">⚙️ Gerenciar</button>
-                                ${canOpen && !event.arquivado ? `
-                                    <button class="event-btn open" onclick="archiveEvent('${id}')">🎊 Abrir Evento!</button>
-                                ` : !event.arquivado ? `
-                                    <button class="event-btn archive" onclick="archiveEvent('${id}')">📁 Arquivar</button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function showQR(eventId) {
-            const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-            currentEventLink = `${baseUrl}jogador.html?evento=${eventId}`;
-            
-            document.getElementById('qrCode').innerHTML = '';
-            new QRCode(document.getElementById('qrCode'), {
-                text: currentEventLink,
-                width: 200,
-                height: 200,
-                colorDark: '#000000',
-                colorLight: '#ffffff'
-            });
-            
-            document.getElementById('qrLink').textContent = currentEventLink;
-            document.getElementById('qrModal').classList.add('active');
-        }
-
-        function copyEventLink() {
-            navigator.clipboard.writeText(currentEventLink).then(() => {
-                showToast('📋 Link copiado!');
-            });
-        }
-
-        function openManager(eventId) {
-            currentManagerEvent = eventId;
-            renderCapsuleManager(eventId);
-            document.getElementById('managerModal').classList.add('active');
-        }
-
-        function renderCapsuleManager(eventId) {
-            const container = document.getElementById('capsuleManager');
-            const event = eventsData[eventId];
-            
-            if (!event) {
-                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Evento não encontrado</p>';
-                return;
-            }
-            
-            const capsules = Object.entries(capsulesData)
-                .filter(([, c]) => c.eventoId === eventId)
-                .map(([id, c]) => ({ id, ...c }));
-            
-            const total = capsules.length;
-            const released = capsules.filter(c => c.liberada).length;
-            const opened = capsules.filter(c => c.aberta).length;
-            
-            container.innerHTML = `
-                <div class="manager-header">
-                    <h2 class="manager-title">${event.nome}</h2>
-                    <p style="color: var(--text-secondary);">📅 Abertura: ${formatDate(event.dataAbertura)}</p>
-                    <div class="manager-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">${total}</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${released}</div>
-                            <div class="stat-label">Liberadas</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">${opened}</div>
-                            <div class="stat-label">Abertas</div>
-                        </div>
-                    </div>
-                    <div class="manager-actions">
-                        <button class="btn-primary" onclick="releaseAll('${eventId}')">🔓 Liberar Todas</button>
-                    </div>
-                </div>
-                ${capsules.length === 0 ? `
-                    <div class="empty-state" style="padding: 40px 0;">
-                        <div class="empty-icon">📭</div>
-                        <p class="empty-text">Nenhuma cápsula ainda</p>
-                    </div>
-                ` : `
-                    <div class="capsules-grid">
-                        ${capsules.map(cap => `
-                            <div class="capsule-card ${cap.aberta ? 'opened' : cap.liberada ? 'released' : ''}">
-                                <div class="capsule-photo">
-                                    ${cap.foto ? `<img src="${cap.foto}" alt="${cap.nome}">` : '👤'}
-                                </div>
-                                <div class="capsule-name">${cap.nome} ${cap.sobrenome || ''}</div>
-                                <div class="capsule-status ${cap.aberta ? 'opened' : cap.liberada ? 'released' : ''}">
-                                    ${cap.aberta ? '✅ Aberta' : cap.liberada ? '🔓 Liberada' : '🔒 Aguardando'}
-                                </div>
-                                ${cap.desejos && cap.desejos.length > 0 ? `
-                                    <div class="capsule-tags">
-                                        ${cap.desejos.slice(0, 3).map(d => `<span class="capsule-tag">${d}</span>`).join('')}
-                                    </div>
-                                ` : ''}
-                                ${cap.aberta ? `
-                                    <button class="capsule-btn view" onclick="viewCapsule('${cap.id}')">👁️ Ver</button>
-                                ` : `
-                                    <button class="capsule-btn release" onclick="requestRelease('${cap.id}')" ${cap.liberada ? 'disabled' : ''}>
-                                        ${cap.liberada ? '✅ Liberada' : '🔓 Liberar'}
-                                    </button>
-                                `}
-                            </div>
-                        `).join('')}
-                    </div>
-                `}
-            `;
-        }
-
-        function requestRelease(capsuleId) {
-            capsuleToRelease = capsuleId;
-            document.getElementById('releasePassword').value = '';
-            document.getElementById('passwordModal').classList.add('active');
-        }
-
-        async function confirmRelease() {
-            const password = document.getElementById('releasePassword').value;
-            
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, password);
-                await currentUser.reauthenticateWithCredential(credential);
-                await database.ref(`capsulas/${capsuleToRelease}/liberada`).set(true);
-                closeModal('passwordModal');
-                showToast('🔓 Cápsula liberada!');
-                createConfetti();
-            } catch (err) {
-                showToast('Senha incorreta', 'error');
-            }
-        }
-
-        async function releaseAll(eventId) {
-            const password = prompt('Digite sua senha para liberar todas as cápsulas:');
-            if (!password) return;
-            
-            try {
-                const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, password);
-                await currentUser.reauthenticateWithCredential(credential);
-                
-                const capsules = Object.entries(capsulesData).filter(([, c]) => c.eventoId === eventId && !c.liberada);
-                
-                for (const [id] of capsules) {
-                    await database.ref(`capsulas/${id}/liberada`).set(true);
-                }
-                
-                showToast(`🔓 ${capsules.length} cápsulas liberadas!`);
-                createConfetti();
-            } catch (err) {
-                showToast('Senha incorreta', 'error');
-            }
-        }
-
-        function viewCapsule(capsuleId) {
-            const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-            window.open(`${baseUrl}capsula.html?id=${capsuleId}`, '_blank');
-        }
-
-        async function archiveEvent(eventId) {
-            const event = eventsData[eventId];
-            const action = event.arquivado ? 'desarquivar' : 'arquivar';
-            
-            if (!confirm(`Deseja ${action} o evento "${event.nome}"?`)) return;
-            
-            try {
-                await database.ref(`eventos/${eventId}/arquivado`).set(!event.arquivado);
-                showToast(event.arquivado ? '📂 Evento reativado!' : '📁 Evento arquivado!');
-            } catch (err) {
-                showToast('Erro ao modificar evento', 'error');
-            }
-        }
-
-        function openSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('searchModal').classList.add('active');
-            setTimeout(() => document.getElementById('searchInput').focus(), 100);
-        }
-
-        function searchCapsules() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const results = document.getElementById('searchResults');
-            
-            if (query.length < 2) {
-                results.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Digite pelo menos 2 caracteres</p>';
-                return;
-            }
-            
-            const found = Object.entries(capsulesData)
-                .filter(([, c]) => {
-                    const name = `${c.nome} ${c.sobrenome || ''}`.toLowerCase();
-                    return name.includes(query) && eventsData[c.eventoId];
-                })
-                .slice(0, 10);
-            
-            if (found.length === 0) {
-                results.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma cápsula encontrada</p>';
-                return;
-            }
-            
-            results.innerHTML = found.map(([id, cap]) => {
-                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-                const link = `${baseUrl}capsula.html?id=${id}`;
-                
-                return `
-                    <div style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-card); border-radius: var(--radius-md); margin-bottom: 10px;">
-                        <div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, var(--gold-primary), var(--accent-warm)); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                            ${cap.foto ? `<img src="${cap.foto}" style="width: 100%; height: 100%; object-fit: cover;">` : cap.nome[0]}
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${cap.nome} ${cap.sobrenome || ''}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-muted);">${eventsData[cap.eventoId]?.nome || 'Evento'}</div>
-                        </div>
-                        <button class="btn-secondary" onclick="navigator.clipboard.writeText('${link}'); showToast('📋 Link copiado!');">📋</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function showNotification(capsule, action) {
-            const notif = document.getElementById('notification');
-            const photo = document.getElementById('notifPhoto');
-            const name = document.getElementById('notifName');
-            const actionEl = document.getElementById('notifAction');
-            const tags = document.getElementById('notifTags');
-            
-            photo.innerHTML = capsule.foto ? `<img src="${capsule.foto}" alt="${capsule.nome}">` : '👤';
-            name.textContent = `${capsule.nome} ${capsule.sobrenome || ''}`;
-            actionEl.textContent = action === 'lacrou' ? '✨ lacrou sua cápsula!' : '📬 abriu sua cápsula!';
-            tags.innerHTML = (capsule.desejos || []).slice(0, 5).map(d => `<span class="notif-tag">${d}</span>`).join('');
-            
-            notif.classList.add('active');
-            createConfetti();
-            
-            setTimeout(() => notif.classList.remove('active'), 6000);
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-            if (id === 'managerModal') currentManagerEvent = null;
-        }
-
-        function formatDate(dateStr) {
-            return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR');
-        }
-
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast show' + (type === 'error' ? ' error' : '');
-            setTimeout(() => toast.className = 'toast', 3000);
-        }
-
-        function createConfetti() {
-            const container = document.getElementById('confetti');
-            container.innerHTML = '';
-            const colors = ['#d4af37', '#f4d03f', '#e67e22', '#27ae60', '#fff', '#ff6b6b'];
-            
-            for (let i = 0; i < 100; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                container.appendChild(confetti);
-            }
-            
-            setTimeout(() => container.innerHTML = '', 5000);
-        }
-    </script>
 </body>
 </html>

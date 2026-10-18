@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⏳ Minha Cápsula do Tempo</title>
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⏳&lt;/text&gt;&lt;/svg&gt;">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -201,6 +202,7 @@
             50% { transform: scale(1.03); }
         }
 
+        #countdown[aria-live="polite"] { }
         .countdown {
             display: flex;
             justify-content: center;
@@ -274,7 +276,13 @@
             flex-shrink: 0;
         }
         
-        .foto-mini img { width: 100%; height: 100%; object-fit: cover; }
+        .foto-mini { display: flex; }
+        .foto-mini img, .foto-mini .foto-fallback { width: 100%; height: 100%; object-fit: cover; }
+        #secaoAudio[hidden], #btnTentar[hidden] { display: none !important; }
+        button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--gold-light);
+            outline-offset: 2px;
+        }
         
         .info-header h2 { font-size: 1.5rem; color: var(--gold-light); }
         .info-header p { font-size: 0.95rem; color: var(--text-secondary); margin-top: 4px; }
@@ -645,6 +653,7 @@
             <div class="foto-lacrada" id="fotoLacrada">⏳</div>
             <h2 class="nome-lacrada" id="nomeLacrada">Carregando...</h2>
             <p class="evento-lacrada" id="eventoLacrada">Cápsula do Tempo</p>
+            <p class="evento-lacrada" id="quandoAbre"></p>
             
             <div class="capsula-3d">
                 <div class="capsula-corpo"></div>
@@ -655,7 +664,7 @@
             
             <div class="status-badge status-lacrada" id="statusBadge">🔒 LACRADA</div>
             
-            <div class="countdown" id="countdown">
+            <div class="countdown" id="countdown" aria-live="polite">
                 <div class="countdown-item"><div class="countdown-value" id="dias">--</div><div class="countdown-label">DIAS</div></div>
                 <div class="countdown-item"><div class="countdown-value" id="horas">--</div><div class="countdown-label">HORAS</div></div>
                 <div class="countdown-item"><div class="countdown-value" id="mins">--</div><div class="countdown-label">MIN</div></div>
@@ -668,7 +677,7 @@
 
         <div class="tela tela-aberta" id="telaAberta">
             <div class="header-aberta">
-                <div class="foto-mini" id="fotoMini"><img src="" alt=""></div>
+                <div class="foto-mini" id="fotoMini"></div>
                 <div class="info-header">
                     <h2 id="nomeAberta">Nome</h2>
                     <p id="eventoAberta">Cápsula do Tempo</p>
@@ -685,7 +694,7 @@
                 <div class="secao-conteudo" id="pessoasContainer">-</div>
             </div>
             
-            <div class="secao" id="secaoAudio" style="display:none">
+            <div class="secao" id="secaoAudio" hidden>
                 <div class="secao-titulo">🎤 Mensagem de Voz</div>
                 <div class="audio-player">
                     <div class="audio-header">
@@ -695,7 +704,8 @@
                             <p>Ouça o que você gravou</p>
                         </div>
                     </div>
-                    <audio id="audioElement" controls style="width:100%"></audio>
+                    <audio id="audioElement" controls preload="metadata" style="width:100%"></audio>
+                    <p id="audioStatus" class="msg-aguarde"></p>
                 </div>
             </div>
             
@@ -728,8 +738,9 @@
 
         <div class="tela tela-erro" id="telaErro">
             <div class="erro-icon">😕</div>
-            <h2 style="color: var(--gold-light); margin-bottom: 12px;">Cápsula não encontrada</h2>
-            <p style="color: var(--text-secondary);">O link pode estar incorreto.</p>
+            <h2 id="erroTitulo" style="color: var(--gold-light); margin-bottom: 12px;">Cápsula não encontrada</h2>
+            <p id="erroTexto" style="color: var(--text-secondary);">O link pode estar incorreto.</p>
+            <button type="button" class="btn-abrir" id="btnTentar" hidden onclick="location.reload()">Tentar de novo</button>
         </div>
     </div>
 
@@ -739,266 +750,8 @@
     <div class="flash" id="flash"></div>
     <div class="toast" id="toast"></div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
-            authDomain: "capsuladotempo-f86bf.firebaseapp.com",
-            databaseURL: "https://capsuladotempo-f86bf-default-rtdb.firebaseio.com",
-            projectId: "capsuladotempo-f86bf",
-            storageBucket: "capsuladotempo-f86bf.firebasestorage.app",
-            messagingSenderId: "43014678980",
-            appId: "1:43014678980:web:0c84f48037ee6924afdc91"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    <script src="capsula-logica.js"></script>
+    <script src="capsula-pagina.js"></script>
 
-        let capsulaId = null, capsulaData = null, eventoData = null;
-        let countdownInterval = null;
-
-        function criarEstrelas() {
-            const c = document.getElementById('atmosphere');
-            for (let i = 0; i < 50; i++) {
-                const s = document.createElement('div');
-                s.className = 'star';
-                s.style.left = Math.random() * 100 + '%';
-                s.style.top = Math.random() * 100 + '%';
-                const sz = 1 + Math.random() * 2;
-                s.style.width = sz + 'px';
-                s.style.height = sz + 'px';
-                s.style.animationDelay = Math.random() * 4 + 's';
-                c.appendChild(s);
-            }
-        }
-
-        function criarConfetes() {
-            const c = document.getElementById('confetes');
-            c.innerHTML = '';
-            const cores = ['#d4af37', '#f4d03f', '#e67e22', '#27ae60', '#fff', '#ff6b6b'];
-            for (let i = 0; i < 100; i++) {
-                const cf = document.createElement('div');
-                cf.className = 'confete';
-                cf.style.left = Math.random() * 100 + 'vw';
-                cf.style.background = cores[Math.floor(Math.random() * cores.length)];
-                cf.style.animationDelay = Math.random() * 2 + 's';
-                const sz = 5 + Math.random() * 10;
-                cf.style.width = sz + 'px';
-                cf.style.height = sz + 'px';
-                cf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                c.appendChild(cf);
-            }
-        }
-
-        function mostrarTela(id) {
-            document.querySelectorAll('.tela').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function formatarData(d) { return new Date(d).toLocaleDateString('pt-BR'); }
-
-        function mostrarToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast show';
-            setTimeout(() => t.className = 'toast', 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            criarEstrelas();
-            const params = new URLSearchParams(window.location.search);
-            capsulaId = params.get('id');
-            if (!capsulaId) { mostrarTela('telaErro'); return; }
-            
-            try {
-                const snap = await database.ref(`capsulas/${capsulaId}`).once('value');
-                capsulaData = snap.val();
-                if (!capsulaData) { mostrarTela('telaErro'); return; }
-                
-                const evtSnap = await database.ref(`eventos/${capsulaData.eventoId}`).once('value');
-                eventoData = evtSnap.val();
-                
-                preencherTelaLacrada();
-                verificarStatus();
-                
-            } catch (err) {
-                console.error(err);
-                mostrarTela('telaErro');
-            }
-        });
-
-        function preencherTelaLacrada() {
-            const foto = document.getElementById('fotoLacrada');
-            if (capsulaData.foto) {
-                foto.innerHTML = `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`;
-            }
-            document.getElementById('nomeLacrada').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
-            document.getElementById('eventoLacrada').textContent = eventoData?.nome || 'Cápsula do Tempo';
-        }
-
-        function verificarStatus() {
-            const dataAbertura = new Date(eventoData?.dataAbertura + 'T00:00:00');
-            const agora = new Date();
-            const podeAbrir = capsulaData.liberada || agora >= dataAbertura;
-            
-            if (capsulaData.aberta) {
-                mostrarConteudo();
-                return;
-            }
-            
-            if (podeAbrir) {
-                document.getElementById('statusBadge').textContent = '✨ PRONTA PARA ABRIR!';
-                document.getElementById('statusBadge').className = 'status-badge status-liberada';
-                document.getElementById('capsulaLacre').textContent = '✨';
-                document.getElementById('btnAbrir').disabled = false;
-                document.getElementById('btnAbrir').textContent = '🎉 ABRIR CÁPSULA!';
-                document.getElementById('msgAguarde').textContent = 'Sua cápsula está pronta para ser aberta!';
-                document.getElementById('countdown').style.display = 'none';
-            } else {
-                iniciarCountdown(dataAbertura);
-            }
-        }
-
-        function iniciarCountdown(dataAlvo) {
-            function atualizar() {
-                const agora = new Date();
-                const diff = dataAlvo - agora;
-                
-                if (diff <= 0) {
-                    clearInterval(countdownInterval);
-                    verificarStatus();
-                    return;
-                }
-                
-                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const segs = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                document.getElementById('dias').textContent = dias.toString().padStart(2, '0');
-                document.getElementById('horas').textContent = horas.toString().padStart(2, '0');
-                document.getElementById('mins').textContent = mins.toString().padStart(2, '0');
-                document.getElementById('segs').textContent = segs.toString().padStart(2, '0');
-            }
-            
-            atualizar();
-            countdownInterval = setInterval(atualizar, 1000);
-        }
-
-        async function abrirCapsula() {
-            const overlay = document.getElementById('aberturaOverlay');
-            const capsula = document.getElementById('aberturaCapsula');
-            const flash = document.getElementById('flash');
-            
-            overlay.classList.add('active');
-            
-            await new Promise(r => setTimeout(r, 500));
-            
-            for (let i = 0; i < 3; i++) {
-                capsula.classList.add('shake');
-                await new Promise(r => setTimeout(r, 500));
-                capsula.classList.remove('shake');
-                await new Promise(r => setTimeout(r, 200));
-            }
-            
-            capsula.classList.add('explode');
-            flash.classList.add('active');
-            
-            await new Promise(r => setTimeout(r, 800));
-            
-            try {
-                await database.ref(`capsulas/${capsulaId}/aberta`).set(true);
-                await database.ref(`capsulas/${capsulaId}/abertaEm`).set(new Date().toISOString());
-            } catch (err) { console.error(err); }
-            
-            overlay.classList.remove('active');
-            flash.classList.remove('active');
-            capsula.classList.remove('explode');
-            
-            mostrarConteudo();
-            criarConfetes();
-        }
-
-        function mostrarConteudo() {
-            mostrarTela('telaAberta');
-            
-            if (capsulaData.foto) {
-                document.getElementById('fotoMini').innerHTML = `<img src="${capsulaData.foto}" alt="${capsulaData.nome}">`;
-            }
-            
-            document.getElementById('nomeAberta').textContent = `${capsulaData.nome} ${capsulaData.sobrenome || ''}`;
-            document.getElementById('eventoAberta').textContent = eventoData?.nome || 'Cápsula do Tempo';
-            
-            const desejosContainer = document.getElementById('desejosContainer');
-            if (capsulaData.desejos?.length > 0) {
-                desejosContainer.innerHTML = capsulaData.desejos.map(d => `<span class="tag-item">${d}</span>`).join('');
-            } else {
-                desejosContainer.innerHTML = '<span style="color: var(--text-muted)">Nenhuma prioridade selecionada</span>';
-            }
-            
-            const pessoasContainer = document.getElementById('pessoasContainer');
-            pessoasContainer.textContent = capsulaData.pessoas?.length > 0 ? capsulaData.pessoas.join(', ') : '-';
-            
-            if (capsulaData.audio) {
-                document.getElementById('secaoAudio').style.display = 'block';
-                document.getElementById('audioElement').src = capsulaData.audio;
-            }
-            
-            const perguntasContainer = document.getElementById('perguntasContainer');
-            const perguntas = capsulaData.perguntas || {};
-            let perguntasHTML = '';
-            
-            if (perguntas.conquista) {
-                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">🎯 O que achava que iria conquistar:</div><div class="pergunta-resposta">${perguntas.conquista}</div></div>`;
-            }
-            if (perguntas.momento) {
-                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">✨ Momento mais marcante:</div><div class="pergunta-resposta">${perguntas.momento}</div></div>`;
-            }
-            if (perguntas.palavra) {
-                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">📝 Palavra que me definia:</div><div class="pergunta-resposta" style="font-size:1.3rem;color:var(--gold-primary);font-weight:600;">"${perguntas.palavra}"</div></div>`;
-            }
-            if (perguntas.felicidade) {
-                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">😊 Nível de felicidade:</div><div class="felicidade-display"><span class="felicidade-nota">${perguntas.felicidade}</span><div class="felicidade-barra"><div class="felicidade-fill" style="width:${perguntas.felicidade * 10}%"></div></div></div></div>`;
-            }
-            if (perguntas.previsao) {
-                perguntasHTML += `<div class="pergunta-item"><div class="pergunta-label">🔮 Minha previsão:</div><div class="pergunta-resposta">${perguntas.previsao}</div></div>`;
-            }
-            
-            perguntasContainer.innerHTML = perguntasHTML || '<p style="color: var(--text-muted)">Nenhuma reflexão registrada</p>';
-            
-            document.getElementById('mensagemTexto').textContent = capsulaData.mensagem || '-';
-            
-            if (capsulaData.reflexao) {
-                document.getElementById('reflexaoForm').style.display = 'none';
-                document.getElementById('reflexaoSalva').style.display = 'block';
-                document.getElementById('reflexaoTexto').textContent = capsulaData.reflexao;
-            }
-        }
-
-        async function salvarReflexao() {
-            const texto = document.getElementById('reflexaoInput').value.trim();
-            if (!texto) { mostrarToast('Escreva algo primeiro!'); return; }
-            
-            try {
-                await database.ref(`capsulas/${capsulaId}/reflexao`).set(texto);
-                document.getElementById('reflexaoForm').style.display = 'none';
-                document.getElementById('reflexaoSalva').style.display = 'block';
-                document.getElementById('reflexaoTexto').textContent = texto;
-                mostrarToast('✅ Reflexão salva!');
-            } catch (err) {
-                mostrarToast('Erro ao salvar');
-            }
-        }
-
-        function compartilhar() {
-            const texto = `⏳ Acabei de abrir minha Cápsula do Tempo!\n\n${eventoData?.nome || 'Cápsula do Tempo'}\n\nFoi incrível relembrar minhas previsões e desejos!`;
-            
-            if (navigator.share) {
-                navigator.share({ title: 'Cápsula do Tempo', text: texto, url: window.location.href });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                mostrarToast('🔗 Link copiado!');
-            }
-        }
-    </script>
 </body>
 </html>
