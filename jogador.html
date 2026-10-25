@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⏳ Criar Cápsula do Tempo</title>
+    <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⏳&lt;/text&gt;&lt;/svg&gt;">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -994,6 +995,13 @@
         
         .toast.error { background: var(--accent-danger); }
 
+        button:focus-visible, input:focus-visible, textarea:focus-visible, .tag:focus-visible, .pessoa-card:focus-visible, .escala-num:focus-visible {
+            outline: 2px solid var(--gold-light);
+            outline-offset: 2px;
+        }
+        .tag, .pessoa-card, .escala-num, button { touch-action: manipulation; }
+        .form-group input, .form-group textarea, .pergunta-box input, .pergunta-box textarea { font-size: 16px; }
+
         @media (max-width: 400px) {
             .container { padding: 16px; }
             .header-tela h2 { font-size: 1.5rem; }
@@ -1246,8 +1254,8 @@
 
         <div class="tela tela-erro" id="telaErro">
             <div class="erro-icon">😕</div>
-            <h2 style="color: var(--gold-light); margin-bottom: 12px;">Evento não encontrado</h2>
-            <p class="erro-msg">O link pode estar incorreto ou o evento foi encerrado.</p>
+            <h2 id="erroTitulo" style="color: var(--gold-light); margin-bottom: 12px;">Evento não encontrado</h2>
+            <p class="erro-msg" id="erroTexto">O link pode estar incorreto ou o evento foi encerrado.</p>
         </div>
     </div>
 
@@ -1278,6 +1286,7 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="capsula-logica.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyB2cNiBL1SU_QfjH_S_QGv_KSiFoocfqd4",
@@ -1289,9 +1298,13 @@
             appId: "1:43014678980:web:0c84f48037ee6924afdc91"
         };
         
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const storage = firebase.storage();
+        let database = null;
+        let storage = null;
+        if (!CapsulaLogica.ehEnsaio() && typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            storage = firebase.storage();
+        }
 
         let eventoId = null, eventoData = null, capsulaId = null;
         let fotoBase64 = null, audioBase64 = null;
@@ -1341,7 +1354,26 @@
 
         function voltarPara(id) { mostrarTela(id); }
 
-        function formatarData(d) { return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR'); }
+        function formatarData(d) { return CapsulaLogica.formatarDataBR(d); }
+
+        function mostrarErroEvento(titulo, texto) {
+            document.getElementById('erroTitulo').textContent = titulo;
+            document.getElementById('erroTexto').textContent = texto;
+            mostrarTela('telaErro');
+        }
+
+        function prepararToque() {
+            document.querySelectorAll('.tag, .pessoa-card, .escala-num').forEach((el) => {
+                el.setAttribute('role', 'button');
+                el.tabIndex = 0;
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        el.click();
+                    }
+                });
+            });
+        }
         
         function gerarID(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); }
 
@@ -1353,22 +1385,67 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            CapsulaLogica.injetarEstiloBase();
             criarEstrelas();
+            prepararToque();
+            if (CapsulaLogica.ehEnsaio()) {
+                CapsulaLogica.montarBannerEnsaio({
+                    onSimular() {
+                        CapsulaLogica.definirAgoraSimulado('2026-12-25T15:00:01.000Z');
+                        location.reload();
+                    },
+                    onLimpar() {
+                        CapsulaLogica.limparEnsaio();
+                        location.reload();
+                    }
+                });
+                const dados = CapsulaLogica.dadosEnsaio();
+                eventoId = new URLSearchParams(window.location.search).get('evento') || 'evt_ensaio_novo';
+                eventoData = dados.eventos[eventoId] || dados.eventos.evt_ensaio_novo;
+                if (eventoData.arquivado) {
+                    mostrarErroEvento('Evento já lacrado', 'As cápsulas deste ensaio já foram guardadas. Cada pessoa abre a sua pelo link individual.');
+                    return;
+                }
+                document.getElementById('nomeEvento').textContent = eventoData.nome;
+                document.getElementById('dataEvento').textContent = formatarData(eventoData.dataAbertura);
+                return;
+            }
             const params = new URLSearchParams(window.location.search);
             eventoId = params.get('evento');
-            if (!eventoId) { mostrarTela('telaErro'); return; }
+            if (!eventoId) {
+                mostrarErroEvento('Evento não encontrado', 'O link precisa identificar o evento.');
+                return;
+            }
             try {
                 const snap = await database.ref(`eventos/${eventoId}`).once('value');
                 eventoData = snap.val();
-                if (!eventoData || eventoData.arquivado) { mostrarTela('telaErro'); return; }
+                if (!eventoData) {
+                    mostrarErroEvento('Evento não encontrado', 'O link pode estar incorreto.');
+                    return;
+                }
+                if (eventoData.arquivado) {
+                    mostrarErroEvento('Evento já lacrado', 'As cápsulas de 2025 continuam guardadas. Cada pessoa abre a sua pelo link individual, na data combinada.');
+                    return;
+                }
                 document.getElementById('nomeEvento').textContent = eventoData.nome;
                 document.getElementById('dataEvento').textContent = formatarData(eventoData.dataAbertura);
-            } catch (err) { mostrarTela('telaErro'); }
+            } catch (err) {
+                mostrarErroEvento('Não foi possível carregar', 'Verifique a internet e tente de novo. Nenhuma cápsula foi alterada.');
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            fecharCamera();
+            if (mediaRecorder?.state === 'recording') mediaRecorder.stop();
         });
 
         function iniciar() { mostrarTela('telaCadastro'); }
 
         async function abrirCamera() {
+            if (!navigator.mediaDevices?.getUserMedia) {
+                mostrarToast('Este navegador não abre a câmera. Use a galeria.', 'error');
+                return;
+            }
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
                 document.getElementById('cameraVideo').srcObject = cameraStream;
@@ -1438,6 +1515,7 @@
             const nome = document.getElementById('nome').value.trim();
             const sobrenome = document.getElementById('sobrenome').value.trim();
             if (!nome || !sobrenome) { mostrarToast('Preencha nome e sobrenome', 'error'); return; }
+            fecharCamera();
             mostrarTela('telaDesejos');
         }
 
@@ -1480,6 +1558,10 @@
 
         async function toggleGravacao() {
             const btn = document.getElementById('btnGravar');
+            if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+                mostrarToast('Este navegador não grava áudio. Você pode pular esta etapa.', 'error');
+                return;
+            }
             if (!mediaRecorder || mediaRecorder.state === 'inactive') {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
@@ -1571,20 +1653,35 @@
 
             try {
                 capsulaId = gerarID('cap');
-                let fotoUrl = null, audioUrl = null;
+                let fotoUrl = null;
+                let audioUrl = null;
+                let avisoFoto = false;
 
-                if (fotoBase64) {
-                    const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
-                    const fotoBlob = await (await fetch(fotoBase64)).blob();
-                    await fotoRef.put(fotoBlob, { contentType: 'image/jpeg' });
-                    fotoUrl = await fotoRef.getDownloadURL();
+                if (fotoBase64 && !CapsulaLogica.ehEnsaio()) {
+                    try {
+                        const fotoRef = storage.ref(`capsulas/${capsulaId}/foto.jpg`);
+                        const fotoBlob = await (await fetch(fotoBase64)).blob();
+                        await fotoRef.put(fotoBlob, { contentType: 'image/jpeg' });
+                        fotoUrl = await fotoRef.getDownloadURL();
+                    } catch (erroFoto) {
+                        console.error(erroFoto);
+                        avisoFoto = true;
+                        if (fotoBase64.length <= 450000) fotoUrl = fotoBase64;
+                    }
+                } else if (fotoBase64) {
+                    fotoUrl = fotoBase64;
                 }
 
-                if (audioBase64 && audioConfirmadoFlag) {
-                    const audioRef = storage.ref(`capsulas/${capsulaId}/audio`);
-                    const audioBlob = await (await fetch(audioBase64)).blob();
-                    await audioRef.put(audioBlob);
-                    audioUrl = await audioRef.getDownloadURL();
+                if (audioBase64 && audioConfirmadoFlag && !CapsulaLogica.ehEnsaio()) {
+                    try {
+                        const audioBlob = await (await fetch(audioBase64)).blob();
+                        const ext = (audioBlob.type || '').includes('mp4') ? 'm4a' : 'webm';
+                        const audioRef = storage.ref(`capsulas/${capsulaId}/audio.${ext}`);
+                        await audioRef.put(audioBlob, { contentType: audioBlob.type || 'audio/webm' });
+                        audioUrl = await audioRef.getDownloadURL();
+                    } catch (erroAudio) {
+                        console.error(erroAudio);
+                    }
                 }
 
                 const capsula = {
@@ -1592,32 +1689,50 @@
                     nome,
                     sobrenome,
                     foto: fotoUrl,
-                    audio: audioUrl,
-                    desejos: desejosSelecionados,
-                    pessoas: pessoasSelecionadas,
-                    perguntas: { conquista, momento, palavra, felicidade: notaFelicidade, previsao },
-                    mensagem,
-                    criadaEm: new Date().toISOString(),
+                    desejos: desejosSelecionados.slice(),
+                    pessoas: pessoasSelecionadas.slice(),
+                    perguntas: { conquista, momento, palavra, previsao, felicidade: notaFelicidade },
+                    audioUrl,
+                    audioBase64: audioConfirmadoFlag ? audioBase64 : null,
+                    mensagemPessoal: mensagem,
+                    dataCriacao: new Date().toISOString(),
+                    dataAbertura: eventoData.dataAbertura,
                     liberada: false,
                     aberta: false
                 };
 
-                await database.ref(`capsulas/${capsulaId}`).set(capsula);
+                if (CapsulaLogica.ehEnsaio()) {
+                    CapsulaLogica.marcarEnsaioCapsula(capsulaId, capsula);
+                } else {
+                    await database.ref(`capsulas/${capsulaId}`).set(capsula);
+                }
 
                 document.getElementById('loading').classList.remove('active');
                 
                 const sf = document.getElementById('sucessoFoto');
-                sf.innerHTML = fotoUrl ? `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;">` : '⏳';
+                sf.replaceChildren();
+                if (fotoUrl || fotoBase64) {
+                    const img = document.createElement('img');
+                    img.src = fotoUrl || fotoBase64;
+                    img.alt = nome;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    sf.appendChild(img);
+                } else {
+                    sf.textContent = '⏳';
+                }
                 document.getElementById('sucessoNome').textContent = `${nome}, sua cápsula está lacrada!`;
                 document.getElementById('sucessoData').textContent = formatarData(eventoData.dataAbertura);
                 
-                const dias = Math.ceil((new Date(eventoData.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
-                document.getElementById('sucessoDias').textContent = dias > 0 ? dias : 0;
+                const dias = Math.max(0, CapsulaLogica.diasAte(eventoData.dataAbertura, new Date()) ?? 0);
+                document.getElementById('sucessoDias').textContent = dias;
                 
-                linkCapsula = window.location.origin + window.location.pathname.replace('jogador.html', '') + `capsula.html?id=${capsulaId}`;
+                linkCapsula = CapsulaLogica.linkPagina('capsula.html', CapsulaLogica.ehEnsaio() ? { id: capsulaId, ensaio: '1' } : { id: capsulaId });
                 
                 mostrarTela('telaSucesso');
                 criarConfetes();
+                if (avisoFoto && !fotoUrl) mostrarToast('A carta foi guardada, mas a foto não coube porque o armazenamento está indisponível.', 'error');
 
             } catch (err) {
                 console.error(err);
@@ -1711,7 +1826,7 @@
             ctx.font = '18px sans-serif';
             ctx.fillText(`📅 Abre em: ${formatarData(eventoData?.dataAbertura)}`, w / 2, 760);
 
-            const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
+            const dias = Math.max(0, CapsulaLogica.diasAte(eventoData?.dataAbertura, new Date()) ?? 0);
             ctx.fillStyle = '#d4af37';
             ctx.font = 'bold 48px sans-serif';
             ctx.fillText(`${dias} DIAS`, w / 2, 830);
@@ -1745,7 +1860,7 @@
                 const tempCtx = tempCanvas.getContext('2d');
                 const nome = document.getElementById('nome').value;
                 const dataAbertura = formatarData(eventoData?.dataAbertura);
-                const dias = Math.ceil((new Date(eventoData?.dataAbertura) - new Date()) / (1000 * 60 * 60 * 24));
+                const dias = Math.max(0, CapsulaLogica.diasAte(eventoData?.dataAbertura, new Date()) ?? 0);
                 
                 let fotoImg = null;
                 if (fotoBase64) {

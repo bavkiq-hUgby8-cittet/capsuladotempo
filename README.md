@@ -1,194 +1,71 @@
-# 🎁 Cápsula do Tempo - Sistema Completo
+# Cápsula do Tempo
 
-Sistema interativo para criar cápsulas do tempo em eventos como Natal e Ano Novo. Os participantes guardam memórias, desejos, áudios e mensagens para abrir no futuro!
+A família Veloso guardou cartas, prioridades e mensagens de voz no Natal de 2025. Cada pessoa abre a própria cápsula em **25/12/2026 às 12:00, horário de Brasília**.
 
-## ✨ Novas Funcionalidades
+O site publicado é o GitHub Pages: [bavkiq-hugby8-cittet.github.io/capsuladotempo](https://bavkiq-hugby8-cittet.github.io/capsuladotempo/).
 
-### 🎤 Gravação de Áudio
-- Grave uma mensagem de voz para seu eu do futuro
-- Limite de 60 segundos
-- Preview antes de confirmar
-- Pode pular se preferir
+## O que cada página faz
 
-### 💭 Perguntas Reflexivas
-- **O que você acha que vai conquistar?** - Ex: "Falar inglês fluente"
-- **Momento mais marcante do ano** - Memórias importantes
-- **Uma palavra que define seu momento** - Para nuvem de palavras
-- **Nota de felicidade (1-10)** - Comparar com o futuro
-- **Uma previsão para o ano que vem** - Ver se acertou!
+| Arquivo | Uso |
+| --- | --- |
+| `index.html` | Painel do guardião: cerimônia, liberação e links |
+| `jogador.html` | Criar uma cápsula nova, em 6 passos |
+| `capsula.html` | Abrir a cápsula de uma pessoa |
 
-### 👥 Pessoas Importantes
-Escolha quem você quer se dedicar mais:
-- 👨‍👩‍👧‍👦 Família
-- 👯 Amigos
-- 💑 Parceiro(a)
-- 👶 Filhos
-- 💼 Colegas
-- 🪞 Eu mesmo
+Os dados ficam no Firebase Realtime Database do projeto `capsuladotempo-f86bf`. Este site não apaga cartas, fotos nem áudios. Liberar uma cápsula só grava `liberada: true`. Abrir só grava `aberta: true` e o horário da visualização.
 
-### 🌟 Desejos (24 opções)
-**Vida Pessoal:** Saúde, Família, Romance, Amizades, Paz interior, Felicidade
+## Data de abertura
 
-**Conquistas:** Viajar, Carreira, Estudos, Promoção, Negócio próprio, Casa própria
+A data **não está fixa no código**. Ela foi gravada em dezembro de 2025 em cada evento e em cada cápsula:
 
-**Financeiro:** Economizar, Investir, Quitar dívidas, Carro novo, Renda extra
+- Evento da família: `Natal 2025 Veloso`
+- Id: `evt_1766622258729_6n25ck4jk`
+- Valor: `2026-12-25T15:00:00.000Z`
+- Na tela: **25/12/2026 às 12:00 (Brasília)**
 
-**Bem-estar:** Exercícios, Meditação, Terapia, Hobby novo, Menos stress, Ler mais, Dormir melhor
+O nome continua "Natal 2025" porque foi o Natal em que as cápsulas foram lacradas. A abertura é no Natal de 2026.
 
----
+Para mudar o horário, altere o campo `dataAbertura` do evento **e** o mesmo campo em cada cápsula, no [console do Realtime Database](https://console.firebase.google.com/). Não use só a data `2026-12-25` sem horário: o painel novo grava meio-dia de Brasília. Não apague os outros campos.
 
-## 📁 Arquivos
+Há também eventos de teste (`tal`, `Acqua Bella 2025`, `teste`), com outras datas de dezembro de 2026. O da família é o que tem as cápsulas do dia 25/12/2025.
 
-| Arquivo | Descrição |
-|---------|-----------|
-| `index.html` | Painel do Guardião/Operador |
-| `jogador.html` | Interface do Participante (6 passos) |
-| `capsula.html` | Visualização da Cápsula |
+## Como abrir no Natal
 
----
+1. O guardião entra no painel com a senha da família (a mesma de 2025, em `painel.js`).
+2. No evento lacrado, toca em **Cerimônia de abertura**. A animação não muda os dados.
+3. Em seguida pode **Liberar** cada cápsula, ou todas de uma vez. Isso só tira a trava.
+4. Cada pessoa abre o próprio link (`capsula.html?id=...`).
 
-## 🚀 Como Usar
+Mesmo sem a liberação manual, o botão **Abrir cápsula** é habilitado sozinho quando o relógio passa de 25/12/2026 às 12:00 em Brasília. Antes disso, a cápsula mostra a contagem regressiva.
 
-### Deploy no GitHub Pages
+Uma cápsula que já foi aberta mostra o conteúdo de novo, sem gravar por cima.
 
-1. Crie um repositório no GitHub
-2. Faça upload dos 3 arquivos HTML
-3. Vá em **Settings** → **Pages**
-4. Selecione **Branch: main** → **Save**
-5. Aguarde 2 minutos e acesse: `seu-usuario.github.io/nome-do-repo`
+## Formato guardado em 2025
 
-### Fluxo do Evento
+O repositório irmão `capsuladotempo2` é a versão que a família usou para lacrar. Este repositório tinha sido reescrito depois e não lia mais esses campos. Agora os dois formatos funcionam:
 
-1. **Operador** cria evento no painel → QR Code gerado
-2. **Participantes** escaneiam QR → Criam cápsula em 6 passos
-3. Cada lacramento aparece **animado com confetes** no painel
-4. **Operador** clica "🔒 Lacrar" → Cerimônia de Fechamento
-5. Quando chegar a data, **Operador** clica "🎊 Abrir!" → Cerimônia de Abertura (20s)
-6. **Operador** libera cápsulas (senha: `otacilia`)
-7. **Participantes** abrem suas cápsulas pelo link
+- carta em `mensagemPessoal` (e também `mensagem`, se existir)
+- áudio em `audioBase64`, com reserva em `audioUrl`
+- foto na URL `foto`
+- data em `dataAbertura` / `dataCriacao`
 
----
+Cápsulas novas são salvas nesse mesmo formato. O áudio fica na cápsula mesmo se o Storage falhar.
 
-## 🎬 Animações
+## Ensaio, sem mexer na família
 
-### Notificação de Nova Cápsula
-- Foto circular 200px com zoom + rotação
-- Nome em dourado com glow
-- Tags de desejos
-- 150 confetes coloridos
-- Auto-fecha em 6 segundos
+Abra `index.html?ensaio=1`. O banner laranja usa só dados fictícios, no navegador. Dá para simular 25/12/2026 às 12:00 e percorrer a cerimônia e a abertura. Nada disso é enviado ao Firebase.
 
-### Cerimônia de Fechamento
-- Avatares em círculo flutuando
-- Nuvem de palavras (top 10 desejos)
-- Contador animado
-- Confetes
+## Segredos e pendências
 
-### Cerimônia de Abertura (20s)
-- Avatares voando estilo Mario Party
-- Palavras subindo na tela
-- Stats finais (cápsulas, desejos, caracteres)
+- A chave `apiKey` do Firebase nos HTML é chave de site. Ela não é uma senha de administrador, mas o banco está aberto para leitura e escrita. Qualquer pessoa com o endereço consegue ler as cartas. Vale revisar as regras no console antes do Natal, sem bloquear a leitura da página.
+- A senha do guardião está no código (`painel.js`). Ela só esconde o painel; não protege o banco.
+- As **fotos** estão no Firebase Storage e, em outubro de 2026, a cobrança desse projeto estava desativada. As URLs respondem `402`. As cartas e os áudios gravados dentro da cápsula continuam no Realtime Database. Para as fotos voltarem, reative a cobrança do projeto `capsuladotempo-f86bf` no Google Cloud. Não é preciso reenviar os arquivos.
+- Links antigos podem apontar para `/capsuladotempo2/`. O id da cápsula é o mesmo; se alguém guardar o link antigo, aquele site ainda é o de 2025. Os links novos deste site usam `/capsuladotempo/`.
 
-### Abertura da Cápsula
-- Shake 3 vezes
-- Explosão
-- Flash branco
-- Confetes
+## Teste automático
 
----
-
-## 🔐 Configurações
-
-### Senha do Guardião
-A senha padrão é `otacilia`. Para alterar, edite no `index.html`:
-```javascript
-const SENHA_GUARDIAO = 'sua-nova-senha';
+```bash
+node --test test/logica.test.mjs
 ```
 
-### Firebase
-O projeto usa Firebase já configurado. Para usar seu próprio:
-
-1. Crie projeto em [console.firebase.google.com](https://console.firebase.google.com)
-2. Ative **Realtime Database** e **Storage**
-3. Configure as regras:
-```json
-{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}
-```
-4. Substitua `firebaseConfig` nos 3 arquivos
-
----
-
-## 📱 Experiência do Participante (6 Passos)
-
-1. **📸 Quem é você?** - Foto e nome
-2. **🌟 Seus desejos** - Selecionar até 10 tags
-3. **👥 Pessoas importantes** - Quem se dedicar
-4. **💭 Reflexões** - Perguntas sobre o momento atual
-5. **🎤 Mensagem de voz** - Gravar áudio (opcional)
-6. **💌 Carta para o futuro** - Mensagem escrita
-
----
-
-## 📊 Dados Salvos
-
-```json
-{
-  "nome": "João",
-  "sobrenome": "Silva",
-  "foto": "https://...",
-  "desejos": ["Saúde", "Viajar", "Paz interior"],
-  "pessoas": ["Família", "Amigos"],
-  "perguntas": {
-    "conquista": "Falar inglês fluente",
-    "momento": "Nascimento do filho",
-    "palavra": "Gratidão",
-    "felicidade": 8,
-    "previsao": "Vou mudar de emprego"
-  },
-  "audio": "https://...",
-  "mensagemPessoal": "Querido eu do futuro...",
-  "dataCriacao": "2024-12-25T10:00:00Z",
-  "dataAbertura": "2025-12-25T12:00:00Z",
-  "liberada": false,
-  "aberta": false,
-  "reflexao": null
-}
-```
-
----
-
-## 🎨 Tecnologias
-
-- **Firebase** - Realtime Database + Storage
-- **QRCode.js** - Geração de QR codes
-- **Web Audio API** - Gravação de áudio
-- **CSS Animations** - Todas as animações
-- **Google Fonts** - Pacifico, Poppins, Orbitron
-
----
-
-## 💡 Dicas de Uso
-
-1. **Teste antes** - Crie um evento de teste para validar
-2. **Conexão estável** - Garanta boa internet para upload de fotos/áudios
-3. **Backup dos links** - Use a busca por nome para recuperar links perdidos
-4. **Cerimônia coletiva** - Projete o painel em uma TV durante a abertura
-5. **Liberação gradual** - Libere uma cápsula por vez para mais emoção!
-
----
-
-## 📞 Suporte
-
-Problemas comuns:
-- **Página não atualiza**: Limpe o cache (Ctrl+Shift+R)
-- **Erro no Firebase**: Verifique as regras do Realtime Database
-- **Áudio não grava**: Permita acesso ao microfone no navegador
-
----
-
-Feito com ❤️ para momentos especiais 🎄✨
+`test/verificar-dados.mjs` só lê o Firebase e imprime contagens e a data, sem o texto das cartas.
